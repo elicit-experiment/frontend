@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+.idea/workspace.xml
+.idea/
+
+.vs/
+
+.DS_Store
+Thumbs.db

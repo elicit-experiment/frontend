@@ -1,0 +1,30 @@
+﻿<div class="TextFormat container-fluid">
+	<h2>Text Format</h2>
+	<p>Modify the text below to see the result of the text format.</p>
+	<div class="row">
+		<div class="col-xs-7">
+			<b>Input: </b>
+			<textarea class="form-control" data-bind="textInput: Input"></textarea>
+			<br/>
+			<img width="" />
+			<b>Output:</b>
+			<p data-bind="html: Output"></p>
+		</div>
+		<div class="col-xs-5">
+			<table class="table table-striped">
+				<thead>
+				<tr>
+					<td>Code</td>
+					<td>Result</td>
+				</tr>
+				</thead>
+				<tbody data-bind="foreach: Examples">
+				<tr>
+					<td data-bind="html: Result"></td>
+					<td><code data-bind="text: Code"></code></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
