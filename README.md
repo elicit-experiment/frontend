@@ -1,2 +1,2 @@
-# Cockpit.Experiments.Web
-Web interface for the cockput experiments
+# Cockpit Experiments
+Web interface for the cockpit experiments
