@@ -1,0 +1,14 @@
+{
+  "ambientDependencies": {
+    "bootstrap": "registry:dt/bootstrap#3.3.5+20160316155526",
+    "crossroads": "registry:dt/crossroads#0.0.0+20160317120654",
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "js-signals": "registry:dt/js-signals#0.0.0+20160316155526",
+    "knockout": "registry:dt/knockout#0.0.0+20160428162840",
+    "require": "registry:dt/require#2.1.20+20160316155526"
+  },
+  "dependencies": {
+    "PortalClient": "file:lib/Portal/PortalClient.d.ts",
+    "analytics": "file:lib/GoogleAnalytics/analytics.d.ts"
+  }
+}
