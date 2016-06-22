@@ -2,7 +2,7 @@
 import Navigation = require("Managers/Navigation/Navigation");
 import NavigationPage = require("Managers/Navigation/NavigationPage");
 import TextFormatter = require("Managers/TextFormatter");
-import ExperimentManager = require("Managers/Experiment");
+import ExperimentManager = require("Managers/Portal/Experiment");
 
 class Shell
 {

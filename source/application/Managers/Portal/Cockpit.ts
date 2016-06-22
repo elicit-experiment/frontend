@@ -6,17 +6,17 @@ export class Experiment
 	public static Get(id: string, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null):CHAOS.Portal.Client.ICallState<CockpitResults<IExperiment>>
 	{
 		if (serviceCaller == null)
-			serviceCaller = CHAOS.Portal.Client.ServiceCallerService.GetDefaultCaller();
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Experiment/Get", CHAOS.Portal.Client.HttpMethod.Get, { id: id }, false);
+		return serviceCaller.CallService("Experiment/Get", PortalClient.HttpMethod.Get, { id: id }, false);
 	}
 
 	public static Next(listId: string, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CockpitResults<IExperimentClaim>>
 	{
 		if (serviceCaller == null)
-			serviceCaller = CHAOS.Portal.Client.ServiceCallerService.GetDefaultCaller();
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Experiment/Next", CHAOS.Portal.Client.HttpMethod.Get, { listId: listId }, false);
+		return serviceCaller.CallService("Experiment/Next", PortalClient.HttpMethod.Get, { listId: listId }, false);
 	}
 }
 
@@ -25,9 +25,9 @@ export class Slide
 	public static Completed(questionaireId: string, slideIndex: number, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CockpitResults<any>>
 	{
 		if (serviceCaller == null)
-			serviceCaller = CHAOS.Portal.Client.ServiceCallerService.GetDefaultCaller();
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Slide/Completed", CHAOS.Portal.Client.HttpMethod.Get, { questionaireId: questionaireId, slideIndex: slideIndex }, false);
+		return serviceCaller.CallService("Slide/Completed", PortalClient.HttpMethod.Get, { questionaireId: questionaireId, slideIndex: slideIndex }, false);
 	}
 }
 
@@ -36,9 +36,9 @@ export class Question
 	public static Get(id: string, index: number, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CockpitResults<IQuestion>>
 	{
 		if (serviceCaller == null)
-			serviceCaller = CHAOS.Portal.Client.ServiceCallerService.GetDefaultCaller();
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Question/Get", CHAOS.Portal.Client.HttpMethod.Get, { id: id, index: index}, false, "json3");
+		return serviceCaller.CallService("Question/Get", PortalClient.HttpMethod.Get, { id: id, index: index}, false, "json3");
 	}
 }
 
@@ -47,9 +47,9 @@ export class Answer
 	public static Set(questionId: string, output: any, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CHAOS.Portal.Client.IPagedPortalResult<any>>
 	{
 		if (serviceCaller == null)
-			serviceCaller = CHAOS.Portal.Client.ServiceCallerService.GetDefaultCaller();
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Answer/Set", CHAOS.Portal.Client.HttpMethod.Post, { questionId: questionId, output: JSON.stringify(output) }, false);
+		return serviceCaller.CallService("Answer/Set", PortalClient.HttpMethod.Post, { questionId: questionId, output: JSON.stringify(output) }, false);
 	}
 }
 

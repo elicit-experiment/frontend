@@ -1,4 +1,4 @@
-﻿import ExperimentManager = require("Managers/Experiment");
+﻿import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 

@@ -1,12 +1,14 @@
 ﻿import knockout = require("knockout");
+import Portal = require("Managers/Portal/Portal");
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import Navigation = require("Managers/Navigation/Navigation");
 import Title = require("Managers/Title");
 import Notification = require("Managers/Notification");
 import CallRepeater = require("Managers/CallRepeater");
 import CallQueue = require("Managers/CallQueue");
+import DisposableComponent = require("Components/DisposableComponent");
 
-class Experiment
+class Experiment extends DisposableComponent
 {
 	public IsReady: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
@@ -35,6 +37,7 @@ class Experiment
 
 	constructor()
 	{
+		super();
 		this.StyleSheet.subscribe(path =>
 		{
 			if (this._styleSheetElement != null)
@@ -62,6 +65,7 @@ class Experiment
 		{
 			if (id != null) this.LoadNext(id);
 		});
+
 		if (Navigation.ExperimentId() != null)
 			this.Load(Navigation.ExperimentId());
 		else if (Navigation.ExperimentListId() != null)
@@ -80,33 +84,35 @@ class Experiment
 		this.IsReady(false);
 		this._hasLoadedCurrentSlide = false;
 
-		CockpitPortal.Experiment.Get(this._id).WithCallback(response =>
-		{
-			if (response.Error != null)
+		this.AddAction(Portal.IsReady, () => {
+			CockpitPortal.Experiment.Get(this._id).WithCallback(response =>
 			{
-				Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
-				Navigation.Navigate(`ExperimentNotFound/${id}`);
-				return;
-			}
-			if (response.Body.Results.length === 0)
-			{
-				Navigation.Navigate(`ExperimentNotFound/${id}`);
-				Notification.Error("No Experiment data retuened");
-				return;
-			}
+				if (response.Error != null)
+				{
+					Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
+					Navigation.Navigate(`ExperimentNotFound/${id}`);
+					return;
+				}
+				if (response.Body.Results.length === 0)
+				{
+					Navigation.Navigate(`ExperimentNotFound/${id}`);
+					Notification.Error("No Experiment data retuened");
+					return;
+				}
 
-			var config = response.Body.Results[0];
+				var config = response.Body.Results[0];
 
-			this.Title(config.Name);
-			this.CloseSlidesEnabled(config.LockQuestion);
-			this.GoToPreviousSlideEnabled(config.EnablePrevious);
-			this.FooterLabel(config.FooterLabel);
-			this.CurrentSlideIndex(config.CurrentSlideIndex);
-			this.IsExperimentCompleted(false);
-			this.StyleSheet(config.Css);
-			this.CompletedUrl(config.RedirectOnCloseUrl);
+				this.Title(config.Name);
+				this.CloseSlidesEnabled(config.LockQuestion);
+				this.GoToPreviousSlideEnabled(config.EnablePrevious);
+				this.FooterLabel(config.FooterLabel);
+				this.CurrentSlideIndex(config.CurrentSlideIndex);
+				this.IsExperimentCompleted(false);
+				this.StyleSheet(config.Css);
+				this.CompletedUrl(config.RedirectOnCloseUrl);
 
-			this.IsReady(true);
+				this.IsReady(true);
+			});
 		});
 	}
 

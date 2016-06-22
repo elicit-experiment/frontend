@@ -1,5 +1,5 @@
 ﻿import knockout = require("knockout");
-import ExperimentManager = require("Managers/Experiment");
+import ExperimentManager = require("Managers/Portal/Experiment");
 import SlideModel = require("Models/Slide");
 
 class SlideShell

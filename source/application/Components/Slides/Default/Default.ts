@@ -1,7 +1,7 @@
 ﻿import knockout = require("knockout");
 import SlideModel = require("Models/Slide");
 import QuestionModel = require("Models/Question");
-import ExperimentManager = require("Managers/Experiment");
+import ExperimentManager = require("Managers/Portal/Experiment");
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import NameConventionLoader = require("Components/NameConventionLoader");
 
