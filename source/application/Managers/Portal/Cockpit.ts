@@ -1,12 +1,5 @@
-﻿import Portal = require("Portal");
+﻿import PortalClient = require("PortalClient");
 import Configuration = require("Managers/Configuration");
-
-export var Client:CHAOS.Portal.Client.IPortalClient;
-
-function Initialize():void
-{
-	Client = Portal.Initialize(Configuration.PortalPath);
-}
 
 export class Experiment
 {
@@ -108,5 +101,3 @@ export interface IQuestionEvent
 	Data: string;
 	DateTime:Date;
 }
-
-Initialize();

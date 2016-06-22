@@ -10,7 +10,7 @@
 /// <reference path="../../TypeScriptDefinitions/routie.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/videojs.d.ts" />
 
-declare module "Portal" { export = CHAOS.Portal.Client }
+declare module "PortalClient" { export = CHAOS.Portal.Client }
 declare var CacheBuster: number;
 declare module "text!../../configuration.json" { var configuration: string; export = configuration; }
 
@@ -21,7 +21,7 @@ requirejs.config({
 		routie: "../lib/Routie/routie.min",
 		knockout: "../lib/knockout/knockout",
 		bootstrap: "../lib/bootstrap/js/bootstrap.min",
-		Portal: "../lib/PortalClient/PortalClient.min",
+		PortalClient: "../lib/PortalClient/PortalClient.min",
 		Highcharts: "../lib/Highcharts/highcharts",
 		HighchartsMore: "../lib/Highcharts/highcharts-more",
 		HighChartsDraggablePoints: "../lib/Highcharts/draggable-points/draggable-points",
@@ -57,7 +57,7 @@ requirejs.config({
 		HighChartsCrossingSpecificValue: {
 			deps: ["jquery", "Highcharts", "HighchartsMore"]
 		},
-		Portal: {
+		PortalClient: {
 			exports: "CHAOS.Portal.Client"
 		},
 		"crypto-js": {

@@ -2,7 +2,7 @@
 import SlideModel = require("Models/Slide");
 import QuestionModel = require("Models/Question");
 import ExperimentManager = require("Managers/Experiment");
-import CockpitPortal = require("CockpitPortal");
+import CockpitPortal = require("Managers/Portal/Cockpit");
 import NameConventionLoader = require("Components/NameConventionLoader");
 
 class Default

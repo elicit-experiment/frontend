@@ -1,5 +1,5 @@
 ﻿import knockout = require("knockout");
-import CockpitPortal = require("CockpitPortal");
+import CockpitPortal = require("Managers/Portal/Cockpit");
 
 class Slide
 {

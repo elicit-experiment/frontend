@@ -1,5 +1,5 @@
 ﻿import knockout = require("knockout");
-import CockpitPortal = require("CockpitPortal");
+import CockpitPortal = require("Managers/Portal/Cockpit");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
 import TextFormatter = require("Managers/TextFormatter");

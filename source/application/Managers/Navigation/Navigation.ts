@@ -1,6 +1,6 @@
 ﻿import knockout = require("knockout");
 import Routie = require("routie");
-import NavigationPage = require("Managers/NavigationPage");
+import NavigationPage = require("Managers/Navigation/NavigationPage");
 import Title = require("Managers/Title");
 
 class Navigation

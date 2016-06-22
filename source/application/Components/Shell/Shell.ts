@@ -1,6 +1,6 @@
 ﻿import knockout = require("knockout");
-import Navigation = require("Managers/Navigation");
-import NavigationPage = require("Managers/NavigationPage");
+import Navigation = require("Managers/Navigation/Navigation");
+import NavigationPage = require("Managers/Navigation/NavigationPage");
 import TextFormatter = require("Managers/TextFormatter");
 import ExperimentManager = require("Managers/Experiment");
 
