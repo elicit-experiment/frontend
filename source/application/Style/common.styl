@@ -1,0 +1,40 @@
+.Rotating {
+	-webkit-animation: Rotating 1s linear 0s infinite;
+	animation: Rotating 1s linear 0s infinite;
+}
+
+@keyframes Rotating {
+	from { transform: rotate(0); }
+	to { transform: rotate(359deg); }
+}
+
+@-webkit-keyframes Rotating {
+	from { transform: rotate(0); }
+	to { transform: rotate(359deg); }
+}
+
+.Tiny {
+	font-size: 50%;
+}
+
+.Small {
+	font-size: 80%;
+}
+
+.Large {
+	font-size: 130%;
+}
+
+label {
+	font-weight: normal !important;
+}
+
+label.disabled {
+	cursor: not-allowed;
+	opacity: 0.65;
+}
+
+label.btn.disabled {
+	pointer-events: all;
+	background-position: 0 !important;
+}

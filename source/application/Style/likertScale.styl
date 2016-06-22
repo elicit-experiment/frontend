@@ -1,0 +1,35 @@
+.LikertScale
+	.Scale 
+		margin 0 auto
+		display table
+		min-width 50%
+
+		> label
+			position relative
+			display table-cell
+
+			> input 
+				position relative
+				display inline-block
+				margin-left auto
+				margin-right auto
+
+			> spanlast-child 
+				width 100%
+				display inline-block
+
+		.Line
+			position absolute
+			top 10px
+			left 0
+			height 1px
+			width 100%
+			border-top 1px solid grey
+
+		labelfirst-child .Line 
+			left 50%
+			width 50%
+		
+		labellast-child .Line 
+			width 50%
+			display inline-block

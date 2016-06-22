@@ -64,7 +64,7 @@ requirejs.config({
 			exports: "CryptoJS"
 		}
 	},
-	deps: ["Main", "bootstrap", "css!Style/Default", "KnockoutBindings/KnockoutBindings"],
+	deps: ["Main", "bootstrap", "css!Style/default", "KnockoutBindings/KnockoutBindings"],
 	waitSeconds: 20,
 	urlArgs: "bust=" + CacheBuster
 });

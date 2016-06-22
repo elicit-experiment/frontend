@@ -1,0 +1,45 @@
+.QuestionHeader {
+	text-align: center;
+}
+
+.Highlight .DoesNotHaveValidAnswer {
+	-webkit-animation: Highlight 3s;
+	animation: Highlight 3s;
+}
+
+@keyframes Highlight {
+	10% { background: orange; }
+	100% { background: none; }
+}
+
+@-webkit-keyframes Highlight {
+	10% { background: orange; }
+	100% { background: none; }
+}
+
+.SingleLineLeft {
+	display: block;
+	text-align: left;
+}
+
+.SingleLineRight {
+	display: block;
+	text-align: right;
+}
+
+.SingleLineCenter {
+	display: block;
+	text-align: center;
+}
+
+.SingleLineJustify {
+	display: block;
+	text-align: justify;
+	height: 1em;
+	line-height: 1;
+}
+.SingleLineJustify:after {
+	content: "";
+	display: inline-block;
+	width: 100%;
+}
