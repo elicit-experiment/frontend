@@ -1,11 +1,11 @@
 ﻿import Portal = require("Portal");
-import Configuration = require("Configuration");
+import Configuration = require("Managers/Configuration");
 
 export var Client:CHAOS.Portal.Client.IPortalClient;
 
 function Initialize():void
 {
-	Client = CHAOS.Portal.Client.Initialize(Configuration.PortalPath);
+	Client = Portal.Initialize(Configuration.PortalPath);
 }
 
 export class Experiment

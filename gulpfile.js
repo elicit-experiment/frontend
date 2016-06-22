@@ -28,7 +28,7 @@ var config = {
 	distPath: "./dist/",
 	dependenciesPath: "lib/",
 	externalDependenciesPath: "./dependencies/",
-	servePort: 5502,
+	servePort: 5504,
 	typeScript: {
 		noImplicitAny: true,
 		module: "amd",

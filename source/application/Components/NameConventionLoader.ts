@@ -1,23 +1,8 @@
-﻿import knockout = require("knockout");
-
-class NameConventionLoader implements KnockoutComponentLoader
+﻿class NameConventionLoader implements KnockoutComponentTypes.Loader
 {
-	private _prefix: string;
-
-	constructor(prefix:string)
+	public getConfig(componentName:string, callback:(result:KnockoutComponentTypes.ComponentConfig) => void):void
 	{
-		this._prefix = prefix;
-	}
-
-	public getConfig(componentName:string, callback:(result:KnockoutComponentConfig) => void):void
-	{
-		if (componentName.indexOf(this._prefix + "-") != 0)
-			componentName = this._prefix + "-" + componentName;
-
-		knockout.components.register(componentName, {});
-
-		var filePath = componentName.replace(this._prefix + "-", "").replace("-", "/");
-		filePath = NameConventionLoader.GetFilePath(filePath);
+		var filePath = NameConventionLoader.GetFilePath(componentName);
 
 		callback({
 			viewModel: { require: filePath },
@@ -25,9 +10,9 @@ class NameConventionLoader implements KnockoutComponentLoader
 		});
 	}
 
-	public static GetFilePath(name:string):string
+	public static GetFilePath(name: string): string
 	{
-		var filePath = name + (name.lastIndexOf("/") == -1 ? "/" + name : name.substring(name.lastIndexOf("/")));
+		var filePath = name + (name.lastIndexOf("/") === -1 ? `/${name}` : name.substring(name.lastIndexOf("/")));
 
 		return "Components/" + filePath;
 	}
