@@ -1,44 +1,34 @@
-.KAcPS .Scale {
-	margin: 0 auto;
-	display: table;
-	min-width: 50%;
-}
+.KAcPS .Scale 
+	margin 0 auto
+	display table
+	min-width 50%
 
-.KAcPS .Scale .Item {
-	display: table-cell;
-	height: 50px;
-	padding: 5px;
-	text-align: center;
-}
+	input[type="radio"]
+		display none
 
-.KAcPS .Scale .Item > div > button {
-	display: block;
-	margin: 0 auto;
-}
+	input[type="radio"]+label .glyphicon
+		display none
 
-.KAcPS .Scale input[type="radio"]  {
-	display: none;
-}
+	input[type="radio"]checked+label .glyphicon
+		display inline
 
-.KAcPS .Scale .Item > label {
-	margin-top: 10px;
-	min-width: 50px;
-	vertical-align: bottom;
-}
+	.Item
+		display table-cell
+		height 50px
+		padding 5px
+		text-align center
 
-.KAcPS .Scale .Item > .Filler {
-	visibility: hidden;
-}
+		> div > button
+			display block
+			margin 0 auto
 
-.KAcPS .Scale .Item > .Stimulus~label {
+		> label
+			margin-top 10px
+			min-width 50px
+			vertical-align bottom
 
-	margin-top: 10px;
-}
+		> .Filler
+			visibility hidden
 
-.KAcPS .Scale input[type="radio"]+label .glyphicon  {
-	display: none;
-}
-
-.KAcPS .Scale input[type="radio"]:checked+label .glyphicon  {
-	display: inline;
-}
+		> .Stimulus~label
+			margin-top 10px
