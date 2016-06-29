@@ -7,9 +7,15 @@ import Notification = require("Managers/Notification");
 import CallRepeater = require("Managers/CallRepeater");
 import CallQueue = require("Managers/CallQueue");
 import DisposableComponent = require("Components/DisposableComponent");
+import TestExperiment = require("Managers/Portal/TestExperiment");
 
 class Experiment extends DisposableComponent
 {
+	private static TestId = "test";
+
+	public get IsTestExperiment():boolean { return this._id === Experiment.TestId; }
+	private _testExperiment:TestExperiment;
+
 	public IsReady: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
 	public CurrentSlideIndex: KnockoutObservable<number> = knockout.observable(0);
@@ -57,6 +63,7 @@ class Experiment extends DisposableComponent
 		this.CloseExperimentEnabled = knockout.computed(() => this.CompletedUrl() != null);
 		this._callQueue = new CallQueue(true);
 
+
 		Navigation.ExperimentId.subscribe(id =>
 		{
 			if(id != null) this.Load(id);
@@ -84,36 +91,55 @@ class Experiment extends DisposableComponent
 		this.IsReady(false);
 		this._hasLoadedCurrentSlide = false;
 
-		this.AddAction(Portal.IsReady, () => {
-			CockpitPortal.Experiment.Get(this._id).WithCallback(response =>
-			{
-				if (response.Error != null)
+		if(!this.IsTestExperiment)
+		{
+			this.AddAction(Portal.IsReady, () => {
+				CockpitPortal.Experiment.Get(this._id).WithCallback(response =>
 				{
-					Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
-					Navigation.Navigate(`ExperimentNotFound/${id}`);
-					return;
-				}
-				if (response.Body.Results.length === 0)
-				{
-					Navigation.Navigate(`ExperimentNotFound/${id}`);
-					Notification.Error("No Experiment data retuened");
-					return;
-				}
+					if (response.Error != null)
+					{
+						Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
+						Navigation.Navigate(`ExperimentNotFound/${id}`);
+						return;
+					}
+					if (response.Body.Results.length === 0)
+					{
+						Navigation.Navigate(`ExperimentNotFound/${id}`);
+						Notification.Error("No Experiment data returned");
+						return;
+					}
 
-				var config = response.Body.Results[0];
+					var config = response.Body.Results[0];
 
-				this.Title(config.Name);
-				this.CloseSlidesEnabled(config.LockQuestion);
-				this.GoToPreviousSlideEnabled(config.EnablePrevious);
-				this.FooterLabel(config.FooterLabel);
-				this.CurrentSlideIndex(config.CurrentSlideIndex);
-				this.IsExperimentCompleted(false);
-				this.StyleSheet(config.Css);
-				this.CompletedUrl(config.RedirectOnCloseUrl);
+					this.Title(config.Name);
+					this.CloseSlidesEnabled(config.LockQuestion);
+					this.GoToPreviousSlideEnabled(config.EnablePrevious);
+					this.FooterLabel(config.FooterLabel);
+					this.CurrentSlideIndex(config.CurrentSlideIndex);
+					this.IsExperimentCompleted(false);
+					this.StyleSheet(config.Css);
+					this.CompletedUrl(config.RedirectOnCloseUrl);
 
-				this.IsReady(true);
+					this.IsReady(true);
+				});
 			});
-		});
+		}
+		else
+		{
+			this._testExperiment = new TestExperiment();
+			Notification.Debug("Loading test experiment");
+
+			this.Title("Test Experiment");
+			this.CloseSlidesEnabled(false);
+			this.GoToPreviousSlideEnabled(true);
+			this.FooterLabel("Test experiment");
+			this.CurrentSlideIndex(0);
+			this.IsExperimentCompleted(false);
+			this.StyleSheet(null);
+			this.CompletedUrl(null);
+
+			this.IsReady(true);
+		}
 	}
 
 	public LoadNext(listId:string):void
@@ -155,62 +181,89 @@ class Experiment extends DisposableComponent
 
 	private LoadSlide(index: number, callback: (slideIndex:number, questions: CockpitPortal.IQuestion[]) => void): void
 	{
-		CockpitPortal.Question.Get(this._id, index).WithCallback(response =>
+		if(!this.IsTestExperiment) {
+			CockpitPortal.Question.Get(this._id, index).WithCallback(response => {
+				if (response.Error != null) {
+					if (response.Error.Fullname === "Chaos.Cockpit.Core.Core.Exceptions.SlideLockedException")
+						Navigation.Navigate("SlideLocked");
+					else if (response.Error.Message === "No Questionaire found by that Id")
+						Navigation.Navigate(`ExperimentNotFound/${this._id}`);
+					else
+						Notification.Error(`Failed to get slide: ${response.Error.Message}`);
+
+					return;
+				}
+
+				if (response.Body.Count === 0) {
+					Notification.Error("No slide returned");
+					return;
+				}
+
+				this.NumberOfSlides(response.Body.FoundCount);
+
+				this._hasLoadedCurrentSlide = true;
+				this.CurrentSlideIndex(index);
+
+				callback(index, response.Body.Results);
+			});
+		}
+		else
 		{
-			if (response.Error != null)
-			{
-				if (response.Error.Fullname === "Chaos.Cockpit.Core.Core.Exceptions.SlideLockedException")
-					Navigation.Navigate("SlideLocked");
-				else if (response.Error.Message === "No Questionaire found by that Id")
-					Navigation.Navigate(`ExperimentNotFound/${this._id}`);
-				else
-					Notification.Error(`Failed to get slide: ${response.Error.Message}`);
+			setTimeout(() => {
+				Notification.Debug("Loading test slide: " + index);
 
-				return;
-			}
+				this.NumberOfSlides(this._testExperiment.Slides.length);
+				this._hasLoadedCurrentSlide = true;
+				this.CurrentSlideIndex(index);
 
-			if (response.Body.Count === 0)
-			{
-				Notification.Error("No slide returned");
-				return;
-			}
-
-			this.NumberOfSlides(response.Body.FoundCount);
-
-			this._hasLoadedCurrentSlide = true;
-			this.CurrentSlideIndex(index);
-
-			callback(index, response.Body.Results);
-		});
+				callback(index, this._testExperiment.Slides[index]);
+			}, 100);
+		}
 	}
 
 	public SaveQuestionAnswer(id: string, answer: any, callback: (success:boolean) => void): void
 	{
 		this._callQueue.Queue(id, new CallRepeater((c) =>
 		{
-			CockpitPortal.Answer.Set(id, answer).WithCallback(response =>
+			if(!this.IsTestExperiment)
 			{
-				if (response.Error != null)
+				CockpitPortal.Answer.Set(id, answer).WithCallback(response =>
 				{
-					if (response.Error.Fullname !== "Chaos.Cockpit.Core.Core.Exceptions.ValidationException")
+					if (response.Error != null)
 					{
-						c(false, false);
-						Notification.Error(`Failed to save answer: ${response.Error.Message}`);
+						if (response.Error.Fullname !== "Chaos.Cockpit.Core.Core.Exceptions.ValidationException")
+						{
+							c(false, false);
+							Notification.Error(`Failed to save answer: ${response.Error.Message}`);
+						} else
+							c(false, true);
 					} else
-						c(false, true);
-				} else
+						c(true, false);
+				});
+			}
+			else
+			{
+				setTimeout(() => {
+					Notification.Debug("Saving test answer: " + id + "\n" + JSON.stringify(answer));
 					c(true, false);
-			});
+				}, 100)
+			}
+
 		}, callback));
 	}
 
 	public CloseSlide(index: number): void
 	{
-		CockpitPortal.Slide.Completed(this._id, index).WithCallback(response =>
+		if(!this.IsTestExperiment) {
+			CockpitPortal.Slide.Completed(this._id, index).WithCallback(response => {
+				if (response.Error != null)
+					Notification.Error(`Failed to close slide: ${response.Error.Message}`);
+			});
+		}
+		else
 		{
-			if (response.Error != null)
-				Notification.Error(`Failed to close slide: ${response.Error.Message}`);
-		});
+			Notification.Debug("Closing test slide: " + index);
+		}
 	}
 
 	public Close():any
