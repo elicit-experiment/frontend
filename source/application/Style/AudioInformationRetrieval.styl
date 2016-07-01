@@ -1,5 +1,26 @@
 @require "flex"
 
-.AudioInformationRetrieval
+borderColor = black;
+
+.audioInformationRetrieval
 	DisplayFlex()
 	FlexColumn()
+	.timeLineContainer
+		DisplayFlex()
+		FlexColumn()
+		.timeLine
+			DisplayFlex()
+			FlexColumn()
+			FlexStretchChildren()
+			border 1px solid borderColor;
+			height 400px
+			.channel
+				DisplayFlex()
+				FlexStretchChildren()
+				border-bottom  1px solid borderColor;
+				.header
+					FlexStatic()
+					width 200px
+					border-right 1px solid borderColor;
+				.segments
+					FlexStretch()

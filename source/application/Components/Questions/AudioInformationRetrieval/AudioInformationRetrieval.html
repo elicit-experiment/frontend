@@ -1,11 +1,23 @@
-<div class="AudioInformationRetrieval">
+<div class="audioInformationRetrieval">
 	<div>
-		<input class="form-control" type="text" />
+		<h3 data-bind="text: SearchViewHeader"></h3>
+		<input class="form-control" type="text"/>
+		<button type="button" class="btn btn-primary" data-bind="text: SearchViewButtonLabel, click: Search"></button>
 	</div>
 	<div>
 		results
 	</div>
-	<div>
-		timeline
+	<div class="timeLineContainer">
+		<h3>Selected title</h3>
+		<div class="timeLine" data-bind="foreach: Channels">
+			<div class="channel">
+				<div class="header">
+					<h4 data-bind="text: Title"></h4>
+				</div>
+				<div class="segments">
+
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

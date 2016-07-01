@@ -42,7 +42,7 @@ class TestExperiment
 	{
 		return this.CreateQuestion(new Date().getTime().toString(), type, [
 			{"Events": events},
-			{"Instruments": instruments}
+			{"Instrument": instruments}
 		]);
 	}
 
