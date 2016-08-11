@@ -36,7 +36,25 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	{
 		return {
 			Title: title,
-			Segments: []
+			Segments: this.CreateSegments()
+		};
+	}
+	
+	public CreateSegments():Segment[] {
+		var segments:Segment[] = [];
+
+		for (let i = 0; i < 1000; i++)
+			segments.push(this.CreateSegment("Segment " + i, i * 80, 0));
+
+		return segments;
+	}
+
+	private CreateSegment(title:string, start:number, end:number)
+	{
+		return {
+			Title: title,
+			Start: start,
+			End: end
 		};
 	}
 }

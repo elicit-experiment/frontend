@@ -12,15 +12,24 @@ borderColor = black;
 			DisplayFlex()
 			FlexColumn()
 			FlexStretchChildren()
-			border 1px solid borderColor;
+			border 1px solid borderColor
 			height 400px
 			.channel
 				DisplayFlex()
 				FlexStretchChildren()
-				border-bottom  1px solid borderColor;
+				border-bottom  1px solid borderColor
+				height 100px
 				.header
 					FlexStatic()
 					width 200px
-					border-right 1px solid borderColor;
+					border-right 1px solid borderColor
 				.segments
 					FlexStretch()
+					position relative
+					overflow-x: auto
+					overflow-y hidden
+					scrollb
+					.segment
+						position absolute
+						border 1px solid borderColor
+						word-wrap
