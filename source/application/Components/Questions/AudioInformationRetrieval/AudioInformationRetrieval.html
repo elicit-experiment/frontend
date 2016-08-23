@@ -9,12 +9,14 @@
 	</div>
 	<div class="timeLineContainer">
 		<h3>Selected title</h3>
-		<div class="timeLine" data-bind="foreach: Channels">
-			<div class="channel">
+		<div class="timeLine">
+			<div class="headers" data-bind="foreach: Channels">
 				<div class="header">
 					<h4 data-bind="text: Title"></h4>
 				</div>
-				<div class="segments" data-bind="foreach: Segments">
+			</div>
+			<div class="tracks" data-bind="foreach: Channels">
+				<div class="track" data-bind="foreach: Segments">
 					<span class="segment" data-bind="text: Title, style: {left: Start + 'px'}"></span>
 				</div>
 			</div>

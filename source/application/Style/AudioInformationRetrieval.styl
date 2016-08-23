@@ -1,6 +1,7 @@
 @require "flex"
 
-borderColor = black;
+borderColor = black
+trackHeight = 100px
 
 .audioInformationRetrieval
 	DisplayFlex()
@@ -10,26 +11,32 @@ borderColor = black;
 		FlexColumn()
 		.timeLine
 			DisplayFlex()
-			FlexColumn()
 			FlexStretchChildren()
 			border 1px solid borderColor
 			height 400px
-			.channel
+			.headers
+				FlexStatic()
 				DisplayFlex()
+				FlexColumn()
 				FlexStretchChildren()
-				border-bottom  1px solid borderColor
-				height 100px
+				width 200px
+				border-right  1px solid borderColor
 				.header
-					FlexStatic()
-					width 200px
-					border-right 1px solid borderColor
-				.segments
-					FlexStretch()
+					height trackHeight
+					border-bottom  1px solid borderColor
+			.tracks
+				FlexStretch()
+				DisplayFlex()
+				FlexColumn()
+				FlexStretchChildren()
+				overflow-x auto
+				overflow-y hidden
+				.track
+					height trackHeight
+					border-bottom  1px solid borderColor
 					position relative
-					overflow-x: auto
-					overflow-y hidden
-					scrollb
 					.segment
 						position absolute
+						padding 3px
+						border-radius 5px
 						border 1px solid borderColor
-						word-wrap
