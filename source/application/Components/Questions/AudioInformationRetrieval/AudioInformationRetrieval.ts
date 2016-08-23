@@ -5,13 +5,14 @@ import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type Selection = {Identifier:string};
 
-type Segment = {Title:string, Start:number, End:number};
+type Segment = {Title:string, Start:number, End:number, Length:number};
 type Channel = {Title:string, Segments:Segment[]};
 
 class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 {
 	public SearchViewHeader = knockout.observable("");
 	public SearchViewButtonLabel = knockout.observable("");
+	public ZoomLevel = knockout.observable(1);
 
 	public Channels = knockout.observableArray<Channel>();
 
@@ -44,17 +45,25 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		var segments:Segment[] = [];
 
 		for (let i = 0; i < 1000; i++)
-			segments.push(this.CreateSegment("Segment " + i, i * 80, 0));
+			segments.push(this.CreateSegment("Segment " + i, i * 80, i * 80 + 50));
 
 		return segments;
 	}
 
-	private CreateSegment(title:string, start:number, end:number)
+	public ZoomTracks(viewModel:any, event:JQueryMouseEventObject):void
+	{
+		var originalEvent = (<WheelEvent>(<any>event).originalEvent);
+
+		this.ZoomLevel(this.ZoomLevel() + (originalEvent.deltaY > 0 ? 0.1 : -.1));
+	}
+
+	private CreateSegment(title:string, start:number, end:number):Segment
 	{
 		return {
 			Title: title,
 			Start: start,
-			End: end
+			End: end,
+			Length: end - start
 		};
 	}
 }
