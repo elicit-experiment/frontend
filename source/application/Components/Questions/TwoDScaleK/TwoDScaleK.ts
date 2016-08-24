@@ -17,9 +17,7 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 	public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Items: Item[];
 
-	private _subscriptions: KnockoutSubscription[] = [];
 	private _chart:HighchartsChartObject;
-	
 
 	constructor(question: QuestionModel)
 	{
@@ -28,7 +26,7 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 		this.Title = this.GetInstrumentFormatted("HeaderLabel");
 		this.InitializeItems();
 
-		this._subscriptions.push(this.ChartElement.subscribe(this.InitializeChart, this));
+		this.Subscribe(this.ChartElement, element => this.InitializeChart());
 	}
 
 	private InitializeItems():void
@@ -172,14 +170,6 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 			cursor: "pointer",
 			data: [answer]
 		};
-	}
-
-	public dispose():void
-	{
-		this.ChartElement(null);
-
-		for (var i = 0; i < this._subscriptions.length; i++)
-			this._subscriptions[i].dispose();
 	}
 }
 

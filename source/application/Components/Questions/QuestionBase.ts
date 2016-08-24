@@ -2,9 +2,10 @@
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
+import DisposableComponent = require("Components/DisposableComponent");
 import TextFormatter = require("Managers/TextFormatter");
 
-class QuestionsBase<T> implements IQuestionViewModel
+class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 {
 	protected Model: QuestionModel;
 	protected HasAnswer: KnockoutComputed<boolean>;
@@ -12,6 +13,7 @@ class QuestionsBase<T> implements IQuestionViewModel
 
 	constructor(question: QuestionModel, requiresInput:boolean = true)
 	{
+		super();
 		this.Model = question;
 		this.Model.RequiresInput = requiresInput;
 		this.HasAnswer = knockout.computed(() => this.Model.Answer() != null && this.HasNoneEventsProperty(this.GetAnswer()));

@@ -6,13 +6,14 @@ import AudioInfo = require("Components/Players/Audio/AudioInfo");
 type Selection = {Identifier:string};
 
 type Segment = {Title:string, Start:number, End:number, Length:number};
-type Channel = {Title:string, Segments:Segment[]};
+type Channel = {Title:string, Segments:Segment[], TrackElement:KnockoutObservable<HTMLElement>};
 
 class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 {
 	public SearchViewHeader = knockout.observable("");
 	public SearchViewButtonLabel = knockout.observable("");
 	public ZoomLevel = knockout.observable(1);
+	public TracksElement = knockout.observable<HTMLElement>(null);
 
 	public Channels = knockout.observableArray<Channel>();
 
@@ -37,7 +38,8 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	{
 		return {
 			Title: title,
-			Segments: this.CreateSegments()
+			Segments: this.CreateSegments(),
+			TrackElement: knockout.observable(null)
 		};
 	}
 	
@@ -54,17 +56,26 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	{
 		var originalEvent = (<WheelEvent>(<any>event).originalEvent);
 
-		this.ZoomLevel(this.ZoomLevel() + (originalEvent.deltaY > 0 ? 0.1 : -.1));
+		this.ZoomLevel(this.ZoomLevel() * (originalEvent.deltaY > 0 ? 1.1 : 0.9));
+
+		setTimeout(() => {
+			if(this.TracksElement() != null && this.TracksElement().scrollLeft > this.TracksElement().scrollWidth - this.TracksElement().clientWidth)
+			{
+				this.TracksElement().scrollLeft = this.TracksElement().scrollWidth - this.TracksElement().clientWidth
+			}
+		});
 	}
 
 	private CreateSegment(title:string, start:number, end:number):Segment
 	{
-		return {
+		var result:Segment = {
 			Title: title,
 			Start: start,
 			End: end,
 			Length: end - start
 		};
+
+		return result;
 	}
 }
 
