@@ -16,7 +16,7 @@
 				</div>
 			</div>
 			<div class="tracks" data-bind="foreach: Channels, event: {wheel: ZoomTracks}, Element: TracksElement">
-				<div class="track" data-bind="foreach: Segments, Element: TrackElement">
+				<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.TracksLength() * $parent.ZoomLevel() + 'px'}">
 					<span class="segment" data-bind="text: Title, style: {left: Start * $parents[1].ZoomLevel() + 'px', width: Length * $parents[1].ZoomLevel() + 'px'}"></span>
 				</div>
 			</div>

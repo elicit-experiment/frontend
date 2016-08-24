@@ -14,6 +14,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	public SearchViewButtonLabel = knockout.observable("");
 	public ZoomLevel = knockout.observable(1);
 	public TracksElement = knockout.observable<HTMLElement>(null);
+	public TracksLength = knockout.observable<number>();
 
 	public Channels = knockout.observableArray<Channel>();
 
@@ -27,6 +28,8 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this.SearchViewButtonLabel(searchView["Button"]["Label"]);
 
 		this.Channels.push(this.CreateChannel("Taler"), this.CreateChannel("Transkriptioner"))
+
+		this.UpdateTracksLength();
 	}
 
 	public Search():void
@@ -64,6 +67,21 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 				this.TracksElement().scrollLeft = this.TracksElement().scrollWidth - this.TracksElement().clientWidth
 			}
 		});
+	}
+
+	private UpdateTracksLength():void
+	{
+		var length = 0;
+		for(var channel of this.Channels())
+		{
+			for(var segment of channel.Segments)
+			{
+				if(segment.End > length)
+					length = segment.End;
+			}
+		}
+
+		this.TracksLength(length);
 	}
 
 	private CreateSegment(title:string, start:number, end:number):Segment
