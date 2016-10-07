@@ -19,7 +19,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		this.HasAnswer = knockout.computed(() => this.Model.Answer() != null && this.HasNoneEventsProperty(this.GetAnswer()));
 
 		var answer = this.Model.Answer();
-		this._events = answer != null && answer.Events ? answer.Events : new Array<CockpitPortal.IQuestionEvent>();
+		this._events = answer != null && answer.Events ? answer.Events : [];
 
 		setTimeout(() =>
 		{
