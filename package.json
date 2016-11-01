@@ -22,12 +22,12 @@
     "gulp-rename": "1.2.x",
     "gulp-replace": "0.5.x",
     "gulp-stylus": "2.4.x",
-    "gulp-typescript": "2.13.x",
+    "gulp-typescript": "3.1.x",
     "gulp-uglify": "1.5.x",
     "merge-stream": "1.0.x",
     "minimist": "1.2.x",
     "run-sequence": "1.1.x",
-    "typescript": "1.8.x",
+    "typescript": "2.0.x",
     "typings": "0.8.x"
   }
 }
