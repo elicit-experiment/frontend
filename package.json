@@ -6,7 +6,7 @@
   "author": "Jacob Poul Richardt",
   "dependencies": {
     "jquery": "2.2.3",
-    "knockout": "3.4.0",
+    "knockout": "3.4.1",
     "requirejs": "2.2.0",
     "requirejs-text": "2.0.12",
     "crossroads": "0.12.2",
