@@ -2,6 +2,7 @@
 
 borderColor = black
 trackHeight = 100px
+timeTrackHeight = 40px
 segmentHeight = 40px
 
 .audioInformationRetrieval
@@ -32,14 +33,21 @@ segmentHeight = 40px
 				overflow-x auto
 				overflow-y hidden
 				.track
-					padding 3px 0
-					height trackHeight
-					border-bottom  1px solid borderColor
 					position relative
+					height trackHeight
+					padding 3px 0
+					border-bottom  1px solid borderColor
 					.segment
 						position absolute
+						height segmentHeight
+						overflow hidden
 						padding 3px
 						border-radius 3px
 						border 1px solid borderColor
-						overflow hidden
-						height segmentHeight
+
+				.timeTrack
+					position relative
+					height timeTrackHeight
+					border-bottom  1px solid borderColor
+					.segment
+						position absolute

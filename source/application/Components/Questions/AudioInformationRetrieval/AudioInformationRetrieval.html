@@ -15,9 +15,14 @@
 					<h4 data-bind="text: Title"></h4>
 				</div>
 			</div>
-			<div class="tracks" data-bind="foreach: Channels, event: {wheel: ZoomTracks}, Element: TracksElement">
+			<div class="tracks" data-bind="event: {wheel: ZoomTracks}, Element: TracksElement">
+				<!-- ko foreach: Channels -->
 				<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.TracksLength() * $parent.ZoomLevel() + 'px'}">
 					<span class="segment" data-bind="text: Title, style: {left: Start * $parents[1].ZoomLevel() + 'px', width: Length * $parents[1].ZoomLevel() + 'px'}"></span>
+				</div>
+				<!-- /ko -->
+				<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: TracksLength() * ZoomLevel() + 'px'}">
+					<span class="segment" data-bind="text: Text, style: {left: Position * $parent.ZoomLevel() + 'px'}"></span>
 				</div>
 			</div>
 		</div>
