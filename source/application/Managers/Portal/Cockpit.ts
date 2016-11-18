@@ -53,6 +53,17 @@ export class Answer
 	}
 }
 
+export class AudioInformation
+{
+	public static Search( serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CHAOS.Portal.Client.IPagedPortalResult<any>>
+	{
+		if (serviceCaller == null)
+			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
+
+		return serviceCaller.CallService("AudioInformation/Search", PortalClient.HttpMethod.Get, null, false);
+	}
+}
+
 export interface IExperiment
 {
 	Id: string;

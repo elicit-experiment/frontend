@@ -1,6 +1,8 @@
 import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
+import CockpitPortal = require("Managers/Portal/Cockpit");
+import Notification = require("Managers/Notification");
 import QuestionModel = require("Models/Question");
+import QuestionBase = require("Components/Questions/QuestionBase");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type Selection = {Identifier:string};
@@ -12,6 +14,8 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 {
 	public SearchViewHeader = knockout.observable("");
 	public SearchViewButtonLabel = knockout.observable("");
+	public SearchResults = knockout.observableArray<any>();
+
 	public ZoomLevel = knockout.observable(1);
 	public TracksElement = knockout.observable<HTMLElement>(null);
 	public TracksLength = knockout.observable<number>();
@@ -37,7 +41,15 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 	public Search():void
 	{
-
+		CockpitPortal.AudioInformation.Search().WithCallback(response => {
+			if(response.Error != null)
+			{
+				Notification.Error("Failed to search: " + response.Error.Message);
+				return;
+			}
+			console.log(response.Body.Results[0])
+			this.SearchResults.push(...response.Body.Results);
+		});
 	}
 
 	public CreateChannel(title:string):Channel
