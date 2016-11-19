@@ -54,6 +54,13 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this._wayfAuthenticator.Login();
 	}
 
+	public GetTest():void
+	{
+		this._wayfAuthenticator.GetAsset("f091ae97-3360-4a25-bc9d-ec05df6924a5", asset => {
+			console.log(asset);
+		})
+	}
+
 	public Search():void
 	{
 		CockpitPortal.AudioInformation.Search().WithCallback(response => {

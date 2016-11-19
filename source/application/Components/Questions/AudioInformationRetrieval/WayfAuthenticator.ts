@@ -39,4 +39,61 @@ export default class WayfAuthenticator extends DisposableComponent
 			console.log(success, notApproved);
 		}, this.ServiceCaller);
 	}
+
+	public GetAsset(id:string, callback:(larmObject:IAsset)=>void):void
+	{
+		this.ServiceCaller.CallService("EZAsset/Get", PortalClient.HttpMethod.Get, { id: id }, true).WithCallback(response => {
+			if(response.Error != null)
+			{
+				Notification.Error("Failed to get Larm asset: " + response.Error.Message);
+				return;
+			}
+
+			callback(response.Body.Results[0]);
+		});
+	}
+}
+
+export interface IAsset
+{
+	Identifier: string;
+	TypeId: string;
+	DoFilesRequireLogin: boolean;
+	Data: IData[];
+	Files: IFile[];
+	Annotations: IAnnotationGroup[];
+	Tags: string[];
+}
+
+export interface IAnnotationGroup
+{
+	DefinitionId: string;
+	Name: string;
+	Data: IAnnotation[];
+}
+
+export interface IData
+{
+	Name: string;
+	Fields: { [key: string]: string };
+}
+
+export interface IFile
+{
+	Identifier: string;
+	Type: string;
+	Name: string;
+	Destinations: IDestination[];
+}
+
+export interface IDestination
+{
+	Type: string;
+	Url: string;
+}
+
+export interface IAnnotation
+{
+	Identifier?: string;
+	[key: string]: any;
 }
