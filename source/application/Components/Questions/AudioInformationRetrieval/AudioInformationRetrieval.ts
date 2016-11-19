@@ -1,9 +1,11 @@
 import knockout = require("knockout");
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import Notification = require("Managers/Notification");
+import Configuration = require("Managers/Configuration");
 import QuestionModel = require("Models/Question");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
+import WayfAuthenticator from "Components/Questions/AudioInformationRetrieval/WayfAuthenticator";
 
 type Selection = {Identifier:string};
 type Segment = {Title:string, Start:number, End:number, Length:number};
@@ -23,9 +25,17 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 	public Channels = knockout.observableArray<Channel>();
 
+	public CanLogin:KnockoutObservable<boolean>;
+	private _wayfAuthenticator:WayfAuthenticator;
+
+	private _larmClient:CHAOS.Portal.Client.IPortalClient;
+
 	constructor(question: QuestionModel)
 	{
 		super(question);
+
+		this._wayfAuthenticator = new WayfAuthenticator();
+		this.CanLogin = this._wayfAuthenticator.CanLogin;
 
 		let searchView = this.GetInstrument("SearchView");
 
@@ -39,6 +49,11 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this.AddTimeSegments();
 	}
 
+	public Login():void
+	{
+		this._wayfAuthenticator.Login();
+	}
+
 	public Search():void
 	{
 		CockpitPortal.AudioInformation.Search().WithCallback(response => {
@@ -47,7 +62,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 				Notification.Error("Failed to search: " + response.Error.Message);
 				return;
 			}
-			console.log(response.Body.Results[0])
+			console.log(response.Body.Results[0]);
 			this.SearchResults.push(...response.Body.Results);
 		});
 	}
