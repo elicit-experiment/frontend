@@ -27,6 +27,7 @@ requirejs.config({
 		HighChartsDraggablePoints: "../lib/Highcharts/draggable-points/draggable-points",
 		HighChartsCrossingSpecificValue: "../lib/Highcharts/crossing-specific-value/crossing-specific-value",
 		"crypto-js": "../lib/crypto-js/md5",
+		soundmanager2: "../lib/soundmanager2/script/soundmanager2-nodebug-jsmin"
 	},
 	map: {
 		"*": {

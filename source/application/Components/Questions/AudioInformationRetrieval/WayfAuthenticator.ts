@@ -42,7 +42,7 @@ export default class WayfAuthenticator extends DisposableComponent
 
 	public GetAsset(id:string, callback:(larmObject:IAsset)=>void):void
 	{
-		this.ServiceCaller.CallService("EZAsset/Get", PortalClient.HttpMethod.Get, { id: id }, true).WithCallback(response => {
+		this.ServiceCaller.CallService<CHAOS.Portal.Client.IPagedPortalResult<any>>("EZAsset/Get", PortalClient.HttpMethod.Get, { id: id }, true).WithCallback(response => {
 			if(response.Error != null)
 			{
 				Notification.Error("Failed to get Larm asset: " + response.Error.Message);
