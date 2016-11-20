@@ -26,10 +26,13 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 	public Channels = knockout.observableArray<Channel>();
 
+	public Position:KnockoutComputed<number>;
+
 	public CanLogin:KnockoutObservable<boolean>;
 	private _wayfAuthenticator:WayfAuthenticator;
 
 	private _larmClient:CHAOS.Portal.Client.IPortalClient;
+	private _audio = knockout.observable<Audio>();
 
 	constructor(question: QuestionModel)
 	{
@@ -37,6 +40,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 		this._wayfAuthenticator = new WayfAuthenticator();
 		this.CanLogin = this._wayfAuthenticator.CanLogin;
+		this.Position = this.PureComputed(() => this._audio() != null ? this._audio().Position() : 0);
 
 		let searchView = this.GetInstrument("SearchView");
 
@@ -60,9 +64,10 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this._wayfAuthenticator.GetAsset("f091ae97-3360-4a25-bc9d-ec05df6924a5", asset => {
 			console.log(asset);
 
-			let audio = new Audio(asset.Files[0].Destinations[0].Url);
-			this.AddAction(audio.IsReady, () => {
-				audio.Play()
+			this._audio(new Audio(asset.Files[0].Destinations[0].Url));
+			this._audio().Volume(10);
+			this.AddAction(this._audio().IsReady, () => {
+				this._audio().Play()
 			});
 		});
 	}

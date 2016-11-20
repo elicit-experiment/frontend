@@ -45,6 +45,7 @@
 				<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: TracksLength() * ZoomLevel() + 'px'}">
 					<span class="segment" data-bind="text: Text, style: {left: Position * $parent.ZoomLevel() + 'px'}"></span>
 				</div>
+				<div class="currentPosition" data-bind="style: {left: Position() * ZoomLevel() + 'px'}"></div>
 			</div>
 		</div>
 	</div>

@@ -30,6 +30,7 @@ segmentHeight = 40px
 				DisplayFlex()
 				FlexColumn()
 				FlexStretchChildren()
+				position relative
 				overflow-x auto
 				overflow-y hidden
 				.track
@@ -44,10 +45,15 @@ segmentHeight = 40px
 						padding 3px
 						border-radius 3px
 						border 1px solid borderColor
-
 				.timeTrack
 					position relative
 					height timeTrackHeight
 					border-bottom  1px solid borderColor
 					.segment
 						position absolute
+				.currentPosition
+					position absolute
+					top 0
+					height 100%
+					width 1px
+					background-color blue
