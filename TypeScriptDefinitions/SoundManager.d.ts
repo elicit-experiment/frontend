@@ -44,4 +44,4 @@ interface ISoundManagerModule
 }
 
 declare var soundManager: ISoundManagerModule;
-declare module "soundmanger2" { export = soundManager }
+declare module "soundmanager2" { export = soundManager }

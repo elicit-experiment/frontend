@@ -6,6 +6,7 @@ import QuestionModel = require("Models/Question");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
 import WayfAuthenticator from "Components/Questions/AudioInformationRetrieval/WayfAuthenticator";
+import Audio from "Utility/Audio";
 
 type Selection = {Identifier:string};
 type Segment = {Title:string, Start:number, End:number, Length:number};
@@ -58,7 +59,12 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	{
 		this._wayfAuthenticator.GetAsset("f091ae97-3360-4a25-bc9d-ec05df6924a5", asset => {
 			console.log(asset);
-		})
+
+			let audio = new Audio(asset.Files[0].Destinations[0].Url);
+			this.AddAction(audio.IsReady, () => {
+				audio.Play()
+			});
+		});
 	}
 
 	public Search():void

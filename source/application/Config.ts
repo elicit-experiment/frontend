@@ -8,6 +8,7 @@
 /// <reference path="../../TypeScriptDefinitions/PortalClient.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/require.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/routie.d.ts" />
+/// <reference path="../../TypeScriptDefinitions/SoundManager.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/videojs.d.ts" />
 
 declare module "PortalClient" { export = CHAOS.Portal.Client }
