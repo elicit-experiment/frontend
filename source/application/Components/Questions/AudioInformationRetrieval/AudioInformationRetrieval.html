@@ -1,51 +1,57 @@
 <div class="audioInformationRetrieval">
-	<div>
-		<h3 data-bind="text: SearchViewHeader"></h3>
-		<button data-bind="click: Login, visible: CanLogin">Login</button>
-		<button data-bind="click: GetTest">GetTest</button>
-		<form data-bind="submit: Search">
-			<input class="form-control" type="text"/>
-			<button type="button" class="btn btn-primary" data-bind="text: SearchViewButtonLabel, click: Search"></button>
-		</form>
+	<h3 data-bind="text: SearchViewHeader"></h3>
+	<div data-bind="visible: !IsLoginReady()">
+		Loading...
 	</div>
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Channel</th>
-				<th>Time</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody data-bind="foreach: SearchResults">
-			<tr>
-				<td data-bind="text: Metadata.ChannelHeaderLabel.Value"></td>
-				<td data-bind="text: Metadata.ProgrammeName.Value"></td>
-				<td data-bind="text: Metadata.PublicationStartTime.Value"></td>
-				<td>
-					<button type="button" class="btn btn-primary">Select</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<div class="timeLineContainer">
-		<h3>Selected title</h3>
-		<div class="timeLine">
-			<div class="headers" data-bind="foreach: Channels">
-				<div class="header">
-					<h4 data-bind="text: Title"></h4>
+	<div data-bind="visible: IsLoginReady">
+		<div data-bind="visible: CanLogin">
+			<button class="btn btn-primary" data-bind="click: Login">Login via Wayf</button>
+		</div>
+		<div data-bind="visible: IsAuthenticated">
+			<form data-bind="submit: Search">
+				<input class="form-control" type="text"/>
+				<button type="button" class="btn btn-primary" data-bind="text: SearchViewButtonLabel, click: Search"></button>
+			</form>
+			<table class="table">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Channel</th>
+					<th>Time</th>
+					<th></th>
+				</tr>
+				</thead>
+				<tbody data-bind="foreach: SearchResults">
+				<tr>
+					<td data-bind="text: Name"></td>
+					<td data-bind="text: ChannelName"></td>
+					<td data-bind="text: Start"></td>
+					<td>
+						<button type="button" class="btn btn-primary" data-bind="click: Select">Select</button>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			<div class="timeLineContainer">
+				<h3>Selected title</h3>
+				<div class="timeLine">
+					<div class="headers" data-bind="foreach: Channels">
+						<div class="header">
+							<h4 data-bind="text: Title"></h4>
+						</div>
+					</div>
+					<div class="tracks" data-bind="event: {wheel: ZoomTracks}, Element: TracksElement">
+						<!-- ko foreach: Channels -->
+						<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.TracksLength() * $parent.ZoomLevel() + 'px'}">
+							<span class="segment" data-bind="text: Title, style: {left: Start * $parents[1].ZoomLevel() + 'px', width: Length * $parents[1].ZoomLevel() + 'px'}"></span>
+						</div>
+						<!-- /ko -->
+						<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: TracksLength() * ZoomLevel() + 'px'}">
+							<span class="segment" data-bind="text: Text, style: {left: Position * $parent.ZoomLevel() + 'px'}"></span>
+						</div>
+						<div class="currentPosition" data-bind="style: {left: Position() * ZoomLevel() + 'px'}"></div>
+					</div>
 				</div>
-			</div>
-			<div class="tracks" data-bind="event: {wheel: ZoomTracks}, Element: TracksElement">
-				<!-- ko foreach: Channels -->
-				<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.TracksLength() * $parent.ZoomLevel() + 'px'}">
-					<span class="segment" data-bind="text: Title, style: {left: Start * $parents[1].ZoomLevel() + 'px', width: Length * $parents[1].ZoomLevel() + 'px'}"></span>
-				</div>
-				<!-- /ko -->
-				<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: TracksLength() * ZoomLevel() + 'px'}">
-					<span class="segment" data-bind="text: Text, style: {left: Position * $parent.ZoomLevel() + 'px'}"></span>
-				</div>
-				<div class="currentPosition" data-bind="style: {left: Position() * ZoomLevel() + 'px'}"></div>
 			</div>
 		</div>
 	</div>

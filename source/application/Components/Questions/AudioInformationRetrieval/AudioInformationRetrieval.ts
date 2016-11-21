@@ -12,12 +12,13 @@ type Selection = {Identifier:string};
 type Segment = {Title:string, Start:number, End:number, Length:number};
 type Channel = {Title:string, Segments:Segment[], TrackElement:KnockoutObservable<HTMLElement>};
 type TimeSegment = {Text:string, Position:number};
+type SearchResult = {Name:string, ChannelName:string, Start:string, Select:()=>void}
 
 class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 {
 	public SearchViewHeader = knockout.observable("");
 	public SearchViewButtonLabel = knockout.observable("");
-	public SearchResults = knockout.observableArray<any>();
+	public SearchResults = knockout.observableArray<SearchResult>();
 
 	public ZoomLevel = knockout.observable(1);
 	public TracksElement = knockout.observable<HTMLElement>(null);
@@ -26,20 +27,20 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 	public Channels = knockout.observableArray<Channel>();
 
-	public Position:KnockoutComputed<number>;
-
+	public IsLoginReady:KnockoutObservable<boolean>;
+	public IsAuthenticated:KnockoutObservable<boolean>;
 	public CanLogin:KnockoutObservable<boolean>;
 	private _wayfAuthenticator:WayfAuthenticator;
 
-	private _larmClient:CHAOS.Portal.Client.IPortalClient;
+	public Position:KnockoutComputed<number>;
 	private _audio = knockout.observable<Audio>();
 
 	constructor(question: QuestionModel)
 	{
 		super(question);
 
-		this._wayfAuthenticator = new WayfAuthenticator();
-		this.CanLogin = this._wayfAuthenticator.CanLogin;
+		this.InitializeWayf();
+
 		this.Position = this.PureComputed(() => this._audio() != null ? this._audio().Position() : 0);
 
 		let searchView = this.GetInstrument("SearchView");
@@ -54,18 +55,26 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this.AddTimeSegments();
 	}
 
+	private InitializeWayf():void
+	{
+		this._wayfAuthenticator = new WayfAuthenticator();
+
+		this.IsLoginReady = this._wayfAuthenticator.IsReady;
+		this.IsAuthenticated = this._wayfAuthenticator.IsAuthenticated;
+		this.CanLogin = this._wayfAuthenticator.CanLogin;
+	}
+
 	public Login():void
 	{
 		this._wayfAuthenticator.Login();
 	}
 
-	public GetTest():void
+	private LoadAudio(assetGuid:string):void
 	{
-		this._wayfAuthenticator.GetAsset("f091ae97-3360-4a25-bc9d-ec05df6924a5", asset => {
-			console.log(asset);
-
+		this._wayfAuthenticator.GetAsset(assetGuid, asset => {
 			this._audio(new Audio(asset.Files[0].Destinations[0].Url));
 			this._audio().Volume(10);
+
 			this.AddAction(this._audio().IsReady, () => {
 				this._audio().Play()
 			});
@@ -81,7 +90,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 				return;
 			}
 			console.log(response.Body.Results[0]);
-			this.SearchResults.push(...response.Body.Results);
+			this.SearchResults.push(...response.Body.Results.map(r => this.CreateSearchResult(r)));
 		});
 	}
 
@@ -115,6 +124,16 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 				this.TracksElement().scrollLeft = this.TracksElement().scrollWidth - this.TracksElement().clientWidth
 			}
 		});
+	}
+
+	private CreateSearchResult(result:any):SearchResult
+	{
+		return {
+			Name: result.Metadata.ProgrammeName.Value,
+			ChannelName: result.Metadata.ChannelHeaderLabel.Value,
+			Start: result.Metadata.PublicationStartTime.Value,
+			Select: () => this.LoadAudio("f091ae97-3360-4a25-bc9d-ec05df6924a5")
+		};
 	}
 
 	private AddTimeSegments():void
