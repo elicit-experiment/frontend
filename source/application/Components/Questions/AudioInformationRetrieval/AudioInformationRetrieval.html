@@ -34,7 +34,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="timeLineContainer" data-bind="with: Timeline, visible: HasSelected">
+			<div class="timeLineContainer" data-bind="with: TimeLine, visible: HasSelected">
 				<h3>Selected title</h3>
 				<div class="timeLine">
 					<div class="headers" data-bind="foreach: Channels">
@@ -44,11 +44,11 @@
 					</div>
 					<div class="tracks" data-bind="event: {wheel: ZoomTracks}, Element: TracksElement">
 						<!-- ko foreach: Channels -->
-						<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.TracksLength() * $parent.ZoomLevel() + 'px'}">
+						<div class="track" data-bind="foreach: Segments, Element: TrackElement, style: {width: $parent.Length() * $parent.ZoomLevel() + 'px'}">
 							<span class="segment" data-bind="text: Title, style: {left: Start * $parents[1].ZoomLevel() + 'px', width: Length * $parents[1].ZoomLevel() + 'px'}"></span>
 						</div>
 						<!-- /ko -->
-						<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: TracksLength() * ZoomLevel() + 'px'}">
+						<div class="timeTrack" data-bind="foreach: TimeSegments, style: {width: Length() * ZoomLevel() + 'px'}">
 							<span class="segment" data-bind="text: Text, style: {left: Position * $parent.ZoomLevel() + 'px'}"></span>
 						</div>
 						<div class="currentPosition" data-bind="style: {left: Position() * ZoomLevel() + 'px'}"></div>

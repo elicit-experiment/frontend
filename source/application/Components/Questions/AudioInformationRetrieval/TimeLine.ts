@@ -5,21 +5,21 @@ type Segment = {Title:string, Start:number, End:number, Length:number};
 type Channel = {Title:string, Segments:Segment[], TrackElement:KnockoutObservable<HTMLElement>};
 type TimeSegment = {Text:string, Position:number};
 
-export default class Timeline extends DisposableComponent
+export default class TimeLine extends DisposableComponent
 {
-	public ZoomLevel = knockout.observable(1);
 	public TracksElement = knockout.observable<HTMLElement>(null);
-	public TracksLength = knockout.observable<number>();
-	public TimeSegments = knockout.observableArray<TimeSegment>();
 
 	public Channels = knockout.observableArray<Channel>();
+	public TimeSegments = knockout.observableArray<TimeSegment>();
 
+	public ZoomLevel = knockout.observable(1);
 	public Position:KnockoutComputed<number>;
+	public Length = knockout.observable<number>();
 
 	constructor()
 	{
 		super();
-		this.TracksLength(80000);
+		this.Length(80000);
 
 		this.Channels.push(this.CreateChannel("Taler"), this.CreateChannel("Transkriptioner"));
 
@@ -62,7 +62,7 @@ export default class Timeline extends DisposableComponent
 	{
 		this.TimeSegments.removeAll();
 
-		for(let i = 0; i < this.TracksLength(); i += 1000)
+		for(let i = 0; i < this.Length(); i += 1000)
 		{
 			this.TimeSegments.push(this.CreateTimeSegment(i));
 		}

@@ -6,7 +6,7 @@ import QuestionModel = require("Models/Question");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import WayfAuthenticator from "Components/Questions/AudioInformationRetrieval/WayfAuthenticator";
 import Search from "Components/Questions/AudioInformationRetrieval/Search";
-import Timeline from "Components/Questions/AudioInformationRetrieval/Timeline";
+import TimeLine from "Components/Questions/AudioInformationRetrieval/TimeLine";
 import Audio from "Utility/Audio";
 
 type Selection = {Identifier:string};
@@ -16,7 +16,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 	public SearchViewHeader:string;
 
 	public Search:Search;
-	public Timeline:Timeline;
+	public TimeLine:TimeLine;
 
 	public HasSelected:KnockoutComputed<boolean>;
 
@@ -38,10 +38,10 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 		this.SearchViewHeader = searchView["Header"]["Label"];
 		this.Search = new Search(searchView["Button"]["Label"]);
-		this.Timeline = new Timeline();
+		this.TimeLine = new TimeLine();
 
 		this.Position = this.PureComputed(() => this._audio() != null ? this._audio().Position() : 0);
-		this.Timeline.Position = this.Position;
+		this.TimeLine.Position = this.Position;
 		this.HasSelected = this.PureComputed(()=> this.Search.Selected() != null);
 
 		this.Subscribe(this.Search.Selected, s => this.LoadAudio("f091ae97-3360-4a25-bc9d-ec05df6924a5"));
@@ -68,7 +68,10 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 			this._audio().Volume(10);
 
 			this.AddAction(this._audio().IsReady, () => {
-				this._audio().Play()
+				this._audio().Play();
+				this.TimeLine.Length(this._audio().Duration());
+				this.TimeLine.ZoomLevel(0.1);
+
 			});
 		});
 	}
