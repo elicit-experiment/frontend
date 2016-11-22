@@ -33,11 +33,7 @@ export default class WayfAuthenticator extends DisposableComponent
 	{
 		this.IsAuthenticating(true);
 
-		Wayf.Login((success, notApproved) =>
-		{
-			this.IsAuthenticating(false);
-			console.log(success, notApproved);
-		}, this.ServiceCaller);
+		Wayf.Login((success, notApproved) => this.IsAuthenticating(false), this.ServiceCaller);
 	}
 
 	public GetAsset(id:string, callback:(larmObject:IAsset)=>void):void
