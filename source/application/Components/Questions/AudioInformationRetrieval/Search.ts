@@ -3,7 +3,7 @@ import CockpitPortal = require("Managers/Portal/Cockpit");
 import Notification = require("Managers/Notification");
 import DisposableComponent = require("Components/DisposableComponent");
 
-type SearchResult = {Name:string, ChannelName:string, Start:string, Select:()=>void}
+type SearchResult = {Name:string, ChannelName:string, Start:string, IsSelected:KnockoutComputed<boolean>, Select:()=>void}
 
 export default class Search extends DisposableComponent
 {
@@ -42,9 +42,11 @@ export default class Search extends DisposableComponent
 			Name: result.Metadata.ProgrammeName.Value,
 			ChannelName: result.Metadata.ChannelHeaderLabel.Value,
 			Start: result.Metadata.PublicationStartTime.Value,
+			IsSelected: null,
 			Select: null
 		};
 
+		item.IsSelected = this.PureComputed(() => this.Selected() == item);
 		item.Select = () => this.Selected(item);
 		return item;
 	}

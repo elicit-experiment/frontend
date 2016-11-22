@@ -23,7 +23,7 @@
 					</tr>
 					</thead>
 					<tbody data-bind="foreach: Results">
-					<tr>
+					<tr data-bind="css: {success: IsSelected}">
 						<td data-bind="text: Name"></td>
 						<td data-bind="text: ChannelName"></td>
 						<td data-bind="text: Start"></td>
