@@ -41,6 +41,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this.TimeLine = new TimeLine();
 
 		this.Position = this.PureComputed(() => this._audio() != null ? this._audio().Position() : 0);
+		this.TimeLine.Length = this.PureComputed(() => this._audio() != null ? this._audio().Duration() : 1);
 		this.TimeLine.Position = this.Position;
 		this.HasSelected = this.PureComputed(()=> this.Search.Selected() != null);
 
@@ -68,10 +69,8 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 			this._audio().Volume(10);
 
 			this.AddAction(this._audio().IsReady, () => {
+				this.TimeLine.Initialize();
 				this._audio().Play();
-				this.TimeLine.Length(this._audio().Duration());
-				this.TimeLine.ZoomLevel(0.1);
-
 			});
 		});
 	}

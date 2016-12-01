@@ -14,16 +14,21 @@ export default class TimeLine extends DisposableComponent
 
 	public ZoomLevel = knockout.observable(1);
 	public Position:KnockoutComputed<number>;
-	public Length = knockout.observable<number>();
+	public Length:KnockoutComputed<number>;
 
 	constructor()
 	{
 		super();
-		this.Length(80000);
 
 		this.Channels.push(this.CreateChannel("Taler"), this.CreateChannel("Transkriptioner"));
+	}
 
+	public Initialize():void
+	{
 		this.AddTimeSegments();
+
+		this.AdjustZoomLevelToFitLength();
+		this.Subscribe(this.Length, () => this.AdjustZoomLevelToFitLength());
 	}
 
 	public CreateChannel(title:string):Channel
@@ -101,5 +106,13 @@ export default class TimeLine extends DisposableComponent
 	private ToTwoDigits(value:number):string
 	{
 		return value < 10 ? "0" + value : value.toString();
+	}
+
+	private AdjustZoomLevelToFitLength():void
+	{
+		if(this.TracksElement() == null) return;
+
+		this.TracksElement().scrollLeft = 0;
+		this.ZoomLevel(this.TracksElement().clientWidth / this.Length());
 	}
 }
