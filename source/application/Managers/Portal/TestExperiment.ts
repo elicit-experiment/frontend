@@ -6,7 +6,33 @@ class TestExperiment
 
 	constructor()
 	{
-		this.Slides = [[this.CreateAudioInformationRetrieval()]];
+		//this.Slides = [[this.CreateAudioInformationRetrieval()]];
+		this.Slides = [[this.CreateTaggingA()]];
+	}
+
+	public CreateTaggingA():CockpitPortal.IQuestion
+	{
+		return this.CreateStandardQuestion("TaggingA", {
+			"HeaderLabel": "Tag that thing",
+			"SelectionTagBoxLabel": "Selection Tags",
+			"UserTagBoxLabel": "User Tags",
+			"TextField": "Add your tags",
+			"SelectionTags": [1, 2, 3, 4, 5, 6, 7, 8].map(i => this.CreateTag(i.toString(), "Tag " + i, i)),
+			"UserTags": [1, 2, 3, 4, 5].map(i => this.CreateTag(i.toString(), "User Tag " + i, i)),
+			"Stimulus": {
+				"Type": "audio/mpeg",
+				"URI": "https://s3.eu-central-1.amazonaws.com/762431201790b41bb9c979968535da52/system/140_item/resource/20151023/A4_wind10_S3.wav"
+			}
+		});
+	}
+
+	private CreateTag(id:string, label:string, position:number): {Id:string, Label:string, Position:number}
+	{
+		return {
+			Id: id,
+			Label: label,
+			Position: position
+		};
 	}
 
 	public CreateAudioInformationRetrieval():CockpitPortal.IQuestion
