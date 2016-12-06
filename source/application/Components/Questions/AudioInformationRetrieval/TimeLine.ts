@@ -25,8 +25,6 @@ export default class TimeLine extends DisposableComponent
 
 	public Initialize():void
 	{
-		this.AddTimeSegments();
-
 		this.AdjustZoomLevelToFitLength();
 		this.Subscribe(this.Length, () => this.AdjustZoomLevelToFitLength());
 	}
@@ -67,7 +65,7 @@ export default class TimeLine extends DisposableComponent
 	{
 		this.TimeSegments.removeAll();
 
-		for(let i = 0; i < this.Length(); i += 1000)
+		for(let i = 0; i < this.Length(); i += 100000)
 		{
 			this.TimeSegments.push(this.CreateTimeSegment(i));
 		}
@@ -114,5 +112,7 @@ export default class TimeLine extends DisposableComponent
 
 		this.TracksElement().scrollLeft = 0;
 		this.ZoomLevel(this.TracksElement().clientWidth / this.Length());
+
+		this.AddTimeSegments();
 	}
 }

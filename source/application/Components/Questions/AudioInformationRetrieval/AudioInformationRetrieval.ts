@@ -7,6 +7,7 @@ import QuestionBase = require("Components/Questions/QuestionBase");
 import WayfAuthenticator from "Components/Questions/AudioInformationRetrieval/WayfAuthenticator";
 import Search from "Components/Questions/AudioInformationRetrieval/Search";
 import TimeLine from "Components/Questions/AudioInformationRetrieval/TimeLine";
+import Rating from "Components/Questions/AudioInformationRetrieval/Rating";
 import Audio from "Utility/Audio";
 
 type Selection = {Identifier:string};
@@ -17,6 +18,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 
 	public Search:Search;
 	public TimeLine:TimeLine;
+	public Rating:Rating;
 
 	public HasSelected:KnockoutComputed<boolean>;
 
@@ -39,6 +41,7 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 		this.SearchViewHeader = searchView["Header"]["Label"];
 		this.Search = new Search(searchView["Button"]["Label"]);
 		this.TimeLine = new TimeLine();
+		this.Rating = new Rating();
 
 		this.Position = this.PureComputed(() => this._audio() != null ? this._audio().Position() : 0);
 		this.TimeLine.Length = this.PureComputed(() => this._audio() != null ? this._audio().Duration() : 1);
