@@ -5,7 +5,7 @@ import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type PredefinedTag = { Label:string; Id:string; Position:number };
 type TagData = {Id: string; Label: string;};
-type Tag = {Data:TagData};
+type Tag = {Data:TagData, IsAdded:KnockoutObservable<boolean>, Toggle:()=>void};
 
 class TaggingA extends QuestionBase<{Tags:TagData[]}>
 {
@@ -66,10 +66,26 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	private CreateTags(tags:PredefinedTag[]):Tag[]
 	{
 		return tags.map(t => {
-			return {
-				Data: {Id: t.Id, Label: t.Label}
+			let tag:Tag = {
+				Data: {Id: t.Id, Label: t.Label},
+				Toggle: null,
+				IsAdded: knockout.observable(false)
 			};
+
+			tag.Toggle = () => this.ToggleTag(tag);
+
+			return tag;
 		});
+	}
+
+	private ToggleTag(tag:Tag):void
+	{
+		tag.IsAdded(!tag.IsAdded());
+
+		if(this.AddedItems.indexOf(tag) == -1)
+			this.AddedItems.push(tag);
+		else
+			this.AddedItems.remove(tag);
 	}
 
 	protected HasValidAnswer(answer: any): boolean

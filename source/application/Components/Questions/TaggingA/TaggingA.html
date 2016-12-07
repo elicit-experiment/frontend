@@ -12,20 +12,20 @@
 		<div class="col-xs-7">
 			<input type="text" data-bind="attr: {placeholder: InputPlaceholder}" />
 			<ul data-bind="foreach: AddedItems">
-				<li data-bind="text: Data.Label"></li>
+				<li data-bind="text: Data.Label, click: Toggle"></li>
 			</ul>
 		</div>
 		<div class="col-xs-5">
 			<div>
 				<p data-bind="html: SelectionTagsLabel"></p>
 				<ul data-bind="foreach: SelectionItems">
-					<li data-bind="text: Data.Label"></li>
+					<li data-bind="text: Data.Label, click: Toggle, visible: !IsAdded()"></li>
 				</ul>
 			</div>
 			<div>
 				<p data-bind="html: UserTagsLabel"></p>
-				<ul  data-bind="foreach: UserItems">
-					<li data-bind="text: Data.Label"></li>
+				<ul data-bind="foreach: UserItems">
+					<li data-bind="text: Data.Label, click: Toggle, visible: !IsAdded()"></li>
 				</ul>
 			</div>
 		</div>
