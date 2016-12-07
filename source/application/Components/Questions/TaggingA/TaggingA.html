@@ -10,20 +10,22 @@
 	</div>
 	<div class="row container-fluid">
 		<div class="col-xs-7">
-			<input type="text" placeholder="Input text" />
-			<ul>
-				<li>Selected</li>
+			<input type="text" data-bind="attr: {placeholder: InputPlaceholder}" />
+			<ul data-bind="foreach: AddedItems">
+				<li data-bind="text: Data.Label"></li>
 			</ul>
 		</div>
 		<div class="col-xs-5">
 			<div>
-				<ul>
-					<li>Selection</li>
+				<p data-bind="html: SelectionTagsLabel"></p>
+				<ul data-bind="foreach: SelectionItems">
+					<li data-bind="text: Data.Label"></li>
 				</ul>
 			</div>
 			<div>
-				<ul>
-					<li>User</li>
+				<p data-bind="html: UserTagsLabel"></p>
+				<ul  data-bind="foreach: UserItems">
+					<li data-bind="text: Data.Label"></li>
 				</ul>
 			</div>
 		</div>

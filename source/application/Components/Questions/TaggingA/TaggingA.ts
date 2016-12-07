@@ -3,7 +3,7 @@ import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
-type UsableTag = { Label:string; Id:string; Position:number };
+type PredefinedTag = { Label:string; Id:string; Position:number };
 type TagData = {Id: string; Label: string;};
 type Tag = {Data:TagData};
 
@@ -11,16 +11,20 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 {
 	public Id: string;
 	public HeaderLabel: string;
+	public SelectionTagsLabel: string;
+	public UserTagsLabel: string;
+	public InputPlaceholder: string;
 
 	public AudioLabel: string;
 	public AudioInfo: AudioInfo = null;
 
-	public Items: Tag[];
-	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+	public SelectionItems = knockout.observableArray<Tag>();
+	public UserItems = knockout.observableArray<Tag>();
+	public AddedItems = knockout.observableArray<Tag>();
+
 	public HasMedia: boolean = false;
 	public CanAnswer: KnockoutObservable<boolean>;
 	public AnswerIsRequired: boolean = true;
-	public IsStimuliBlockVisible:boolean = true;
 
 	private _alignForStimuli:boolean = true;
 
@@ -30,6 +34,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		this.Id = this.Model.Id;
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
+		this.SelectionTagsLabel = this.GetInstrumentFormatted("SelectionTagBoxLabel");
+		this.UserTagsLabel = this.GetInstrumentFormatted("UserTagBoxLabel");
+		this.InputPlaceholder = this.GetInstrument("TextField");
 
 		let stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
@@ -43,6 +50,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
+		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags")));
+		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags")));
+
 		/*this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
 
 		if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
@@ -51,6 +61,15 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v);
 			this.SetAnswer({ Id: v });
 		});*/
+	}
+
+	private CreateTags(tags:PredefinedTag[]):Tag[]
+	{
+		return tags.map(t => {
+			return {
+				Data: {Id: t.Id, Label: t.Label}
+			};
+		});
 	}
 
 	protected HasValidAnswer(answer: any): boolean
