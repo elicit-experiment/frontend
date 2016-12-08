@@ -88,10 +88,19 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	{
 		tag.IsAdded(!tag.IsAdded());
 
-		if(this.AddedItems.indexOf(tag) == -1)
+		if(tag.IsAdded())
+		{
 			this.AddedItems.push(tag);
+			tag.IsAdded(false);
+		}
 		else
+		{
 			this.AddedItems.remove(tag);
+			tag.IsAdded(true);
+		}
+
+		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
+		this.SetAnswer( {Tags: this.AddedItems().map(t => ({Id: t.Data.Id, Label: t.Data.Label}))});
 	}
 
 	protected HasValidAnswer(answer: any): boolean
