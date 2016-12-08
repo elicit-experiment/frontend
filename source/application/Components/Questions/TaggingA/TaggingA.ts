@@ -15,6 +15,8 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	public UserTagsLabel: string;
 	public InputPlaceholder: string;
 
+	public TextInput = knockout.observable("");
+
 	public AudioLabel: string;
 	public AudioInfo: AudioInfo = null;
 
@@ -69,19 +71,33 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		});*/
 	}
 
+	public AddText():void
+	{
+		if(this.TextInput() == "") return;
+
+		this.AddedItems.push(this.CreateTag({Id: null, Label: this.TextInput(), Position: null}));
+
+		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", this.TextInput());
+		this.UpdateAnswer();
+		this.TextInput("");
+	}
+
 	private CreateTags(tags:PredefinedTag[]):Tag[]
 	{
-		return tags.map(t => {
-			let tag:Tag = {
-				Data: {Id: t.Id, Label: t.Label},
-				Toggle: null,
-				IsAdded: knockout.observable(false)
-			};
+		return tags.map(t => this.CreateTag(t));
+	}
 
-			tag.Toggle = () => this.ToggleTag(tag);
+	private CreateTag(data:PredefinedTag):Tag
+	{
+		let tag:Tag = {
+			Data: {Id: data.Id, Label: data.Label},
+			Toggle: null,
+			IsAdded: knockout.observable(false)
+		};
 
-			return tag;
-		});
+		tag.Toggle = () => this.ToggleTag(tag);
+
+		return tag;
 	}
 
 	private ToggleTag(tag:Tag):void
@@ -100,6 +116,11 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		}
 
 		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
+		this.UpdateAnswer();
+	}
+
+	private UpdateAnswer():void
+	{
 		this.SetAnswer( {Tags: this.AddedItems().map(t => ({Id: t.Data.Id, Label: t.Data.Label}))});
 	}
 
