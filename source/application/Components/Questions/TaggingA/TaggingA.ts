@@ -22,6 +22,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	public UserItems = knockout.observableArray<Tag>();
 	public AddedItems = knockout.observableArray<Tag>();
 
+	public HasSelectionItems:KnockoutComputed<boolean>;
+	public HasUserItems:KnockoutComputed<boolean>;
+
 	public HasMedia: boolean = false;
 	public CanAnswer: KnockoutObservable<boolean>;
 	public AnswerIsRequired: boolean = true;
@@ -52,6 +55,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags")));
 		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags")));
+
+		this.HasSelectionItems = this.PureComputed(()=> this.SelectionItems().some(t => !t.IsAdded()));
+		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
 
 		/*this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
 
