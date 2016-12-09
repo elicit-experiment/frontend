@@ -29,7 +29,6 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	public HasAddedItems:KnockoutComputed<boolean>;
 
 	public HasMedia: boolean = false;
-	public CanAnswer: KnockoutObservable<boolean>;
 	public AnswerIsRequired: boolean = true;
 
 	constructor(question: QuestionModel)
@@ -52,8 +51,6 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 			this.HasMedia = true;
 		}
 
-		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
-
 		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
 		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
 
@@ -61,14 +58,48 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
 		this.HasAddedItems = this.PureComputed(()=> this.AddedItems().length != 0);
 
-		/*this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
+		this.InitializeAnswer();
+	}
 
-		if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
-		this.Answer.subscribe(v =>
+	private InitializeAnswer():void
+	{
+		if(!this.HasAnswer()) return;
+
+		let answer = this.GetAnswer();
+
+		if(!answer.Tags || answer.Tags.length == 0) return;
+
+		for(let tag of answer.Tags)
 		{
-			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v);
-			this.SetAnswer({ Id: v });
-		});*/
+			if(tag.Id == null)
+			{
+				this.AddedItems.push(this.CreateTag({Id: null, Label: tag.Label, Position: null}, true));
+			}
+			else
+			{
+				let found = false;
+				for(let predefinedTag of this.SelectionItems())
+				{
+					if(predefinedTag.Data.Id != tag.Id) continue;
+
+					predefinedTag.IsAdded(true);
+					this.AddedItems.push(predefinedTag);
+					found = true;
+					break;
+				}
+
+				if(found) continue;
+
+				for(let predefinedTag of this.UserItems())
+				{
+					if(predefinedTag.Data.Id != tag.Id) continue;
+
+					predefinedTag.IsAdded(true);
+					this.AddedItems.push(predefinedTag);
+					break;
+				}
+			}
+		}
 	}
 
 	public AddText():void

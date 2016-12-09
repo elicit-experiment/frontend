@@ -18,12 +18,12 @@ class TestExperiment
 			"UserTagBoxLabel": "User Tags",
 			"TextField": "Add your tags",
 			"SelectionTags": [1, 2, 3, 4, 5, 6, 7, 8].map(i => this.CreateTag(i.toString(), "Tag " + i, i)),
-			"UserTags": [1, 2, 3, 4, 5].map(i => this.CreateTag(i.toString(), "User Tag " + i, i)),
+			"UserTags": [1, 2, 3, 4, 5, 9].map(i => this.CreateTag(i.toString(), "User Tag " + i, i)),
 			"Stimulus": {
 				"Type": "audio/mpeg",
 				"URI": "https://s3.eu-central-1.amazonaws.com/762431201790b41bb9c979968535da52/system/140_item/resource/20151023/A4_wind10_S3.wav"
 			}
-		});
+		}, {Tags: [{Id:1, Label: "Test"}, {Id:null, Label: "Test"}, {Id:9, Label: "Test"}]});
 	}
 
 	private CreateTag(id:string, label:string, position:number): {Id:string, Label:string, Position:number}
@@ -64,21 +64,28 @@ class TestExperiment
 		});
 	}
 
-	public CreateStandardQuestion(type:string, instruments:any, events:any = null):CockpitPortal.IQuestion
+	public CreateStandardQuestion(type:string, instruments:any, output:any = null):CockpitPortal.IQuestion
 	{
 		return this.CreateQuestion(new Date().getTime().toString(), type, [
-			{"Events": events},
+			{"Events": {}},
 			{"Instrument": instruments}
-		]);
+		], output, null);
 	}
 
-	public CreateQuestion(id: string, type:string, input:any[]):CockpitPortal.IQuestion
+	public CreateQuestion(id: string, type:string, input:any[], output:any, events:any[]):CockpitPortal.IQuestion
 	{
+		if(output == null)
+			output = {};
+		if(events == null)
+			events = [];
+
+		output.Events = events;
+
 		return {
 			Id: id,
 			Type: type,
 			Input: input,
-			Output: {Events: []}
+			Output: output
 		}
 	}
 }
