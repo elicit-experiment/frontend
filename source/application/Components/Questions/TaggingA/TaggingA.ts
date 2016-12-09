@@ -32,8 +32,6 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	public CanAnswer: KnockoutObservable<boolean>;
 	public AnswerIsRequired: boolean = true;
 
-	private _alignForStimuli:boolean = true;
-
 	constructor(question: QuestionModel)
 	{
 		super(question);
@@ -56,8 +54,8 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
-		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags")));
-		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags")));
+		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
+		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
 
 		this.HasSelectionItems = this.PureComputed(()=> this.SelectionItems().some(t => !t.IsAdded()));
 		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
@@ -128,19 +126,6 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	{
 		return !this.AnswerIsRequired || answer != undefined && answer.Tags != undefined && answer.Tags.length !== 0;
 	}
-
-	/*private ItemInfo(data: Item): ItemInfo
-	{
-		if (data.Selected === "1")
-			this.Answer(data.Id);
-
-		var info = {
-			Id: data.Id,
-			Label: this.GetFormatted(data.Label)
-		};
-
-		return info;
-	}*/
 }
 
 export = TaggingA;
