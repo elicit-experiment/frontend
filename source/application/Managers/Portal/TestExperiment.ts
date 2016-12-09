@@ -12,7 +12,7 @@ class TestExperiment
 
 	public CreateTaggingA():CockpitPortal.IQuestion
 	{
-		return this.CreateStandardQuestion("TaggingA", {
+		return this.CreateStandardQuestion("TaggingB", {
 			"HeaderLabel": "Tag that thing",
 			"SelectionTagBoxLabel": "Selection Tags",
 			"UserTagBoxLabel": "User Tags",
@@ -21,7 +21,8 @@ class TestExperiment
 			"UserTags": [1, 2, 3, 4, 5, 9].map(i => this.CreateTag(i.toString(), "User Tag " + i, i)),
 			"Stimulus": {
 				"Type": "audio/mpeg",
-				"URI": "https://s3.eu-central-1.amazonaws.com/762431201790b41bb9c979968535da52/system/140_item/resource/20151023/A4_wind10_S3.wav"
+				"URI": "https://s3.eu-central-1.amazonaws.com/762431201790b41bb9c979968535da52/system/140_item/resource/20151023/A4_wind10_S3.wav",
+				"Label": "My stimulus"
 			}
 		}, {Tags: [{Id:1, Label: "Test"}, {Id:null, Label: "Test"}, {Id:9, Label: "Test"}]});
 	}
