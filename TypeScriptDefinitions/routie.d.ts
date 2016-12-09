@@ -21,7 +21,6 @@ interface RouteStatic
 
 declare var routie:RouteStatic;
 
-
 declare module "routie"
 {
 	export = routie;

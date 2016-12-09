@@ -11,7 +11,8 @@
     "requirejs-text": "2.0.12",
     "crossroads": "0.12.2",
     "signals": "1.0.0",
-    "autosize": "3.0.15"
+    "autosize": "3.0.15",
+    "taggle": "1.11.1"
   },
   "devDependencies": {
     "del": "1.2.x",
@@ -27,6 +28,6 @@
     "merge-stream": "1.0.x",
     "minimist": "1.2.x",
     "run-sequence": "1.1.x",
-    "typescript": "2.0.x"
+    "typescript": "2.1.x"
   }
 }

@@ -10,6 +10,7 @@
 /// <reference path="../../TypeScriptDefinitions/routie.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/SoundManager.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/videojs.d.ts" />
+/// <reference path="../../TypeScriptDefinitions/taggle.d.ts" />
 
 declare module "PortalClient" { export = CHAOS.Portal.Client }
 declare var CacheBuster: number;
@@ -28,7 +29,8 @@ requirejs.config({
 		HighChartsDraggablePoints: "../lib/Highcharts/draggable-points/draggable-points",
 		HighChartsCrossingSpecificValue: "../lib/Highcharts/crossing-specific-value/crossing-specific-value",
 		"crypto-js": "../lib/crypto-js/md5",
-		soundmanager2: "../lib/soundmanager2/script/soundmanager2-nodebug-jsmin"
+		soundmanager2: "../lib/soundmanager2/script/soundmanager2-nodebug-jsmin",
+		Taggle: "../lib/taggle/taggle",
 	},
 	map: {
 		"*": {
@@ -64,6 +66,9 @@ requirejs.config({
 		},
 		"crypto-js": {
 			exports: "CryptoJS"
+		},
+		Taggle: {
+			deps: ["css!../lib/taggle/taggle"]
 		}
 	},
 	deps: ["Main", "bootstrap", "css!Style/default", "KnockoutBindings/KnockoutBindings"],

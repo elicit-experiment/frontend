@@ -10,14 +10,7 @@
 	</div>
 	<div class="row container-fluid">
 		<div class="col-xs-7">
-			<form data-bind="submit: AddText">
-				<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
-			</form>
-			<ul data-bind="foreach: AddedItems, visible: HasAddedItems" class="TagList">
-				<li data-bind="click: Toggle">
-					<span class="badge" data-bind="text: Data.Label"></span>
-				</li>
-			</ul>
+			<div class="tagBox" data-bind="Element: TagBoxElement"></div>
 		</div>
 		<div class="col-xs-5">
 			<div class="TagContainer" data-bind="visible: HasSelectionItems">

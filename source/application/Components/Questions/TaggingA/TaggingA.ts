@@ -77,29 +77,48 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 			}
 			else
 			{
-				let found = false;
-				for(let predefinedTag of this.SelectionItems())
+				let existingTag = this.FindTagById(tag.Id);
+
+				if(existingTag != null)
 				{
-					if(predefinedTag.Data.Id != tag.Id) continue;
-
-					predefinedTag.IsAdded(true);
-					this.AddedItems.push(predefinedTag);
-					found = true;
-					break;
-				}
-
-				if(found) continue;
-
-				for(let predefinedTag of this.UserItems())
-				{
-					if(predefinedTag.Data.Id != tag.Id) continue;
-
-					predefinedTag.IsAdded(true);
-					this.AddedItems.push(predefinedTag);
-					break;
+					existingTag.IsAdded(true);
+					this.AddedItems.push(existingTag);
 				}
 			}
 		}
+	}
+
+	protected FindTagByLabel(label:string):Tag
+	{
+		for(let predefinedTag of this.SelectionItems())
+		{
+			console.log(predefinedTag.Data.Label, label);
+			if(predefinedTag.Data.Label == label)
+				return predefinedTag
+		}
+		for(let predefinedTag of this.UserItems())
+		{
+			if(predefinedTag.Data.Label == label)
+				return predefinedTag
+		}
+
+		return null;
+	}
+
+	protected FindTagById(id:string):Tag
+	{
+		for(let predefinedTag of this.SelectionItems())
+		{
+			if(predefinedTag.Data.Id == id)
+				return predefinedTag
+		}
+		for(let predefinedTag of this.UserItems())
+		{
+			if(predefinedTag.Data.Id== id)
+				return predefinedTag
+		}
+
+		return null;
 	}
 
 	public AddText():void
