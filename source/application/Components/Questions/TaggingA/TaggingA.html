@@ -13,21 +13,27 @@
 			<form data-bind="submit: AddText">
 				<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
 			</form>
-			<ul data-bind="foreach: AddedItems" class="TagList">
-				<li data-bind="text: Data.Label, click: Toggle"></li>
+			<ul data-bind="foreach: AddedItems, visible: HasAddedItems" class="TagList">
+				<li data-bind="click: Toggle">
+					<span class="badge" data-bind="text: Data.Label"></span>
+				</li>
 			</ul>
 		</div>
 		<div class="col-xs-5">
 			<div class="TagContainer" data-bind="visible: HasSelectionItems">
 				<p data-bind="html: SelectionTagsLabel"></p>
 				<ul data-bind="foreach: SelectionItems">
-					<li data-bind="text: Data.Label, click: Toggle, visible: !IsAdded()"></li>
+					<li data-bind="click: Toggle, visible: !IsAdded()">
+						<span class="badge" data-bind="text: Data.Label"></span>
+					</li>
 				</ul>
 			</div>
 			<div class="TagContainer" data-bind="visible: HasUserItems">
 				<p data-bind="html: UserTagsLabel"></p>
 				<ul data-bind="foreach: UserItems">
-					<li data-bind="text: Data.Label, click: Toggle, visible: !IsAdded()"></li>
+					<li data-bind="click: Toggle, visible: !IsAdded()">
+						<span class="badge" data-bind="text: Data.Label"></span>
+					</li>
 				</ul>
 			</div>
 		</div>

@@ -26,6 +26,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 	public HasSelectionItems:KnockoutComputed<boolean>;
 	public HasUserItems:KnockoutComputed<boolean>;
+	public HasAddedItems:KnockoutComputed<boolean>;
 
 	public HasMedia: boolean = false;
 	public CanAnswer: KnockoutObservable<boolean>;
@@ -60,6 +61,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		this.HasSelectionItems = this.PureComputed(()=> this.SelectionItems().some(t => !t.IsAdded()));
 		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
+		this.HasAddedItems = this.PureComputed(()=> this.AddedItems().length != 0);
 
 		/*this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
 
@@ -75,9 +77,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	{
 		if(this.TextInput() == "") return;
 
-		this.AddedItems.push(this.CreateTag({Id: null, Label: this.TextInput(), Position: null}));
+		this.AddedItems.push(this.CreateTag({Id: null, Label: this.TextInput(), Position: null}, true));
 
-		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", this.TextInput());
+		this.AddEvent("Change", "/Instrument", "Keyboard", this.TextInput());
 		this.UpdateAnswer();
 		this.TextInput("");
 	}
@@ -87,12 +89,12 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		return tags.map(t => this.CreateTag(t));
 	}
 
-	private CreateTag(data:PredefinedTag):Tag
+	private CreateTag(data:PredefinedTag, isAdded = false):Tag
 	{
 		let tag:Tag = {
 			Data: {Id: data.Id, Label: data.Label},
 			Toggle: null,
-			IsAdded: knockout.observable(false)
+			IsAdded: knockout.observable(isAdded)
 		};
 
 		tag.Toggle = () => this.ToggleTag(tag);
@@ -102,16 +104,14 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 	private ToggleTag(tag:Tag):void
 	{
-		tag.IsAdded(!tag.IsAdded());
-
 		if(tag.IsAdded())
 		{
-			this.AddedItems.push(tag);
+			this.AddedItems.remove(tag);
 			tag.IsAdded(false);
 		}
 		else
 		{
-			this.AddedItems.remove(tag);
+			this.AddedItems.push(tag);
 			tag.IsAdded(true);
 		}
 
