@@ -32,7 +32,7 @@ class CreateExperiment extends DisposableComponent
 
 	public Load():void
 	{
-		PortalClient.Object.Get([this.ObjectGuid()], null, true).WithCallback(results => {
+		PortalClient.Object.Get([this.ObjectGuid()], null, true, true, true, true, true).WithCallback(results => {
 			this.ExperimentXml(results.Body.Results[0].Metadatas[0].MetadataXml);
 			this.Result(JSON.stringify(results.Body.Results[0]));
 		});
@@ -43,17 +43,17 @@ class CreateExperiment extends DisposableComponent
 		if(this.ObjectGuid() == "")
 		{
 			PortalClient.Object.Create(null, this.ObjectTypeId, this.FolderId()).WithCallback(results => {
-				this.ObjectGuid(results.Body.Results[0].Id);
+				this.ObjectGuid(results.Body.Results[0].Guid);
 				this.Result(JSON.stringify(results.Body.Results[0]));
 
-				PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, null, this.ExperimentXml()).WithCallback(results => {
+				PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, 1, this.ExperimentXml()).WithCallback(results => {
 					this.Result(JSON.stringify(results.Body.Results[0]));
 				});
 			});
 		}
 		else
 		{
-			PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, null, this.ExperimentXml()).WithCallback(results => {
+			PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, 1, this.ExperimentXml()).WithCallback(results => {
 				this.Result(JSON.stringify(results.Body.Results[0]));
 			});
 		}
