@@ -1,0 +1,23 @@
+﻿<div>
+	<h2>Create Experiment</h2>
+	<div data-bind="visible: !IsAuthenticated()">
+		<form data-bind="submit: Login">
+			<input class="form-control" type="text" data-bind="textInput: Email" placeholder="Email" />
+			<input class="form-control" type="password" data-bind="textInput: Password" placeholder="Password" />
+			<button type="submit">Login</button>
+		</form>
+	</div>
+	<div data-bind="visible: IsAuthenticated">
+		<form data-bind="submit: CreateExperiment">
+			<p>Object Type Id: <span data-bind="text: ObjectTypeId"></span></p>
+			<p>Metadata Schema Guid: <span data-bind="text: MetadataSchemaGuid"></span></p>
+			<input class="form-control" type="text" data-bind="textInput: ObjectGuid" placeholder="Experiment Id" />
+			<button class="btn btn-default" type="button" data-bind="click: Load">Load</button>
+			<input class="form-control" type="text" data-bind="textInput: FolderId" placeholder="Folder Id" />
+			<textarea class="form-control" data-bind="textInput: ExperimentXml" placeholder="Experiment Xml" style="height: 500px"></textarea>
+			<button class="btn btn-primary" type="submit">Create</button>
+		</form>
+		<div data-bind="text: Result">
+		</div>
+	</div>
+</div>

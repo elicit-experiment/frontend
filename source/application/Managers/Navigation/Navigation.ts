@@ -18,6 +18,7 @@ class Navigation
 			"NoMoreExperiments": () => { this.LoadPage("NoMoreExperiments"); },
 			"SlideLocked": () => { this.LoadPage("SlideLocked"); },
 			"TextFormat": () => { this.LoadPage("TextFormat"); },
+			"CreateExperiment": () => { this.LoadPage("CreateExperiment"); },
 			"ExperimentNotFound/:id": (id: string) => { this.LoadPage("ExperimentNotFound", id); },
 			"*": () => { this.LoadPage("NotFound"); }
 		});
