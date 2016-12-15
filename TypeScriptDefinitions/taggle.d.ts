@@ -17,6 +17,8 @@ interface TaggleOptions
 
 	onTagAdd?:(event:Event, tag:string)=>void;
 	onTagRemove?:(event:Event, tag:string)=>void;
+
+	onBeforeTagAdd?:(event:Event, tag:string)=>boolean;
 }
 
 declare module "Taggle"

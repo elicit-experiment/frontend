@@ -30,13 +30,15 @@ class TaggingB extends TaggingA
 			onTagAdd: (e, tag) => {
 				if(isModifying) return;
 				isModifying = true;
-				this.AddTagByName(tag);
+				this.AddTagByLabel(tag);
 				isModifying = false;
 			},
+			onBeforeTagAdd:
+			(e, tag) => !this.IsTagAdded(tag),
 			onTagRemove: (e, tag) => {
 				if(isModifying) return;
 				isModifying = true;
-				this.RemoveTagByName(tag);
+				this.RemoveTagByLabel(tag);
 				isModifying = false;
 			}
 		});
@@ -52,20 +54,10 @@ class TaggingB extends TaggingA
 		});
 	}
 
-	private AddTagByName(tagLabel: string)
-	{
-		let existingTag = this.FindTagByLabel(tagLabel);
 
-		if(existingTag != null)
-		{
-			existingTag.IsAdded(true);
-			this.AddedItems.push(existingTag);
-		}
-	}
-
-	private RemoveTagByName(tagLabel: string)
+	private RemoveTagByLabel(tagLabel: string)
 	{
-		let existingTag = this.FindTagByLabel(tagLabel);
+		let existingTag = this.GetTagByLabel(tagLabel);
 
 		if(existingTag != null)
 		{

@@ -71,13 +71,13 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 		for(let tag of answer.Tags)
 		{
-			if(tag.Id == null)
+			if(tag.Id == null || tag.Id == "")
 			{
 				this.AddedItems.push(this.CreateTag({Id: null, Label: tag.Label, Position: null}, true));
 			}
 			else
 			{
-				let existingTag = this.FindTagById(tag.Id);
+				let existingTag = this.GetTagById(tag.Id);
 
 				if(existingTag != null)
 				{
@@ -88,24 +88,35 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		}
 	}
 
-	protected FindTagByLabel(label:string):Tag
+	protected GetTagByLabel(label:string):Tag
 	{
+		label = label.toLocaleLowerCase();
 		for(let predefinedTag of this.SelectionItems())
 		{
-			console.log(predefinedTag.Data.Label, label);
-			if(predefinedTag.Data.Label == label)
+			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
 				return predefinedTag
 		}
 		for(let predefinedTag of this.UserItems())
 		{
-			if(predefinedTag.Data.Label == label)
+			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
 				return predefinedTag
 		}
 
 		return null;
 	}
 
-	protected FindTagById(id:string):Tag
+	protected IsTagAdded(label:string):boolean
+	{
+		label = label.toLocaleLowerCase();
+		for(let tag of this.AddedItems())
+		{
+			if(tag.Data.Label.toLocaleLowerCase() == label)
+				return true;
+		}
+		return false;
+	}
+
+	protected GetTagById(id:string):Tag
 	{
 		for(let predefinedTag of this.SelectionItems())
 		{
@@ -125,11 +136,44 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	{
 		if(this.TextInput() == "") return;
 
-		this.AddedItems.push(this.CreateTag({Id: null, Label: this.TextInput(), Position: null}, true));
+		if(this.AddTagByLabel(this.TextInput()))
+			this.TextInput("");
+	}
 
-		this.AddEvent("Change", "/Instrument", "Keyboard", this.TextInput());
+	protected AddTagByLabel(label:string):boolean
+	{
+		let tag = this.GetTagByLabel(label);
+
+		if(tag != null)
+			tag.IsAdded(true);
+		else
+			tag = this.CreateTag({Id: null, Label: label, Position: null}, true);
+
+		return this.AddTag(tag);
+	}
+
+	protected AddTag(tag:Tag):boolean
+	{
+		if(this.AddedItems.indexOf(tag) != -1) return false;
+
+		tag.IsAdded(true);
+		this.AddedItems.push(tag);
+
+		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
 		this.UpdateAnswer();
-		this.TextInput("");
+
+		return true;
+	}
+
+	protected RemoveTag(tag:Tag):void
+	{
+		if(this.AddedItems.indexOf(tag) == -1) return;
+
+		tag.IsAdded(false);
+		this.AddedItems.remove(tag);
+
+		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
+		this.UpdateAnswer();
 	}
 
 	private CreateTags(tags:PredefinedTag[]):Tag[]
@@ -153,18 +197,9 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	private ToggleTag(tag:Tag):void
 	{
 		if(tag.IsAdded())
-		{
-			this.AddedItems.remove(tag);
-			tag.IsAdded(false);
-		}
+			this.RemoveTag(tag);
 		else
-		{
-			this.AddedItems.push(tag);
-			tag.IsAdded(true);
-		}
-
-		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
-		this.UpdateAnswer();
+			this.AddTag(tag);
 	}
 
 	private UpdateAnswer():void
