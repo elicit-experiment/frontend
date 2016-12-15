@@ -51,8 +51,8 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 			this.HasMedia = true;
 		}
 
-		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
-		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
+		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
+		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
 
 		this.HasSelectionItems = this.PureComputed(()=> this.SelectionItems().some(t => !t.IsAdded()));
 		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
