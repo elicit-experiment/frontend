@@ -46,14 +46,14 @@ class CreateExperiment extends DisposableComponent
 				this.ObjectGuid(results.Body.Results[0].Guid);
 				this.Result(JSON.stringify(results.Body.Results[0]));
 
-				PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, 1, this.ExperimentXml()).WithCallback(results => {
+				PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, new Date().getTime(), this.ExperimentXml()).WithCallback(results => {
 					this.Result(JSON.stringify(results.Body.Results[0]));
 				});
 			});
 		}
 		else
 		{
-			PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, 1, this.ExperimentXml()).WithCallback(results => {
+			PortalClient.Metadata.Set(this.ObjectGuid(), this.MetadataSchemaGuid, null, new Date().getTime(), this.ExperimentXml()).WithCallback(results => {
 				this.Result(JSON.stringify(results.Body.Results[0]));
 			});
 		}
