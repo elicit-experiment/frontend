@@ -39,15 +39,13 @@
 }
 
 .taggle_list .taggle .close {
-	font-size: 1.1rem;
 	position: absolute;
 	top: 10px;
 	right: 3px;
 	text-decoration: none;
 	padding: 0;
 	line-height: 0.5;
-	color: #ccc;
-	color: rgba(0, 0, 0, 0.2);
+	color: black;
 	padding-bottom: 4px;
 	display: none;
 	border: 0;
