@@ -134,7 +134,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 	public AddText():void
 	{
-		if(this.TextInput() == "") return;
+		if(this.TextInput() == "" || this.IsTagAdded(this.TextInput())) return;
 
 		if(this.AddTagByLabel(this.TextInput()))
 			this.TextInput("");
@@ -144,9 +144,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	{
 		let tag = this.GetTagByLabel(label);
 
-		if(tag != null)
-			tag.IsAdded(true);
-		else
+		if(tag == null)
 			tag = this.CreateTag({Id: null, Label: label, Position: null}, true);
 
 		return this.AddTag(tag);
