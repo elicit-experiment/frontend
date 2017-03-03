@@ -12,7 +12,17 @@ class TestExperiment
 
 	public CreateTaggingA():CockpitPortal.IQuestion
 	{
-		return this.CreateStandardQuestion("TaggingB", {
+		return this.CreateTagging("TaggingA");
+	}
+
+	public CreateTaggingB():CockpitPortal.IQuestion
+	{
+		return this.CreateTagging("TaggingB");
+	}
+
+	private CreateTagging(componentName:string):CockpitPortal.IQuestion
+	{
+		return this.CreateStandardQuestion(componentName, {
 			"HeaderLabel": "Tag that thing",
 			"SelectionTagBoxLabel": "Selection Tags",
 			"UserTagBoxLabel": "User Tags",

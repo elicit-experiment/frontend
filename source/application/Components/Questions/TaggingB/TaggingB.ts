@@ -60,10 +60,7 @@ class TaggingB extends TaggingA
 		let existingTag = this.GetTagByLabel(tagLabel);
 
 		if(existingTag != null)
-		{
-			existingTag.IsAdded(false);
-			this.AddedItems.remove(existingTag);
-		}
+			this.RemoveTag(existingTag);
 	}
 }
 

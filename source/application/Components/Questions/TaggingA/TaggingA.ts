@@ -91,12 +91,18 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	protected GetTagByLabel(label:string):Tag
 	{
 		label = label.toLocaleLowerCase();
+
 		for(let predefinedTag of this.SelectionItems())
 		{
 			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
 				return predefinedTag
 		}
 		for(let predefinedTag of this.UserItems())
+		{
+			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
+				return predefinedTag
+		}
+		for(let predefinedTag of this.AddedItems())
 		{
 			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
 				return predefinedTag
