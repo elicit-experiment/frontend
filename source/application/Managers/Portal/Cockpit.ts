@@ -8,7 +8,7 @@ export class Experiment
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Experiment/Get", PortalClient.HttpMethod.Get, { id: id }, false);
+		return serviceCaller.CallService("Experiment/Get", PortalClient.HttpMethod.Get, { id: id }, true);
 	}
 
 	public static Next(listId: string, serviceCaller: CHAOS.Portal.Client.IServiceCaller = null): CHAOS.Portal.Client.ICallState<CockpitResults<IExperimentClaim>>
@@ -16,7 +16,7 @@ export class Experiment
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Experiment/Next", PortalClient.HttpMethod.Get, { listId: listId }, false);
+		return serviceCaller.CallService("Experiment/Next", PortalClient.HttpMethod.Get, { listId: listId }, true);
 	}
 }
 
@@ -27,7 +27,7 @@ export class Slide
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Slide/Completed", PortalClient.HttpMethod.Get, { questionaireId: questionaireId, slideIndex: slideIndex }, false);
+		return serviceCaller.CallService("Slide/Completed", PortalClient.HttpMethod.Get, { questionaireId: questionaireId, slideIndex: slideIndex }, true);
 	}
 }
 
@@ -38,7 +38,7 @@ export class Question
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Question/Get", PortalClient.HttpMethod.Get, { id: id, index: index}, false, "json3");
+		return serviceCaller.CallService("Question/Get", PortalClient.HttpMethod.Get, { id: id, index: index}, true, "json3");
 	}
 }
 
@@ -49,7 +49,7 @@ export class Answer
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("Answer/Set", PortalClient.HttpMethod.Post, { questionId: questionId, output: JSON.stringify(output) }, false);
+		return serviceCaller.CallService("Answer/Set", PortalClient.HttpMethod.Post, { questionId: questionId, output: JSON.stringify(output) }, true);
 	}
 }
 
@@ -60,7 +60,7 @@ export class AudioInformation
 		if (serviceCaller == null)
 			serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-		return serviceCaller.CallService("AudioInformation/Search", PortalClient.HttpMethod.Get, null, false);
+		return serviceCaller.CallService("AudioInformation/Search", PortalClient.HttpMethod.Get, null, true);
 	}
 }
 

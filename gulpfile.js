@@ -38,7 +38,7 @@ var config = {
 	parameters: {
 		string: ["portalPath"],
 		default: {
-			portalPath: "https://dev-api.cosound.dk"
+			portalPath: "http://localhost:3000/"
 		}
 	}
 };
