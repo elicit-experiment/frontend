@@ -36,9 +36,11 @@ var config = {
 		target: "ES5"
 	},
 	parameters: {
-		string: ["portalPath"],
+		string: ["portalPath", "elicitLandingPath"],
 		default: {
-			portalPath: "http://localhost:3000/"
+//			portalPath: "https://dev-api.cosound.dk"
+			portalPath: "http://localhost:3000/",
+			elicitLandingPath: "http://localhost:3000",
 		}
 	}
 };
