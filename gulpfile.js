@@ -110,6 +110,7 @@ gulp.task("copyConfig", function () {
 
 	return gulp.src(config.projectPath + "configuration.json")
 		.pipe(replace("{PortalPath}", parameters.portalPath))
+		.pipe(replace("{ElicitLandingPath}", parameters.elicitLandingPath))
 		.pipe(gulp.dest(config.distPath));
 });
 
