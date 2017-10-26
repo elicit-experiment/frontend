@@ -2,6 +2,7 @@ FROM node
 
 ARG API_URL
 ARG ELICIT_LANDING_URL
+ARG API_SCHEME
 
 RUN apt-get update
 RUN apt-get install -y ruby-dev build-essential
@@ -34,8 +35,8 @@ RUN npm install
 
 COPY . /experiment-frontend
 
-RUN sed -i'' -E "s/(\s+portalPath\: ).*/\1\"http:\/\/$API_URL\"/g" gulpfile.js 
-RUN sed -i'' -E "s/(\s+elicitLandingPath\: ).*/\1\"http:\/\/$ELICIT_LANDING_URL\"/g" gulpfile.js 
+RUN sed -i'' -E "s/(\s+portalPath\: ).*/\1\"$API_SCHEME:\/\/$API_URL\",/g" gulpfile.js 
+RUN sed -i'' -E "s/(\s+elicitLandingPath\: ).*/\1\"$API_SCHEME:\/\/$ELICIT_LANDING_URL\",/g" gulpfile.js 
 
 RUN cat gulpfile.js | grep portalPath
 
