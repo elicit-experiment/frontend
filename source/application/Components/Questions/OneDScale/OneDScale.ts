@@ -35,7 +35,9 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 	public IsStimuliBlockVisible: boolean = true;
 
-	private _alignForStimuli: boolean = true;
+    public DefaultPosition: number;
+
+    private _alignForStimuli: boolean = true;
 
 	constructor(question: QuestionModel)
 	{
@@ -43,6 +45,7 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 		this.Id = this.Model.Id;
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
+        this.DefaultPosition = undefined;
 		this.X1Ticks = this.GetTicks("X1AxisTicks");
 		this.X2Ticks = this.GetTicks("X2AxisTicks");
 		this.Y1Ticks = this.GetTicks("Y1AxisTicks");
@@ -50,7 +53,11 @@ class OneDScale extends QuestionBase<{Position:number}>
 		this.HasY1Ticks = this.Y1Ticks.length !== 0;
 		this.HasY2Ticks = this.Y2Ticks.length !== 0;
 
-		this.IsValueNotSet = knockout.computed(() => !(this.HasAnswer() && this.HasValidAnswer()));
+		var defaultPos = this.GetInstrumentFormatted("Position")
+		if (defaultPos)
+            this.DefaultPosition = parseFloat(defaultPos);
+
+		this.IsValueNotSet = knockout.computed(() => !( (this.HasAnswer() && this.HasValidAnswer()) || (this.DefaultPosition !== undefined) ));
 
 		var stimulus = this.GetInstrument("Stimulus");
 
@@ -68,7 +75,11 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
-		if (this.HasAnswer()) this.Answer(this.GetAnswer().Position);
+		if (this.HasAnswer())
+			this.Answer(this.GetAnswer().Position);
+		else
+			this.Answer(this.DefaultPosition);
+
 		this.Answer.subscribe(v =>
 		{
 			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v.toString());
