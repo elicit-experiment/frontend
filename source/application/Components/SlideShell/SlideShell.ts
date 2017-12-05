@@ -128,7 +128,9 @@ class SlideShell
 			this.SlideData().Complete(() => ExperimentManager.CloseSlide(oldSlide.Index));
 		}
 
-		this.SlideData(null);
+        ExperimentManager.SlideTitle("");
+
+        this.SlideData(null);
 	}
 
 	public Close():void
