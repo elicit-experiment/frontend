@@ -13,6 +13,7 @@
 				display inline-block
 				margin-left auto
 				margin-right auto
+				z-index 100
 
 			> spanlast-child 
 				width 100%
@@ -21,11 +22,20 @@
 		.Line
 			position absolute
 			top 10px
-			left 50%
 			height 1px
-			width 100%
 			border-top 1px solid grey
+			z-order -10
 
-		label:last-of-type .Line
+		.Line-Right
+			left 50%
+			width 50%
+
+		.Line-Left
+			left -50%
+			width 100%
+
+		label:last-of-type .Line-Right
 			display:none
 
+		label:first-of-type .Line-Left
+			display:none
