@@ -8,8 +8,7 @@ type Item = { Label: string; Id: string; Selected: string };
 
 class RadioButtonGroup extends QuestionBase<{Id:string}>
 {
-    private _minNoOfSelections: number;
-    private _maxNoOfSelections: number;
+    private _isOptional: boolean;
 
     public Id: string;
 	public HeaderLabel: string;
@@ -49,8 +48,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 			this.HasMedia = true;
 		}
 
-        this._minNoOfSelections = parseInt(this.GetInstrument("MinNoOfScalings"));
-        this._maxNoOfSelections = parseInt(this.GetInstrument("MaxNoOfScalings"));
+        this._isOptional = parseInt(this.GetInstrument("IsOptional"));
 
         this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
@@ -71,6 +69,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 
 	protected HasValidAnswer(answer: any): boolean
 	{
+		if (this._isOptional) return true;
 		return answer.Id != undefined && answer.Id != null;
 	}
 
