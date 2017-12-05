@@ -8,7 +8,10 @@ type Item = { Label: string; Id: string; Selected: string };
 
 class RadioButtonGroup extends QuestionBase<{Id:string}>
 {
-	public Id: string;
+    private _minNoOfSelections: number;
+    private _maxNoOfSelections: number;
+
+    public Id: string;
 	public HeaderLabel: string;
 	public AudioLabel: string;
 	public AudioInfo: AudioInfo = null;
@@ -21,12 +24,20 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 	public AddOneFillerItem:KnockoutComputed<boolean>;
 	public AddHalfFillerItem:KnockoutComputed<boolean>;
 
-	constructor(question: QuestionModel)
+    public IsStimuliBlockVisible: boolean = true;
+
+    private _alignForStimuli: boolean = true;
+
+    constructor(question: QuestionModel)
 	{
 		super(question);
 
 		this.Id = this.Model.Id;
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
+
+        var alignForStimuli = this.GetInstrument("AlignForStimuli");
+        this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
+        this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
 
 		var stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
@@ -38,7 +49,10 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 			this.HasMedia = true;
 		}
 
-		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
+        this._minNoOfSelections = parseInt(this.GetInstrument("MinNoOfScalings"));
+        this._maxNoOfSelections = parseInt(this.GetInstrument("MaxNoOfScalings"));
+
+        this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
 		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
 		this.RowedItems = this.RowItems(this.Items, 4);
