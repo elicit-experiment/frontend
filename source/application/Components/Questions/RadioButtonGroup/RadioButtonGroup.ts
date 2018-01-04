@@ -48,7 +48,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 			this.HasMedia = true;
 		}
 
-        this._isOptional = parseInt(this.GetInstrument("IsOptional"));
+        this._isOptional = parseInt(this.GetInstrument("IsOptional")) == 1;
 
         this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
