@@ -96,6 +96,7 @@ class TestExperiment
 			Id: id,
 			Type: type,
 			Input: input,
+			Component: [],
 			Output: output
 		}
 	}

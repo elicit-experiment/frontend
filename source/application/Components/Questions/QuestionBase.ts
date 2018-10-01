@@ -2,6 +2,7 @@
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
+import MediaInfo = require("Components/Players/MediaInfo");
 import DisposableComponent = require("Components/DisposableComponent");
 import TextFormatter = require("Managers/TextFormatter");
 
@@ -68,6 +69,11 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 	protected GetInputs():any[]
 	{
 		return this.Model === null || this.Model.Input === null ? new Array<any>() : this.Model.Input;
+	}
+
+	protected GetComponent():any[]
+	{
+		return this.Model === null || this.Model.Component === null ? new Array<any>() : this.Model.Component;
 	}
 
 	protected GetInstrumentFormatted(key: string): string
@@ -209,6 +215,33 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		});
 
 		allHavePlayed(numberOfPlays === (<AudioInfo[]>audio).length);
+
+		return knockout.computed(() => this.HasAnswer() || allHavePlayed());
+	}
+
+	protected WhenAllMediaHavePlayed(media:MediaInfo|MediaInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
+	{
+		if (media == null) return knockout.computed(() => true);
+
+		if (media instanceof MediaInfo)
+			media = [<MediaInfo>media];
+
+		var allHavePlayed = knockout.observable(false);
+		var numberOfPlays = 0;
+
+		(<MediaInfo[]>media).forEach(a =>
+		{
+			if (a === null)
+				numberOfPlays++;
+			else
+			{
+				a.AddIsPlayingCallback(() => {
+					if (++numberOfPlays === (<AudioInfo[]>media).length) allHavePlayed(true);
+				}, true);
+			}
+		});
+
+		allHavePlayed(numberOfPlays === (<MediaInfo[]>media).length);
 
 		return knockout.computed(() => this.HasAnswer() || allHavePlayed());
 	}

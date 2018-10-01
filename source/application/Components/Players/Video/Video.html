@@ -1,0 +1,11 @@
+<!-- ko if: SourceType === 'youtube' -->
+<div id='player' data-bind="Element: YouTubePlayerElement"></div>
+<!-- /ko -->
+<!-- ko if: SourceType === 'html5' -->
+<video class="VideoPlayer" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">
+</video>
+<!-- /ko -->
+<button type="button" class="btn btn-default" aria-label="Left Align" data-bind="click: TogglePlay">
+	<span class="glyphicon glyphicon-play" aria-hidden="true" data-bind="visible: !IsPlaying()"></span>
+	<span class="glyphicon glyphicon-stop" aria-hidden="true" data-bind="visible: IsPlaying"></span>
+</button>

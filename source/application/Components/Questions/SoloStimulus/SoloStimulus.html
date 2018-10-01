@@ -1,0 +1,10 @@
+<div class="container-fluid SoloStimulus">
+	<div class="row">
+		<div class="col-xs-2">
+			<!-- ko if: HasMedia -->
+			<div data-bind="component: {name: MediaComponentName, params: MediaInfo}"></div>
+			<p data-bind="html: MediaLabel"></p>
+			<!-- /ko -->
+		</div>
+	</div>
+</div>

@@ -9,6 +9,7 @@ class Question
 	public APIType:string;
 	public HasUIElement: boolean;
 	public Input: any[];
+	public Component: any[];
 	public Answer: KnockoutObservable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
 	public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
 	public RequiresInput: boolean;
@@ -18,7 +19,29 @@ class Question
 
 	constructor(question: CockpitPortal.IQuestion, answerChangedCallback: (question: Question)=>void, questionLoadedCallback:()=>void)
 	{
-		var questionMap = QuestionMap.Get(question.Type);
+		var questionMap:any;
+		var input;
+
+		if (question.Type == 'NewComponent') {
+			console.log('NewComponent');
+			const component = question.Component as any;
+			console.dir(component);
+
+			if (component.hasOwnProperty('Stimuli')) {
+				questionMap = QuestionMap.Get('SoloStimulus');
+				input = component.Stimuli; // TODO: Handle more than one stimulus ?
+			} else if (component.hasOwnProperty('Instruments')) {
+				input = [component.Instruments[0].Instrument]; // TODO: Handle more than one instrument
+				const type = Object.keys(input[0])[0];
+				input = input.map((x) => {return {Instrument: x[type]} });
+				questionMap = QuestionMap.Get(type);
+			}
+			console.dir(input);
+			console.dir(questionMap);
+		} else {
+			input = question.Component;
+			questionMap = QuestionMap.Get(question.Type);
+		}
 		this.Id = question.Id;
 		this.Type = questionMap.Type;
 		this.HasUIElement = questionMap.HasUIElement;
@@ -28,7 +51,8 @@ class Question
 		if (question.Output)
 			this.Answer(question.Output);
 
-		this.Input = question.Input;
+		this.Input = input;
+		this.Component = question.Component;
 
 		this.Answer.extend({ rateLimit: { timeout: 200, method: "notifyWhenChangesStop" } });
 		this.Answer.subscribe(() => answerChangedCallback(this));

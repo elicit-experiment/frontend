@@ -96,6 +96,7 @@ export interface IQuestion
 	Id:string;
 	Type: string;
 	Input:any[];
+	Component: any[];
 	Output: IOutput;
 }
 

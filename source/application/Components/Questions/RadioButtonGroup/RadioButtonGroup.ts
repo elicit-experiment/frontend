@@ -26,6 +26,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
     public IsStimuliBlockVisible: boolean = true;
 
     private _alignForStimuli: boolean = true;
+    private _questionsPerRow: number = 4;
 
     constructor(question: QuestionModel)
 	{
@@ -34,8 +35,10 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 		this.Id = this.Model.Id;
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 
-        var alignForStimuli = this.GetInstrument("AlignForStimuli");
+		var alignForStimuli = this.GetInstrument("AlignForStimuli");
+		var questionsPerRow = this.GetInstrument("QuestionsPerRow");
         this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
+        this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
         this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
 
 		var stimulus = this.GetInstrument("Stimulus");
@@ -53,7 +56,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
         this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
 		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
-		this.RowedItems = this.RowItems(this.Items, 4);
+		this.RowedItems = this.RowItems(this.Items, this._questionsPerRow);
 
 		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
 		this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
