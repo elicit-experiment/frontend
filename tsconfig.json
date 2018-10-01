@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+		"noImplicitAny": true,
+		"module": "amd",
+		"outDir": "app",
+		"target": "ES5",
+        "typeRoots": [
+            "node_modules/@types"
+        ],
+        "types": [ "youtube" ]
+    },
+    "include": [
+        "source/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
