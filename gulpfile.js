@@ -47,19 +47,13 @@ var config = {
 
 var server = CreateServer();
 
-gulp.task("default", ["build"]);
-
-gulp.task("build", function(callback) {
-	runSequence("clean", ["compileTypeScript", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"], callback);
-});
-
-gulp.task("compileTypeScript", function(){
+gulp.task("compileTypeScript", gulp.series(function(){
 	return gulp.src(config.projectPath + config.appDirBase + "/**/*.ts")
 		.pipe(typescript(config.typeScript))
 		.pipe(gulp.dest(config.distPath + config.appDirBase));
-});
+}));
 
-gulp.task("compileStylus", function()
+gulp.task("compileStylus", gulp.series(function()
 {
 	return gulp.src(config.projectPath + "**/default.styl")
 		.pipe(plumber())
@@ -67,9 +61,9 @@ gulp.task("compileStylus", function()
 			compress: true
 		}))
 		.pipe(gulp.dest(config.distPath));
-});
+}));
 
-gulp.task("copyDependencies", function()
+gulp.task("copyDependencies", gulp.series(function()
 {
 	var external = gulp.src(config.externalDependenciesPath + "**/*.*")
 		.pipe(gulp.dest(config.distPath + config.dependenciesPath));
@@ -103,18 +97,18 @@ gulp.task("copyDependencies", function()
 
 
 	return merge(external, requirejs, requirejsText, jquery, autosize, crossroads, signals, knockout);*/
-});
+}));
 
-gulp.task("copyConfig", function () {
+gulp.task("copyConfig", gulp.series(function () {
 	var parameters = minimist(process.argv.slice(3),config.parameters);
 
 	return gulp.src(config.projectPath + "configuration.json")
 		.pipe(replace("{PortalPath}", parameters.portalPath))
 		.pipe(replace("{ElicitLandingPath}", parameters.elicitLandingPath))
 		.pipe(gulp.dest(config.distPath));
-});
+}));
 
-gulp.task("copyHTML", function()
+gulp.task("copyHTML", gulp.series(function()
 {
 	var defaultFilter = filter(["**/default.html"], {restore: true});
 
@@ -123,30 +117,34 @@ gulp.task("copyHTML", function()
 		.pipe(replace(/var CacheBuster = (\d+);/g, "var CacheBuster = " + new Date().getTime() + ";"))
 		.pipe(defaultFilter.restore)
 		.pipe(gulp.dest(config.distPath));
-});
+}));
 
-gulp.task("copyImages", function()
+gulp.task("copyImages", gulp.series(function()
 {
 	return gulp.src(config.projectPath + config.appDirBase + "/Images/**")
 		.pipe(gulp.dest(config.distPath + config.appDirBase + "/Images"));
-});
+}));
 
-gulp.task("clean", function (callback)
+gulp.task("clean", gulp.series(function (callback)
 {
 	del([config.distPath + "**"], callback);
-});
+}));
 
-gulp.task("watch", function()
+gulp.task("watch", gulp.series(function()
 {
-	gulp.watch(config.projectPath + "**/*.ts", ["compileTypeScript"]);
-	gulp.watch(config.projectPath + "**/*.styl", ["compileStylus"]);
-	gulp.watch(config.projectPath + "**/*.html", ["copyHTML"]);
-	gulp.watch(config.projectPath  + config.appDirBase + "/Images/**", ["copyImages"]);
-});
+	gulp.watch(config.projectPath + "**/*.ts", gulp.parallel("compileTypeScript"));
+	gulp.watch(config.projectPath + "**/*.styl", gulp.parallel("compileStylus"));
+	gulp.watch(config.projectPath + "**/*.html", gulp.parallel("copyHTML"));
+	gulp.watch(config.projectPath  + config.appDirBase + "/Images/**", gulp.parallel("copyImages"));
+}));
 
-gulp.task("serve", function () {
+gulp.task("serve", gulp.series(function () {
 	server.listen(config.servePort);
-});
+}));
+
+gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
+
+gulp.task("default", gulp.series(["build"]));
 
 function CreateServer()
 {
