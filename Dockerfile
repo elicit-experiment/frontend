@@ -8,8 +8,9 @@ RUN apt-get update
 RUN apt-get install -y ruby-dev build-essential
 #RUN gem install compass --pre
 
+RUN npm uninstall gulp -g
 RUN npm install -g gulp
-RUN npm install gulp
+RUN npm install gulpjs/gulp-cli -g
 RUN npm install gulp-coffee
 RUN npm install gulp-concat
 RUN npm install gulp-uglify
@@ -30,6 +31,8 @@ RUN mkdir /experiment-frontend
 WORKDIR /experiment-frontend
 
 COPY ./package.json /experiment-frontend
+COPY ./package-lock.json /experiment-frontend
+COPY ./yarn.lock /experiment-frontend
 
 RUN npm install
 
@@ -40,6 +43,11 @@ RUN sed -i'' -E "s/(\s+elicitLandingPath\: ).*/\1\"$API_SCHEME:\/\/$ELICIT_LANDI
 
 RUN cat gulpfile.js | grep portalPath
 
+RUN npm --version
+
+RUN node --version
+
+RUN gulp  --version
 #RUN chown -R elicituser:elicituser /experiment-frontend
 
 #USER elicituser
