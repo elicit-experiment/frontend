@@ -4,6 +4,10 @@ import MediaInfo = require("Components/Players/MediaInfo");
 
 type Source = { Type: string; Source: string; };
 
+declare global {
+    interface Window { onYouTubeIframeAPIReady: any; }
+}
+
 // TODO: probably should be refactored into a container for HTMLVideo or YouTubeVideo children
 class Video
 {
@@ -95,7 +99,15 @@ class Video
 				height: '390',
 				width: '640',
 				videoId: videoId,
-				playerVars: {rel: 0},
+				playerVars: {
+					autoplay: 0,
+					controls: 0,
+					disablekb: 0,
+					enablejsapi: 1,
+					loop: 0,
+					modestbranding: 1,
+					rel: 0
+				},
 				events: {
 					'onReady': onPlayerReady,
 					'onStateChange': onPlayerStateChange
