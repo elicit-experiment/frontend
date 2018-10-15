@@ -13,6 +13,8 @@ class Navigation
 	{
 		Routie({
 			"": () => { this.LoadPage("Welcome"); },
+			"X": () => { this.LoadPage("Welcome"); },
+			"WebGazer": () => { this.LoadPage("WebGazer"); },
 			"Experiment/:id": (id: string) => { this.LoadSlide(id); },
 			"ExperimentList/:id": (id: string) => { this.LoadExperimentFromList(id); },
 			"NoMoreExperiments": () => { this.LoadPage("NoMoreExperiments"); },

@@ -29,8 +29,11 @@ function Initialize()
 		"KacPS": new QuestionMap("Questions/KAcPS"),
 		"TaggingA": new QuestionMap("Questions/TaggingA"),
 		"TaggingB": new QuestionMap("Questions/TaggingB"),
+		"AudioInformationRetrieval": new QuestionMap("Questions/AudioInformationRetrieval"),
+
+		// NEW Components
 		"SoloStimulus": new QuestionMap("Questions/SoloStimulus"),
-		"AudioInformationRetrieval": new QuestionMap("Questions/AudioInformationRetrieval")
+		"WebGazerCalibrate": new QuestionMap("Questions/WebGazerCalibrate"),
 	};
 
 	_map[_unsupported] = new QuestionMap("Questions/Unsupported", false);

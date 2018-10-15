@@ -22,12 +22,15 @@ class Question
 		var questionMap:any;
 		var input;
 
-		if (question.Type == 'NewComponent') {
-			console.log('NewComponent');
+		if (question.Type.indexOf('NewComponent') == 0) {
+			console.log(question.Type);
 			const component = question.Component as any;
 			console.dir(component);
 
-			if (component.hasOwnProperty('Stimuli')) {
+			if (question.Type == 'NewComponent::WebGazerCalibrate') {
+				questionMap = QuestionMap.Get('WebGazerCalibrate');
+				input = null
+			} else if (component.hasOwnProperty('Stimuli')) {
 				questionMap = QuestionMap.Get('SoloStimulus');
 				input = component.Stimuli; // TODO: Handle more than one stimulus ?
 			} else if (component.hasOwnProperty('Instruments')) {

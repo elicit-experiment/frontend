@@ -1,6 +1,6 @@
 import knockout = require("knockout");
 
-type Source = {Type:string; Source:string;};
+type Source = {Type:string; Source:string; IsPausable: boolean};
 
 class MediaInfo
 {
@@ -24,7 +24,7 @@ class MediaInfo
 	public static Create(stimulus:IStimulus):MediaInfo
 	{
 		if (stimulus === null) return null;
-		return new MediaInfo([{ Type: stimulus.Type, Source: stimulus.URI }]);
+		return new MediaInfo([{ Type: stimulus.Type, Source: stimulus.URI, IsPausable: (stimulus.IsPausable || true) }]);
 	}
 }
 

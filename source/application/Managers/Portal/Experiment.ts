@@ -125,6 +125,8 @@ class Experiment extends DisposableComponent
 					this.StyleSheet(config.Css);
 					this.CompletedUrl(config.RedirectOnCloseUrl);
 
+					// TODO: If uses WebGazer, then...
+
 					this.IsReady(true);
 				});
 			});

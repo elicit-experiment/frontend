@@ -12,6 +12,7 @@ var runSequence = require("run-sequence");
 var uglify = require("gulp-uglify");
 
 var typescript = require("gulp-typescript");
+var babel = require('gulp-babel');
 
 var stylus = require("gulp-stylus");
 
@@ -53,8 +54,13 @@ gulp.task("compileTypeScript", gulp.series(function(){
 		.pipe(gulp.dest(config.distPath + config.appDirBase));
 }));
 
-gulp.task("compileStylus", gulp.series(function()
-{
+gulp.task('compileES6JS', function() {
+	return gulp.src(config.projectPath + config.appDirBase + "/**/*.js")
+      .pipe(babel({presets: ['env']}))
+	  .pipe(gulp.dest(config.distPath + config.appDirBase));
+});
+
+gulp.task("compileStylus", gulp.series(function() {
 	return gulp.src(config.projectPath + "**/default.styl")
 		.pipe(plumber())
 		.pipe(stylus({
@@ -133,16 +139,17 @@ gulp.task("clean", gulp.series(function (callback)
 gulp.task("watch", gulp.series(function()
 {
 	gulp.watch(config.projectPath + "**/*.ts", gulp.parallel("compileTypeScript"));
+	gulp.watch(config.projectPath + "**/*.js", gulp.parallel("compileES6JS"));
 	gulp.watch(config.projectPath + "**/*.styl", gulp.parallel("compileStylus"));
 	gulp.watch(config.projectPath + "**/*.html", gulp.parallel("copyHTML"));
-	gulp.watch(config.projectPath  + config.appDirBase + "/Images/**", gulp.parallel("copyImages"));
+	gulp.watch(config.projectPath + config.appDirBase + "/Images/**", gulp.parallel("copyImages"));
 }));
 
 gulp.task("serve", gulp.series(function () {
 	server.listen(config.servePort);
 }));
 
-gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
+gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
 
 gulp.task("default", gulp.series(["build"]));
 

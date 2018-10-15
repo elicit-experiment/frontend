@@ -1,6 +1,7 @@
 ﻿import knockout = require("knockout");
 import ExperimentManager = require("Managers/Portal/Experiment");
 import SlideModel = require("Models/Slide");
+import CockpitPortal = require("Managers/Portal/Cockpit");
 
 class SlideShell
 {
@@ -93,14 +94,21 @@ class SlideShell
 	{
 		this.UnloadSlide(true);
 
-		ExperimentManager.LoadNextSlide((index, questions) => this.SlideData(new SlideModel("Slides/Default", index, this.AreAllQuestionsAnswered, questions)));
+		ExperimentManager.LoadNextSlide(this.MakeLoadSlideCallback());
 	}
 
 	public GoToPreviousSlide():void
 	{
 		this.UnloadSlide(false);
 
-		ExperimentManager.LoadPreviousSlide((index, questions) => this.SlideData(new SlideModel("Slides/Default", index, this.AreAllQuestionsAnswered, questions)));
+		ExperimentManager.LoadPreviousSlide(this.MakeLoadSlideCallback());
+	}
+
+	public MakeLoadSlideCallback() : (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void
+	{
+		return (slideIndex, questions) => {
+			this.SlideData(new SlideModel("Slides/Default", slideIndex, this.AreAllQuestionsAnswered, questions));
+		};
 	}
 
 	private DoWhenDone(check:() => boolean, action:() => void):void

@@ -15,12 +15,12 @@ class Video
 	public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Sources: Source[];
 	public IsPlaying: KnockoutObservable<boolean>;
+	public IsPausable: boolean;
 	public SourceType: string;
 
 	private _info: MediaInfo;
 	private static _activePlayer:Video = null;
 	private _youTubePlayer:YT.Player;
-
 
 	constructor(info:MediaInfo)
 	{
@@ -29,6 +29,7 @@ class Video
 
 		this.Sources = this._info.Sources;
 		this.SourceType = this._info.Sources[0].Type == 'video/youtube' ? 'youtube' : 'html5';
+		this.IsPausable = this._info.Sources[0].IsPausable;
 
 		var sub = this.PlayerElement.subscribe(e =>
 		{
@@ -45,7 +46,7 @@ class Video
 	public TogglePlay():void
 	{
 		if (this.SourceType == 'youtube') {
-			if (this.IsPlaying())
+			if (this.IsPlaying() && this.IsPausable)
 			{
 				Video._activePlayer = null;
 				this._youTubePlayer.pauseVideo();
@@ -60,7 +61,7 @@ class Video
 			}	
 
 		} else {
-			if (this.IsPlaying())
+			if (this.IsPlaying() && this.IsPausable)
 			{
 				Video._activePlayer = null;
 				this.PlayerElement().pause();
