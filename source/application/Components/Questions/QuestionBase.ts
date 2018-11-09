@@ -235,7 +235,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 				numberOfPlays++;
 			else
 			{
-				a.AddIsPlayingCallback(() => {
+				a.AddIsPlayedCallback(() => {
 					if (++numberOfPlays === (<AudioInfo[]>media).length) allHavePlayed(true);
 				}, true);
 			}

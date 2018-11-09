@@ -15,6 +15,7 @@ class Video
 	public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Sources: Source[];
 	public IsPlaying: KnockoutObservable<boolean>;
+	public IsPlayed: KnockoutObservable<boolean>;
 	public IsPausable: boolean;
 	public SourceType: string;
 
@@ -26,6 +27,7 @@ class Video
 	{
 		this._info = info;
 		this.IsPlaying = this._info.IsPlaying;
+		this.IsPlayed = this._info.IsPlayed;
 
 		this.Sources = this._info.Sources;
 		this.SourceType = this._info.Sources[0].Type == 'video/youtube' ? 'youtube' : 'html5';
@@ -45,6 +47,10 @@ class Video
 
 	public TogglePlay():void
 	{
+		console.log(this._info.IsStartable());
+		if (!this._info.IsStartable()) {
+			return;
+		}
 		if (this.SourceType == 'youtube') {
 			if (this.IsPlaying() && this.IsPausable)
 			{
@@ -58,8 +64,7 @@ class Video
 	
 				Video._activePlayer = this;
 				this._youTubePlayer.playVideo();
-			}	
-
+			}
 		} else {
 			if (this.IsPlaying() && this.IsPausable)
 			{
@@ -97,8 +102,8 @@ class Video
 		var self = this;
 		window.onYouTubeIframeAPIReady = () => {
 			self._youTubePlayer = new YT.Player('player', {
-				height: '390',
-				width: '640',
+				height: window.innerHeight * 0.65,
+				width: window.innerWidth * 0.80,
 				videoId: videoId,
 				playerVars: {
 					autoplay: 0,
@@ -130,6 +135,9 @@ class Video
 				event.data == YT.PlayerState.ENDED ||
 			    event.data == YT.PlayerState.UNSTARTED) {
 				self._info.IsPlaying(false);
+			}
+			if (event.data == YT.PlayerState.ENDED) {
+				self._info.IsPlayed(true);
 			}
 		}
 		function stopVideo() {

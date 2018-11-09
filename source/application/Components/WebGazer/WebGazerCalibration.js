@@ -113,7 +113,9 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     function ClearCanvas() {
         $(".Calibration").hide();
         var canvas = document.getElementById("plotting_canvas");
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        if (canvas) {
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        }
     }
 
     /**
@@ -267,7 +269,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
 
         wgCalibrate.$data.Answer(true);
 
-        // TODO: maybe investigate parent of wgCalibrate from conext?
+        // TODO: maybe investigate parent of wgCalibrate from context?
         slideShell.GoToNextSlide();
     }
 
@@ -275,32 +277,40 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
      * Restart the calibration process by clearing the local storage and reseting the calibration point
      */
     function Restart() {
-        document.getElementById("Accuracy").innerHTML = "<a>Not yet Calibrated</a>";
+        const accuracy = document.getElementById("Accuracy");
+        if (accuracy) {
+            innerHTML = "<a>Not yet Calibrated</a>";
+        }
         ClearCalibration();
         PopUpInstruction();
     }
 
-    function onload() {
+    let currentPoint = ko.observable({});
 
+    function onload() {
         //start the webgazer tracker
-        webgazer.setRegression('ridge') /* currently must set regression and tracker */
+        webgazer
+            .setRegression('ridge') /* currently must set regression and tracker */
             .setTracker('clmtrackr')
             .setGazeListener(function (data, clock) {
-                //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-                //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+                currentPoint({
+                    data: data,             /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+                    clock_ms: clock,        /* elapsed time in milliseconds since webgazer.begin() was called */
+                    timestamp: (new Date())
+                })
             })
             .begin()
             .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
 
-
         //Set up the webgazer video feedback.
         var setup = function () {
-
             //Set up the main canvas. The main canvas is used to calibrate the webgazer.
             var canvas = document.getElementById("plotting_canvas");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            canvas.style.position = 'fixed';
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.position = 'fixed';    
+            }
         };
 
         function checkIfReady() {
@@ -310,11 +320,21 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
                 setTimeout(checkIfReady, 100);
             }
         }
+
         setTimeout(checkIfReady, 100);
+    };
+
+    function end() {
+        webgazer.end();
     };
 
     return {
         init: init,
-        Restart: Restart
+        end: end,
+        Restart: Restart,
+        currentPoint: currentPoint,
+        HideWebGazerVideo: () => {
+            ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#'+s).hide());
+        }
     }
 })

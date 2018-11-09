@@ -27,6 +27,31 @@ class WebGazerCalibrate extends QuestionBase<any>
         //webgazer.begin();
         this._webGazerCalibration = webGazerCalibration;
         this._webGazerCalibration.init();
+
+        var pointIndex: number = 0;
+        this._webGazerCalibration.currentPoint.subscribe((v:any) => {
+            pointIndex = (pointIndex++)%10;
+            if (pointIndex == 0) {
+                if (v.eyeFeatures) {
+                    var dataPoint = {
+                        x: v.x,
+                        y: v.y,
+                        clock_ms: v.clock_ms,
+                        timestamp: v.timestamp,
+                        left_image_x: v.eyeFeatures.left.imagex,
+                        left_image_y: v.eyeFeatures.left.imagey,
+                        left_width: v.eyeFeatures.left.width,
+                        left_height: v.eyeFeatures.left.height,
+                        right_image_x: v.eyeFeatures.right.imagex,
+                        right_image_y: v.eyeFeatures.right.imagey,
+                        right_width: v.eyeFeatures.right.width,
+                        right_height: v.eyeFeatures.right.height,
+                    }
+                    console.dir(dataPoint);
+                    console.log(JSON.stringify(v).length);        
+                }
+            }
+        });
         
         this.CanAnswer = knockout.computed(() => true);
         //this.Answer(true); // we can immediately go to next slide

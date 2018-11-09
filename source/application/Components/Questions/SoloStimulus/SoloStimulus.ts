@@ -3,25 +3,80 @@ import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import MediaInfo = require("Components/Players/MediaInfo");
+import WebGazer = require("Components/WebGazer/WebGazerCalibration");
 
 class SoloStimulus extends QuestionBase<any>
 {
-	public MediaLabel: string = "";
-	public MediaInfo: MediaInfo = null;
+    public MediaLabel: string = "";
+    public MediaInfo: MediaInfo = null;
     public HasMedia: boolean = true;
     public AnswerIsRequired: boolean = true;
     public CanAnswer: KnockoutObservable<boolean>;
-	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+    public Calibrating: boolean = false;
+    public CalibrationElement: HTMLElement;
+    public CalibrationPoints: Array<{ x: number, y: number }> = [];
+    public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
     public MediaComponentName: string = 'Players/Audio';
+    public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
 
-    constructor(question: QuestionModel)
-	{
-		super(question, true);
+    constructor(question: QuestionModel) {
+        super(question, true);
 
-		var stimulus = (this.GetComponent() as any).Stimuli[0];
+        var stimulus = (this.GetComponent() as any).Stimuli[0];
 
-        console.dir(stimulus);
-        
+        WebGazer.init();
+        WebGazer.Restart();
+
+        document.getElementsByTagName('body')[0].classList.add('hide-webgazer-video')
+
+        var pointIndex: number = 0;
+        var points: Array<any> = [];
+        WebGazer.currentPoint.subscribe((v: any) => {
+            pointIndex = (pointIndex++) % 1000;
+
+            var dataPoint;
+
+            if (v.data && v.data.eyeFeatures) {
+                if (this.Calibrating &&
+                    !isNaN(v.data.x) &&
+                    !isNaN(v.data.y)) {
+                    this.CalibrationPoints.push({ x: v.data.x, y: v.data.y });
+                    if (this.CalibrationPoints.length > 50) {
+                        this.CalibrationPoints.pop();
+                    }
+                }
+                var eyeFeatures = v.data.eyeFeatures;
+                dataPoint = {
+                    x: v.data.x,
+                    y: v.data.y,
+                    clock_ms: v.clock_ms,
+                    timestamp: v.timestamp,
+                    left_image_x: eyeFeatures.left.imagex,
+                    left_image_y: eyeFeatures.left.imagey,
+                    left_width: eyeFeatures.left.width,
+                    left_height: eyeFeatures.left.height,
+                    right_image_x: eyeFeatures.right.imagex,
+                    right_image_y: eyeFeatures.right.imagey,
+                    right_width: eyeFeatures.right.width,
+                    right_height: eyeFeatures.right.height,
+                }
+            } else {
+                dataPoint = {
+                    clock_ms: v.clock_ms,
+                    timestamp: v.timestamp,
+                }
+            }
+
+            points.push(dataPoint);
+
+            if (pointIndex === 0) {
+                //console.dir(dataPoint);
+                //console.log(JSON.stringify(dataPoint).length);
+                this.AddEvent("Change", "/Instrument", "Gaze", JSON.stringify(points));
+                points = [];
+            }
+        });
+
         this.MediaComponentName = SoloStimulus.MimeTypeToPlayerType[stimulus.Type];
 
         if (this.MediaComponentName == undefined) {
@@ -30,31 +85,109 @@ class SoloStimulus extends QuestionBase<any>
 
         this.MediaLabel = this.GetFormatted(stimulus.Label);
 
-        this.MediaInfo = MediaInfo.Create(stimulus);
+        this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying);
         this.TrackAudioInfo("/Instrument/Stimulus", this.MediaInfo);
         this.HasMedia = true;
 
         this.CanAnswer = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
-        this.CanAnswer.subscribe(v =>
-            {
-                console.dir(v)
-            });
+        this.CanAnswer.subscribe(v => {
+            console.dir(v)
+        });
     }
 
-	public SlideCompleted(): boolean
-	{
-		ExperimentManager.SlideTitle("");
+    public SlideCompleted(): boolean {
+        webgazer.showPredictionPoints(false);
+        
+        ExperimentManager.SlideTitle("");
 
-		return false;
+        return false;
     }
-    
-    protected HasValidAnswer(answer: any): boolean
-	{
-        console.log(this.CanAnswer());
+
+    protected HasValidAnswer(answer: any): boolean {
         return this.CanAnswer();
     }
 
-    public static MimeTypeToPlayerType:any = {
+    public Calibrate(data:any, event: Event) {
+        //  var matrixRegex = /matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/,
+        //matches = $(element).css('-webkit-transform').match(matrixRegex);
+
+        // https://stackoverflow.com/questions/5603615/get-the-scale-value-of-an-element
+
+        var element = event.currentTarget as HTMLElement;
+
+        if (this.Calibrating && element != this.CalibrationElement) {
+            return;
+        }
+
+        if (element.className.match(/\bpulsate\b/)) {
+            var m = element.style.transform.match(/scale\(([0-9\.]+)\)/);
+            var scale = parseFloat(m[1]);
+
+            var deltaScale = -0.2;
+
+            if (this.CalibrationPoints.length > 10) {
+                console.dir(this.CalibrationPoints);
+                var bounds = element.getBoundingClientRect();
+                var target = {
+                    x: bounds.left + bounds.width / 2,
+                    y: bounds.top + bounds.height / 2
+                }
+                var accuracyPct = this.CalibrationPoints
+                    .map((c) => ({ dx: c.x - target.x, dy: c.y - target.y }))
+                    .map((e) => (Math.sqrt((e.dx * e.dx) + (e.dy * e.dy)) / window.innerHeight))
+                    .map((m) => 1.0 - (m > 1.0 ? 1.0 : m))
+                var accuracyAvg = accuracyPct.reduce((l, r) => l + r, 0.0) / this.CalibrationPoints.length;
+
+                console.log(`Accuracy Avg: ${accuracyAvg}`);
+                deltaScale = -0.05 - 0.25 * accuracyAvg;
+            }
+
+            if (scale > 0.7) {
+                element.style.transform = `scale(${scale + deltaScale})`;
+                var h = 60 - 60 * ((scale - 0.7) / 1.3);
+                element.style.backgroundColor = `hsl(${h}, 100%, 50%)`;
+                this.Calibrating = true;
+                this.CalibrationElement = element;
+            } else {
+                this.Calibrating = false;
+                this.CalibrationElement = null;
+                this.CalibrationPoints = [];
+                element.classList.add('calibrated');
+                element.classList.remove('pulsate');
+                element.style.transform = '';
+                element.style.backgroundColor = '';
+
+                const calibrationPoints = Array.prototype.slice.call(<Node[]><any>document.querySelectorAll('.video-calibration-point'));
+                const allCalibrated = (calibrationPoints)
+                            .map((element:HTMLElement) => !!element.className.match(/\bcalibrated\b/))
+                            .reduce((a:boolean,b:boolean) => a && b, true);
+                console.log(`calibrated: ${allCalibrated}`);
+                if (allCalibrated) {
+                    console.log('all calibrations complete');
+                    (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
+                    this.CanStartPlaying(true);
+                }
+            }
+        } else if (element.className.match(/\bcalibrated\b/)) {
+            return;
+        } else {
+            element.classList.add('pulsate');
+            element.style.transform = `scale(2.0)`;
+            element.style.backgroundColor = `hsl(0, 100%, 50%)`;
+        }
+
+        /*
+            setTimeout( () =>  {
+                this.SetAnswer({ Id: "foo" })
+                console.log('set answer');
+                WebGazer.end();
+            }, 5000);
+            */
+
+        event.preventDefault();
+    }
+
+    public static MimeTypeToPlayerType: any = {
         'video/mp4': 'Players/Video',
         'video/youtube': 'Players/Video',
         'audio/mpeg': 'Players/Audio',
