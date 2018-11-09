@@ -134,8 +134,8 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
             console.log('Starting calibration.');
             ShowCalibrationPoint();
         });
-
     }
+
     /**
       * Show the help instructions right at the start.
       */
@@ -276,13 +276,15 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     /**
      * Restart the calibration process by clearing the local storage and reseting the calibration point
      */
-    function Restart() {
+    function Restart(showInstructions) {
         const accuracy = document.getElementById("Accuracy");
         if (accuracy) {
             innerHTML = "<a>Not yet Calibrated</a>";
         }
         ClearCalibration();
-        PopUpInstruction();
+        if (showInstructions) {
+            PopUpInstruction();
+        }
     }
 
     let currentPoint = ko.observable({});

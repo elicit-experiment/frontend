@@ -6,7 +6,7 @@ interface XWebGazerCalibration {
 
 declare module 'Components/WebGazer/WebGazerCalibration' {
 	function init(): void;
-	function Restart(): void;
+	function Restart(showInstructions:boolean): void;
 
 	var currentPoint:KnockoutObservable<any>;
 	function HideWebGazerVideo(): void;

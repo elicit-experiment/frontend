@@ -25,7 +25,7 @@ class SoloStimulus extends QuestionBase<any>
         var stimulus = (this.GetComponent() as any).Stimuli[0];
 
         WebGazer.init();
-        WebGazer.Restart();
+        WebGazer.Restart(false);
 
         document.getElementsByTagName('body')[0].classList.add('hide-webgazer-video')
 
@@ -97,7 +97,7 @@ class SoloStimulus extends QuestionBase<any>
 
     public SlideCompleted(): boolean {
         webgazer.showPredictionPoints(false);
-        
+
         ExperimentManager.SlideTitle("");
 
         return false;
