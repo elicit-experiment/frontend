@@ -19,15 +19,43 @@ class SoloStimulus extends QuestionBase<any>
     public MediaComponentName: string = 'Players/Audio';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
 
+    public videoEls = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'];
+
     constructor(question: QuestionModel) {
         super(question, true);
 
         var stimulus = (this.GetComponent() as any).Stimuli[0];
 
-        WebGazer.init();
-        WebGazer.Restart(false);
+        if (!WebGazer.ready()) {
+            WebGazer.init();
+            WebGazer.Restart(false);    
+            document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video')
 
-        document.getElementsByTagName('body')[0].classList.add('hide-webgazer-video')
+            WebGazer.swal({
+                title: "Calibration",
+                text: "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. This will calibrate your eye movements.",
+                buttons: {
+                    cancel: false,
+                    confirm: true
+                }
+            }).then(isConfirm => {
+                console.log('Starting calibration.');
+
+                const player = document.getElementById('player');
+                const bbox = player.getBoundingClientRect();
+                this.videoEls.map((id:string) => document.getElementById(id)).forEach((el:HTMLElement) => {
+                    el.style.top = bbox.top + 'px';
+                    el.style.left = bbox.left + 'px';
+                    el.style.width = bbox.width + 'px';
+                    el.style.height = bbox.height + 'px';
+                })
+            });
+        } else {
+            for (var pt of <HTMLElement[]><any>document.querySelectorAll('.video-calibration-point')) {
+                pt.style.display = 'none';
+            }
+            this.CanStartPlaying(true)
+        }
 
         var pointIndex: number = 0;
         var points: Array<any> = [];
@@ -165,6 +193,10 @@ class SoloStimulus extends QuestionBase<any>
                 if (allCalibrated) {
                     console.log('all calibrations complete');
                     (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
+
+                    this.videoEls.map((id:string) => document.getElementById(id))
+                                .forEach((el:HTMLElement) => el.style.display = 'none');
+
                     this.CanStartPlaying(true);
                 }
             }

@@ -64,7 +64,7 @@ class WebGazerCalibrate extends QuestionBase<any>
 
     public RestartCalibration() {
         console.log('restarting');
-        this._webGazerCalibration.Restart();
+        this._webGazerCalibration.Restart(true);
     }
 
     public HideWebGazerVideo() {

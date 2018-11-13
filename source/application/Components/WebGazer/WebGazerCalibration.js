@@ -1,7 +1,7 @@
 define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     var PointCalibrate = 0;
     var CalibrationPoints = {};
-
+    var currentAccuracy;
 
     /*
       BEGIN www/js/precision_store_points.js
@@ -209,6 +209,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
                             var precision_measurement = calculatePrecision(past50);
                             var accuracyLabel = "<a>Accuracy | " + precision_measurement + "%</a>";
                             document.getElementById("Accuracy").innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
+                            currentAccuracy = precision_measurement;
                             swal({
                                 title: "Your accuracy measure is " + precision_measurement + "%",
                                 allowOutsideClick: false,
@@ -279,7 +280,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     function Restart(showInstructions) {
         const accuracy = document.getElementById("Accuracy");
         if (accuracy) {
-            innerHTML = "<a>Not yet Calibrated</a>";
+            accuracy.innerHTML = "<a>Not yet Calibrated</a>";
         }
         ClearCalibration();
         if (showInstructions) {
@@ -327,16 +328,29 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     };
 
     function end() {
-        webgazer.end();
+        try {
+            webgazer.end();
+        }
+        catch (e) {
+            console.error(e);
+        }
     };
 
     return {
         init: init,
         end: end,
+        ready: () => (webgazer ? webgazer.isReady() : false),
         Restart: Restart,
         currentPoint: currentPoint,
         HideWebGazerVideo: () => {
             ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#'+s).hide());
-        }
+        },
+        calibrationAccuracy: (newValue) => {
+                if (typeof newValue === 'undefined') {
+                    return currentAccuracy;
+                }
+                currentAccuracy = newValue;
+        },
+        swal // so ghetto ;(
     }
 })
