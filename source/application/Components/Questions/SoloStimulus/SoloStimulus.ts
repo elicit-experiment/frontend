@@ -42,13 +42,15 @@ class SoloStimulus extends QuestionBase<any>
                 console.log('Starting calibration.');
 
                 const player = document.getElementById('player');
-                const bbox = player.getBoundingClientRect();
-                this.videoEls.map((id:string) => document.getElementById(id)).forEach((el:HTMLElement) => {
-                    el.style.top = bbox.top + 'px';
-                    el.style.left = bbox.left + 'px';
-                    el.style.width = bbox.width + 'px';
-                    el.style.height = bbox.height + 'px';
-                })
+                const playerBBox = player.getBoundingClientRect();
+                const videoFeed = document.getElementById('webgazerVideoFeed');
+                const videoBBox = videoFeed.getBoundingClientRect();
+                const scale = Math.round(10.0*Math.min(playerBBox.width/videoBBox.width, playerBBox.height / videoBBox.height))/10.0;
+                const tx = Math.round(10.0*(playerBBox.left + playerBBox.width/2 - videoBBox.width/2))/10.0;
+                const ty = Math.round(10.0*(playerBBox.top + playerBBox.height/2 - videoBBox.height/2))/10.0;
+                const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+                this.videoEls.map((id:string) => document.getElementById(id))
+                             .forEach((el:HTMLElement) => el.style.transform = transform )
             });
         } else {
             for (var pt of <HTMLElement[]><any>document.querySelectorAll('.video-calibration-point')) {
