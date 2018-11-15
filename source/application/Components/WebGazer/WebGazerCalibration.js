@@ -250,6 +250,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     */
     function ClearCalibration() {
         window.localStorage.clear();
+        
         $(".Calibration").css('background-color', 'red');
         $(".Calibration").css('opacity', 0.2);
         $(".Calibration").prop('disabled', false);

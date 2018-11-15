@@ -38,7 +38,7 @@ class SoloStimulus extends QuestionBase<any>
                     cancel: false,
                     confirm: true
                 }
-            }).then(isConfirm => {
+            }).then( (isConfirm:boolean) => {
                 console.log('Starting calibration.');
 
                 const player = document.getElementById('player');
@@ -138,11 +138,6 @@ class SoloStimulus extends QuestionBase<any>
     }
 
     public Calibrate(data:any, event: Event) {
-        //  var matrixRegex = /matrix\((-?\d*\.?\d+),\s*0,\s*0,\s*(-?\d*\.?\d+),\s*0,\s*0\)/,
-        //matches = $(element).css('-webkit-transform').match(matrixRegex);
-
-        // https://stackoverflow.com/questions/5603615/get-the-scale-value-of-an-element
-
         var element = event.currentTarget as HTMLElement;
 
         if (this.Calibrating && element != this.CalibrationElement) {
@@ -210,8 +205,7 @@ class SoloStimulus extends QuestionBase<any>
             element.style.backgroundColor = `hsl(0, 100%, 50%)`;
         }
 
-        /*
-            setTimeout( () =>  {
+        /*setTimeout( () =>  {
                 this.SetAnswer({ Id: "foo" })
                 console.log('set answer');
                 WebGazer.end();

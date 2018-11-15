@@ -19,12 +19,7 @@ class WebGazerCalibrate extends QuestionBase<any>
         $('.panel-heading').hide();
         $('.panel-footer').hide();
         $('.panel-body').css('height', 'calc(100vh - 100px)');
-        //$('.container').hide();
-        //$("#webgazer-calibration").appendTo("body");
 
-        console.log('ctor');
-        //console.dir(webgazer);
-        //webgazer.begin();
         this._webGazerCalibration = webGazerCalibration;
         this._webGazerCalibration.init();
 
