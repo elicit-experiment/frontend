@@ -153,7 +153,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
         onload();
 
         ClearCanvas();
-        
+
         helpModalShow();
 
         $(".Calibration").click(function () { // click event on the calibration buttons
@@ -250,7 +250,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     */
     function ClearCalibration() {
         window.localStorage.clear();
-        
+
         $(".Calibration").css('background-color', 'red');
         $(".Calibration").css('opacity', 0.2);
         $(".Calibration").prop('disabled', false);
@@ -313,7 +313,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
             if (canvas) {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                canvas.style.position = 'fixed';    
+                canvas.style.position = 'fixed';
             }
         };
 
@@ -337,6 +337,10 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
         }
     };
 
+
+    /// ** REFACTOR **
+
+
     return {
         init: init,
         end: end,
@@ -344,13 +348,13 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
         Restart: Restart,
         currentPoint: currentPoint,
         HideWebGazerVideo: () => {
-            ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#'+s).hide());
+            ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#' + s).hide());
         },
         calibrationAccuracy: (newValue) => {
-                if (typeof newValue === 'undefined') {
-                    return currentAccuracy;
-                }
-                currentAccuracy = newValue;
+            if (typeof newValue === 'undefined') {
+                return currentAccuracy;
+            }
+            currentAccuracy = newValue;
         },
         swal // so ghetto ;(
     }

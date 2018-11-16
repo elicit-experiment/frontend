@@ -3,6 +3,7 @@ import Portal = require("Managers/Portal/Portal");
 import CockpitPortal = require("Managers/Portal/Cockpit");
 import Navigation = require("Managers/Navigation/Navigation");
 import Title = require("Managers/Title");
+import WebGazer = require("Managers/WebGazerManager");
 import Notification = require("Managers/Notification");
 import CallRepeater = require("Managers/CallRepeater");
 import CallQueue = require("Managers/CallQueue");

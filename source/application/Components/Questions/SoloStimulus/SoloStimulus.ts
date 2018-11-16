@@ -1,9 +1,10 @@
 import knockout = require("knockout");
+import swal = require("sweetalert");
 import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import MediaInfo = require("Components/Players/MediaInfo");
-import WebGazer = require("Components/WebGazer/WebGazerCalibration");
+import WebGazerManager = require("Managers/WebGazerManager");
 
 class SoloStimulus extends QuestionBase<any>
 {
@@ -26,12 +27,13 @@ class SoloStimulus extends QuestionBase<any>
 
         var stimulus = (this.GetComponent() as any).Stimuli[0];
 
-        if (!WebGazer.ready()) {
-            WebGazer.init();
-            WebGazer.Restart(false);    
+        if (!WebGazerManager.Ready()) {
+            WebGazerManager.Init().then(() => {
+
+            //WebGazer.Restart(false);    
             document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video')
 
-            WebGazer.swal({
+            swal({
                 title: "Calibration",
                 text: "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. This will calibrate your eye movements.",
                 buttons: {
@@ -52,6 +54,8 @@ class SoloStimulus extends QuestionBase<any>
                 this.videoEls.map((id:string) => document.getElementById(id))
                              .forEach((el:HTMLElement) => el.style.transform = transform )
             });
+
+            });
         } else {
             for (var pt of <HTMLElement[]><any>document.querySelectorAll('.video-calibration-point')) {
                 pt.style.display = 'none';
@@ -61,7 +65,7 @@ class SoloStimulus extends QuestionBase<any>
 
         var pointIndex: number = 0;
         var points: Array<any> = [];
-        WebGazer.currentPoint.subscribe((v: any) => {
+        WebGazerManager.currentPoint.subscribe((v: any) => {
             pointIndex = (pointIndex++) % 1000;
 
             var dataPoint;
@@ -100,8 +104,6 @@ class SoloStimulus extends QuestionBase<any>
             points.push(dataPoint);
 
             if (pointIndex === 0) {
-                //console.dir(dataPoint);
-                //console.log(JSON.stringify(dataPoint).length);
                 this.AddEvent("Change", "/Instrument", "Gaze", JSON.stringify(points));
                 points = [];
             }
