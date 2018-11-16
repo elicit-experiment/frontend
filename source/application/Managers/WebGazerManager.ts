@@ -3,6 +3,13 @@ import Configuration = require("Managers/Configuration");
 import DisposableComponent = require("Components/DisposableComponent");
 import knockout = require("knockout");
 
+export enum WebGazerState {
+    NotStarted,
+    Started,
+    Calibrating,
+    Running
+}
+
 class WebGazerManager extends DisposableComponent
 {
     constructor() 
@@ -11,7 +18,7 @@ class WebGazerManager extends DisposableComponent
     }
 
     public currentPoint = knockout.observable({});
-
+    public state = WebGazerState.NotStarted;
 
     public Ready() : boolean {
         return webgazer ? webgazer.isReady() : false;
@@ -24,15 +31,8 @@ class WebGazerManager extends DisposableComponent
             webgazer
                 .setRegression('ridge') /* currently must set regression and tracker */
                 .setTracker('clmtrackr')
-                .setGazeListener(function (data:any, clock:number) {
-                    self.currentPoint({
-                        data: data,             /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-                        clock_ms: clock,        /* elapsed time in milliseconds since webgazer.begin() was called */
-                        timestamp: (new Date())
-                    })
-                })
-                .begin()
-                .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+                .setGazeListener((data:any, clock:number) => self.ProcessPoint(data, clock))
+                .begin();
 
             // Set up the webgazer video feedback.
             var setup = function () {
@@ -48,6 +48,7 @@ class WebGazerManager extends DisposableComponent
             function checkIfReady() {
                 if (webgazer.isReady()) {
                     setup();
+                    self.state = WebGazerState.Started;
                     resolve();
                 } else {
                     setTimeout(checkIfReady, 100);
@@ -56,6 +57,39 @@ class WebGazerManager extends DisposableComponent
 
             setTimeout(checkIfReady, 100);
         });
+    }
+
+    public End() {
+        try {
+            webgazer.end();
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    public StartCalibration() {
+        this.SetState(WebGazerState.Calibrating);
+    }
+
+    public StartTracking() {
+        this.SetState(WebGazerState.Running);
+    }
+
+    public SetState(newState: WebGazerState) {
+        if (newState === WebGazerState.Calibrating) {
+            webgazer.showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+        } else if (newState === WebGazerState.Running) {
+            webgazer.showPredictionPoints(false);
+        }
+        this.state = newState;
+    }
+
+    public ProcessPoint(data:any, clock:number) {
+        this.currentPoint({
+            data: data,             /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+            clock_ms: clock,        /* elapsed time in milliseconds since webgazer.begin() was called */
+            timestamp: (new Date())
+        })
     }
 }
 

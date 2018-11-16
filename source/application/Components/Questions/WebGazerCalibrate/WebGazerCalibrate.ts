@@ -5,11 +5,6 @@ import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import WebGazerManager = require("Managers/WebGazerManager");
 
-
-declare var store_points_var: boolean;
-declare var  xPast50: number[];
-declare var  yPast50: number[];
-
 class WebGazerCalibrate extends QuestionBase<any>
 {
     public AnswerIsRequired: boolean = true;
@@ -99,6 +94,7 @@ class WebGazerCalibrate extends QuestionBase<any>
             }
         }).then(() => {
             console.log('Starting calibration.');
+            WebGazerManager.StartCalibration();
             this.ShowCalibrationPoint();
         });
     }
@@ -133,6 +129,8 @@ class WebGazerCalibrate extends QuestionBase<any>
         const slideShell = knockout.contextFor($('.panel').get(0)).$data
 
         wgCalibrate.$data.Answer(true);
+
+        WebGazerManager.StartTracking();
 
         // TODO: maybe investigate parent of wgCalibrate from context?
         slideShell.GoToNextSlide();

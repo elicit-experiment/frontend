@@ -43,6 +43,8 @@ class SoloStimulus extends QuestionBase<any>
             }).then( (isConfirm:boolean) => {
                 console.log('Starting calibration.');
 
+                WebGazerManager.StartCalibration();
+
                 const player = document.getElementById('player');
                 const playerBBox = player.getBoundingClientRect();
                 const videoFeed = document.getElementById('webgazerVideoFeed');
@@ -59,6 +61,9 @@ class SoloStimulus extends QuestionBase<any>
         } else {
             for (var pt of <HTMLElement[]><any>document.querySelectorAll('.video-calibration-point')) {
                 pt.style.display = 'none';
+            }
+            for (var instructions of <HTMLElement[]><any>document.querySelectorAll('.calibration-instructions')) {
+                instructions.style.display = 'none';
             }
             this.CanStartPlaying(true)
         }
@@ -191,10 +196,13 @@ class SoloStimulus extends QuestionBase<any>
                 console.log(`calibrated: ${allCalibrated}`);
                 if (allCalibrated) {
                     console.log('all calibrations complete');
+                    // TODO: refactor with calibration check in ctor
                     (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
 
                     this.videoEls.map((id:string) => document.getElementById(id))
                                 .forEach((el:HTMLElement) => el.style.display = 'none');
+
+                    WebGazerManager.StartTracking();
 
                     this.CanStartPlaying(true);
                 }
