@@ -4,16 +4,17 @@ import QuestionModel = require("Models/Question");
 
 class Header extends QuestionBase<any>
 {
+	public HeaderLabel : string;
+
 	constructor(question: QuestionModel)
 	{
 		super(question, false);
 
-		var header = this.GetComponent() as any;
+		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 
-		console.dir(header);
-		if (header === undefined || header.HeaderLabel == undefined) throw new Error("HeaderLabel not found for Header");
+		if (!this.HeaderLabel) throw new Error("HeaderLabel not found for Header");
 
-		ExperimentManager.SlideTitle(this.GetFormatted(header.HeaderLabel));
+		ExperimentManager.SlideTitle(this.GetFormatted(this.HeaderLabel));
 	}
 
 	public SlideCompleted(): boolean

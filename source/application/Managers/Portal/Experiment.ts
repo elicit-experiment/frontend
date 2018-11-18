@@ -235,7 +235,6 @@ class Experiment extends DisposableComponent
 		{
 			if(!this.IsTestExperiment)
 			{
-				debugger;
 				CockpitPortal.Answer.Set(id, answer).WithCallback(response =>
 				{
 					if (response.Error != null)
