@@ -19,7 +19,7 @@ class WebGazerManager extends DisposableComponent {
     public state = WebGazerState.NotStarted;
     public pointIndex: number = 0;
     public points: Array<any> = [];
-
+    public sessionGuid: string;
 
     public Ready(): boolean {
         return webgazer ? webgazer.isReady() : false;
@@ -27,7 +27,7 @@ class WebGazerManager extends DisposableComponent {
 
     public Init(): Promise<void> {
         const self = this;
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve) => {
             //start the webgazer tracker
             webgazer
                 .setRegression('ridge') /* currently must set regression and tracker */
@@ -152,18 +152,21 @@ class WebGazerManager extends DisposableComponent {
             return keyValue ? keyValue[2] : null;
         }
 
+        if (!this.sessionGuid) {
+            this.sessionGuid = getCookie('session_guid');
+        }
+
         const url = new URL('/v6/time_series/webgazer', Configuration.PortalPath);
         console.log(url.href);
         fetch(url.href, {
             method: 'POST',
             //credentials: 'include', // include the sessionGUID cookie
             mode: "cors", // no-cors, cors, *same-origin
-//            credentials: 'same-origin',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({sessionGUID: getCookie('session_guid'), points: pointsToSend})
+            body: JSON.stringify({sessionGUID: this.sessionGuid, points: pointsToSend})
         }).then((rawResponse) => rawResponse.json())
             .then((json) => console.dir(json))
             .catch((err) => console.error(err));

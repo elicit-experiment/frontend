@@ -5,24 +5,25 @@
   "repository": "git@github.com:cosound/Cockpit.Experiments.Web.git",
   "author": "Jacob Poul Richardt",
   "dependencies": {
-    "@types/node-fetch": "^2.1.3",
     "autosize": "3.0.15",
     "crossroads": "0.12.2",
+    "es6-promise": "^4.2.5",
     "jquery": "^3.3.1",
     "knockout": "3.4.1",
     "requirejs": "2.2.0",
     "requirejs-text": "2.0.12",
     "signals": "1.0.0",
     "sweetalert": "^2.1.2",
-    "sweetalert2": "^7.29.0",
+    "sweetalert2": "^7.29.1",
     "taggle": "1.11.1",
-    "webgazer": "git+https://github.com/brownhci/WebGazer.git",
-    "youtube": "^0.1.0"
+    "webgazer": "git+https://github.com/brownhci/WebGazer.git"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
-    "@types/es6-shim": "0.31.32",
+    "@types/es6-promise": "^3.3.0",
+    "@types/highcharts": "^5.0.33",
+    "@types/knockout": "^3.4.59",
     "@types/sweetalert": "^2.0.4",
     "@types/youtube": "^0.0.34",
     "babel-core": "^6.26.3",
@@ -43,6 +44,6 @@
     "merge-stream": "1.0.x",
     "minimist": "1.2.x",
     "run-sequence": "1.1.x",
-    "typescript": "2.1.x"
+    "typescript": "2.9.x"
   }
 }

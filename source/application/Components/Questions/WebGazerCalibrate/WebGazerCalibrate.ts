@@ -19,9 +19,7 @@ class WebGazerCalibrate extends QuestionBase<any>
     constructor(question: QuestionModel) {
         super(question, true);
 
-        $('.panel-heading').hide();
-        $('.panel-footer').hide();
-        $('.panel-body').css('height', 'calc(100vh - 100px)');
+        this.hidePanelElements();
 
         const me = this;
         WebGazerManager.Init().then(() => {
@@ -38,7 +36,20 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         this.Answer.subscribe(v => {
             this.HideWebGazerVideo();
+            this.showPanelElements();
         });
+    }
+
+    private hidePanelElements() {
+        $('.panel-heading').hide();
+        $('.panel-footer').hide();
+        $('.panel-body').css('height', 'calc(100vh - 100px)');
+    }
+
+    private showPanelElements() {
+        $('.panel-heading').show();
+        $('.panel-footer').show();
+        $('.panel-body').css('height', 'auto');
     }
 
     /**
@@ -120,7 +131,7 @@ class WebGazerCalibrate extends QuestionBase<any>
 
     // sleep function because java doesn't have one, sourced from http://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
     private sleep(time: number) {
-        return new Promise((resolve) => setTimeout(resolve, time));
+        return new Promise<any>((resolve) => setTimeout(resolve, time));
     }
 
     private CalibrationCompleted() {

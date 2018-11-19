@@ -12,7 +12,7 @@ class SoloStimulus extends QuestionBase<any>
     public MediaInfo: MediaInfo = null;
     public HasMedia: boolean = true;
     public AnswerIsRequired: boolean = true;
-    public CanAnswer: KnockoutObservable<boolean>;
+    public CanAnswer: KnockoutObservable<boolean> = knockout.observable(false);
     public Calibrating: boolean = false;
     public CalibrationElement: HTMLElement;
     public CalibrationPoints: Array<{ x: number, y: number }> = [];
@@ -20,7 +20,9 @@ class SoloStimulus extends QuestionBase<any>
     public MediaComponentName: string = 'Players/Audio';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
 
-    public videoEls = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'];
+    protected _pointsSubscription: KnockoutSubscription;
+
+    public VIDEO_ELEMENTS = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'];
 
     constructor(question: QuestionModel) {
         super(question, true);
@@ -53,7 +55,7 @@ class SoloStimulus extends QuestionBase<any>
                 const tx = Math.round(10.0*(playerBBox.left + playerBBox.width/2 - videoBBox.width/2))/10.0;
                 const ty = Math.round(10.0*(playerBBox.top + playerBBox.height/2 - videoBBox.height/2))/10.0;
                 const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
-                this.videoEls.map((id:string) => document.getElementById(id))
+                this.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
                              .forEach((el:HTMLElement) => el.style.transform = transform )
             });
 
@@ -70,7 +72,7 @@ class SoloStimulus extends QuestionBase<any>
 
         var pointIndex: number = 0;
         var points: Array<any> = [];
-        WebGazerManager.currentPoint.subscribe((v: any) => {
+        this._pointsSubscription = WebGazerManager.currentPoint.subscribe((v: any) => {
             pointIndex = (pointIndex++) % 1000;
 
             var dataPoint;
@@ -107,11 +109,6 @@ class SoloStimulus extends QuestionBase<any>
             }
 
             points.push(dataPoint);
-
-            if (pointIndex === 0) {
-                this.AddEvent("Change", "/Instrument", "Gaze", JSON.stringify(points));
-                points = [];
-            }
         });
 
         this.MediaComponentName = SoloStimulus.MimeTypeToPlayerType[stimulus.Type];
@@ -126,14 +123,19 @@ class SoloStimulus extends QuestionBase<any>
         this.TrackAudioInfo("/Instrument/Stimulus", this.MediaInfo);
         this.HasMedia = true;
 
-        this.CanAnswer = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
+        this.WhenAllMediaHavePlayed(this.MediaInfo, true).subscribe( () => this.CanAnswer(true) );
         this.CanAnswer.subscribe(v => {
-            console.dir(v)
+            console.log('Can answer changed: ');
+            console.dir(v);
+            this.SetAnswer({ completed: v });
         });
     }
 
     public SlideCompleted(): boolean {
         webgazer.showPredictionPoints(false);
+        
+        this._pointsSubscription && this._pointsSubscription.dispose();
+        this._pointsSubscription = null;
 
         ExperimentManager.SlideTitle("");
 
@@ -141,7 +143,8 @@ class SoloStimulus extends QuestionBase<any>
     }
 
     protected HasValidAnswer(answer: any): boolean {
-        return this.CanAnswer();
+        console.log(`HasValidAnswer: ${answer}`);
+        return answer.completed;
     }
 
     public Calibrate(data:any, event: Event) {
@@ -199,7 +202,7 @@ class SoloStimulus extends QuestionBase<any>
                     // TODO: refactor with calibration check in ctor
                     (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
 
-                    this.videoEls.map((id:string) => document.getElementById(id))
+                    this.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
                                 .forEach((el:HTMLElement) => el.style.display = 'none');
 
                     WebGazerManager.StartTracking();

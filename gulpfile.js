@@ -34,7 +34,8 @@ var config = {
 		noImplicitAny: true,
 		module: "amd",
 		outDir: "app",
-		target: "ES5"
+		target: "ES5",
+		lib: ["dom", "es2015.promise", "es5"] 
 	},
 	parameters: {
 		string: ["portalPath", "elicitLandingPath"],

@@ -1,10 +1,12 @@
-﻿/// <reference path="jquery.d.ts" />
-/// <reference path="highcharts.d.ts" />
-
-interface HighchartsSeriesOptions
+﻿declare namespace Highcharts
 {
-	draggableX?:boolean;
-	draggableY?:boolean;
-} 
+	interface SeriesOptions
+	{
+		draggableX?:boolean;
+		draggableY?:boolean;
+	} 	
+}
 
-declare module "HighChartsDraggablePoints" {}
+export = Highcharts;
+export as namespace Highcharts;
+

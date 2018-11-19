@@ -1,14 +1,21 @@
-﻿import knockout = require("knockout");
+﻿
+import knockout = require("knockout");
 import jquery = require("jquery");
-import Highcharts = require("Highcharts"); Highcharts;
-import HighchartsMore = require("HighchartsMore"); HighchartsMore;
-import HighChartsDraggablePoints = require("HighChartsDraggablePoints"); HighChartsDraggablePoints;
-//import HighChartsCrossingSpecificValue = require("HighChartsCrossingSpecificValue"); HighChartsCrossingSpecificValue;
+import Highcharts = require("Highcharts"); //Highcharts;
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
-type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: HighchartsSeriesOptions;};
+namespace XHighcharts
+{
+	interface SeriesOptions
+	{
+		draggableX?:boolean;
+		draggableY?:boolean;
+	} 	
+}
+
+type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptions;};
 type AnswerItem = { Id: string; Position:string;};
 
 class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
@@ -17,7 +24,7 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 	public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Items: Item[];
 
-	private _chart:HighchartsChartObject;
+	private _chart:Highcharts.ChartObject;
 
 	constructor(question: QuestionModel)
 	{
@@ -108,7 +115,7 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 				],
 				labels: { enabled: false }
 			},
-			tooltip: false,
+			tooltip: {  enabled: false },
 			series: this.Items.map(item => item.GraphData).filter(data => data != null)
 		});
 		this._chart = jquery(this.ChartElement()).highcharts();
@@ -130,7 +137,7 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 
 	private CreateAnswerItem(item: Item): AnswerItem
 	{
-		var point = item.GraphData.data[0];
+		var point = <Highcharts.DataPoint>item.GraphData.data[0];
 
 		return { Id: item.Id, Position: point.x.toString() + " " + point.y.toString() };
 	}
@@ -161,10 +168,11 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 		return item;
 	}
 
-	private CreateGraphItem(data: any, answer: { x: number; y: number }):HighchartsSeriesOptions
+	private CreateGraphItem(data: any, answer: { x: number; y: number }):Highcharts.SeriesOptions
 	{
 		return {
 			name: data.List.Label,
+	    	// @ts-ignore:TS2322
 			draggableX: true,
 			draggableY: true,
 			cursor: "pointer",

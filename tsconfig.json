@@ -3,13 +3,13 @@
 		"noImplicitAny": true,
 		"module": "amd",
 		"outDir": "app",
-		"target": "es5",
+        "target": "es5",
+        "moduleResolution": "classic",
         "typeRoots": [
             "node_modules/@types"
-            //"types"
         ],
-        "types": [ "youtube", "es6-promise" ],
-        "lib": ["dom", "es2015", "es2016", "es2017"] 
+        "types": [ "youtube" ],
+        "lib": ["dom", "es2015.promise", "es5"] 
     },
     "include": [
         "source/**/*"

@@ -1,16 +1,14 @@
 /// <reference path="../../TypeScriptDefinitions/bootstrap.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/crypto-js.d.ts" />
-/// <reference path="../../TypeScriptDefinitions/highcharts.d.ts" />
-/// <reference path="../../TypeScriptDefinitions/HighChartsCrossingSpecificValue.d.ts" />
-/// <reference path="../../TypeScriptDefinitions/highchartsDraggable.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/jquery.d.ts" />
-/// <reference path="../../TypeScriptDefinitions/knockout.d.ts" />
+/// <reference path="../../TypeScriptDefinitions/highchartsDraggable.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/PortalClient.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/require.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/routie.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/SoundManager.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/videojs.d.ts" />
 /// <reference path="../../dependencies/sweetalert/typings/sweetalert.d.ts" />
+/// <reference path="../../dependencies/es6-promise/es6-promise.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/taggle.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/webgazer.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/WebGazerCalibration.d.ts" />
@@ -37,6 +35,7 @@ requirejs.config({
 		webgazer: "../lib/webgazer/webgazer",
 		swal: "../lib/sweetalert/sweetalert.min",
 		sweetalert: "../lib/sweetalert/sweetalert.min",
+		'es6-promise': "../lib/es6-promise/es6-promise.auto",
 	},
 	map: {
 		"*": {
