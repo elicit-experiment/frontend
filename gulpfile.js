@@ -35,12 +35,11 @@ var config = {
 		module: "amd",
 		outDir: "app",
 		target: "ES5",
-		lib: ["dom", "es2015.promise", "es5"] 
+		lib: ["dom", "es2015.promise", "es5"]
 	},
 	parameters: {
 		string: ["portalPath", "elicitLandingPath"],
 		default: {
-//			portalPath: "https://dev-api.cosound.dk"
 			portalPath: "http://localhost:3000/",
 			elicitLandingPath: "http://localhost:3000",
 		}

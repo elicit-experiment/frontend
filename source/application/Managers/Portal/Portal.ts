@@ -7,7 +7,7 @@ class MyCallHandler<T> implements CHAOS.Portal.Client.ICallHandler {
 	public ProcessResponse<T>(response: CHAOS.Portal.Client.IPortalResponse<T>, recaller:(resetSession:boolean)=>void):boolean {
 		if (response.Error) {
 			console.log(response.Error);
-			location.href = "http://localhost:3000/participant";
+			location.href = Configuration.PortalPath  +"/participant";
 			return false;
 		}
 		return true;
