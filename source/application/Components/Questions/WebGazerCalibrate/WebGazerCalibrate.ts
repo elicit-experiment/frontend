@@ -213,13 +213,13 @@ class WebGazerCalibrate extends QuestionBase<any>
                         let buttons:any = {};
                         let title = `Your accuracy measure is ${precision_measurement}%`;
 
-                        if (me.currentAccuracy < 80.0) {
+                        if (me.currentAccuracy > 80.0) {
                             buttons['confirm'] = "Go on to the survey";
                         } else {
                             buttons['cancel'] = "Recalibrate";
                             title += '. The experiment requires more accuracy. Please try again.';
                         }
-                        
+
                         swal({
                             title,
                             allowOutsideClick: false,
