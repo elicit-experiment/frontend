@@ -210,18 +210,24 @@ class WebGazerCalibrate extends QuestionBase<any>
                         var accuracyLabel = "<a>Accuracy | " + precision_measurement + "%</a>";
                         document.getElementById("Accuracy").innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
                         me.currentAccuracy = precision_measurement;
+                        let buttons:any = {};
+                        let title = `Your accuracy measure is ${precision_measurement}%`;
+
+                        if (me.currentAccuracy < 80.0) {
+                            buttons['confirm'] = "Go on to the survey";
+                        } else {
+                            buttons['cancel'] = "Recalibrate";
+                            title += '. The experiment requires more accuracy. Please try again.';
+                        }
+                        
                         swal({
-                            title: "Your accuracy measure is " + precision_measurement + "%",
+                            title,
                             allowOutsideClick: false,
-                            buttons: {
-                                cancel: "Recalibrate",
-                                confirm: "Go on to the survey",
-                            }
+                            buttons
                         }).then((isConfirm: boolean) => {
                             if (isConfirm) {
                                 //clear the calibration & hide the last middle button
                                 me.ClearCanvas();
-
                                 me.CalibrationCompleted();
                             } else {
                                 //use restart function to restart the calibration
