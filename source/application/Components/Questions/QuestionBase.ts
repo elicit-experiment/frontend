@@ -192,6 +192,11 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		audioInfo.AddIsPlayingCallback(isPlaying => this.AddEvent(isPlaying ? "Start" : "Stop", id, "AudioDevice"));
 	}
 
+	protected TrackMediaInfo(id:string, mediaInfo:MediaInfo):void
+	{
+		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddEvent(isPlaying ? "Start" : "Stop", id, mediaInfo.Sources[0].Type));
+	}
+
 	protected WhenAllAudioHavePlayed(audio:AudioInfo|AudioInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
 	{
 		if (audio == null) return knockout.computed(() => true);

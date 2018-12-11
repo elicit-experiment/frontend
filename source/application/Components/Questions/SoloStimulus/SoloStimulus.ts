@@ -120,13 +120,11 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaLabel = this.GetFormatted(stimulus.Label);
 
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying);
-        this.TrackAudioInfo("/Instrument/Stimulus", this.MediaInfo);
+        this.TrackMediaInfo("/Instrument/SoloStimulus", this.MediaInfo);
         this.HasMedia = true;
 
         this.WhenAllMediaHavePlayed(this.MediaInfo, true).subscribe( () => this.CanAnswer(true) );
         this.CanAnswer.subscribe(v => {
-            console.log('Can answer changed: ');
-            console.dir(v);
             this.SetAnswer({ completed: v });
         });
     }
