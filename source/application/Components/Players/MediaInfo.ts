@@ -8,6 +8,7 @@ class MediaInfo
 	public IsPlaying: KnockoutObservable<boolean> = knockout.observable(false);
 	public IsPlayed: KnockoutObservable<boolean> = knockout.observable(false);
 	public IsStartable: KnockoutObservable<boolean>;
+	public IsLayedOut: KnockoutObservable<(ClientRect | DOMRect)> = knockout.observable(null);
 
 	constructor(sources:Source[], startable: KnockoutObservable<boolean> = knockout.observable(true))
 	{
@@ -34,6 +35,15 @@ class MediaInfo
 		});
 	}
 	
+	public AddScreenElementLocationCallback(callback: (bbox: ClientRect|DOMRect) => void) 
+	{
+		var sub = this.IsLayedOut.subscribe(v =>
+			{
+				sub.dispose();
+				callback(v);
+			});	
+	}
+
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true)):MediaInfo
 	{
 		if (stimulus === null) return null;

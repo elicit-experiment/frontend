@@ -123,7 +123,9 @@ class Video
 
 		// 4. The API will call this function when the video player is ready.
 		function onPlayerReady(event:any) {
-			//event.target.playVideo();
+			const player = document.getElementById('player');
+			const playerBBox = player.getBoundingClientRect();
+			self._info.IsLayedOut(playerBBox);	
 		}
 
 		// 5. The API calls this function when the player's state changes.
@@ -149,18 +151,18 @@ class Video
 	{
 		var $player = jquery(player);
 
-		$player.on("playing", () =>
-		{
-			this._info.IsPlaying(true);
-		}).on("pause", () =>
-		{
-			this._info.IsPlaying(false);
-		}).on("ended", () =>
-		{
-			this._info.IsPlaying(false);
-		});
+		$player.on("playing", () => this._info.IsPlaying(true))
+			   .on("pause", () => this._info.IsPlaying(false))
+		       .on("ended", () => {
+				   this._info.IsPlaying(false);
+				   this._info.IsPlayed(true);
+				});
 
 		this.Sources.forEach(s => $player.append(`<Source type="${s.Type}" src="${s.Source}"/>`));
+
+        const playerBBox = player.getBoundingClientRect();
+
+		this._info.IsLayedOut(playerBBox);
 	}
 }
 

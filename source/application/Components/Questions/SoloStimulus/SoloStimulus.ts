@@ -18,6 +18,7 @@ class SoloStimulus extends QuestionBase<any>
     public CalibrationPoints: Array<{ x: number, y: number }> = [];
     public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
     public MediaComponentName: string = 'Players/Audio';
+    public EventId: string = '/Instrument/SoloStimulus';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
 
     protected _pointsSubscription: KnockoutSubscription;
@@ -48,7 +49,7 @@ class SoloStimulus extends QuestionBase<any>
                 WebGazerManager.StartCalibration();
 
                 const player = document.getElementById('player');
-                const playerBBox = player.getBoundingClientRect();
+                const playerBBox = player.getBoundingClientRect();        
                 const videoFeed = document.getElementById('webgazerVideoFeed');
                 const videoBBox = videoFeed.getBoundingClientRect();
                 const scale = Math.round(10.0*Math.min(playerBBox.width/videoBBox.width, playerBBox.height / videoBBox.height))/10.0;
@@ -120,7 +121,10 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaLabel = this.GetFormatted(stimulus.Label);
 
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying);
-        this.TrackMediaInfo("/Instrument/SoloStimulus", this.MediaInfo);
+        this.TrackMediaInfo(this.EventId, this.MediaInfo);
+
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.EventId, this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
+
         this.HasMedia = true;
 
         this.WhenAllMediaHavePlayed(this.MediaInfo, true).subscribe( () => this.CanAnswer(true) );

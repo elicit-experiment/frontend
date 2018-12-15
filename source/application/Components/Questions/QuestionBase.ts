@@ -26,7 +26,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		{
 			this.UpdateIsAnswerValid();
 			this.Model.Loaded();
-		}, 0); //Give decendent time to override HasValidAnswer 
+		}, 0); //Give decendent time to override HasValidAnswer
 	}
 
 	protected UpdateIsAnswerValid(answer?:T):void
@@ -195,6 +195,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 	protected TrackMediaInfo(id:string, mediaInfo:MediaInfo):void
 	{
 		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddEvent(isPlaying ? "Start" : "Stop", id, mediaInfo.Sources[0].Type));
+        mediaInfo.AddIsPlayedCallback(isPlayed => this.AddEvent(isPlayed ? "Completed" : "Incomplete", id, mediaInfo.Sources[0].Type));
 	}
 
 	protected WhenAllAudioHavePlayed(audio:AudioInfo|AudioInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
@@ -253,7 +254,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 
 	public SlideLoaded(): void
 	{
-		
+
 	}
 
 	public SlideCompleted():boolean
