@@ -47,7 +47,7 @@ class MediaInfo
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true)):MediaInfo
 	{
 		if (stimulus === null) return null;
-		const config = { Type: stimulus.Type, Source: stimulus.URI, IsPausable: (stimulus.IsPausable || true) };
+		const config = { Type: stimulus.Type, Source: stimulus.URI, IsPausable: !!stimulus.IsPausable };
 		return new MediaInfo([config], startable);
 	}
 }
