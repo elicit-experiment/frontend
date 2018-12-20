@@ -121,7 +121,12 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		this.UpdateIsAnswerValid(answer);
 
 		var output = <any>answer;
-		output.Events = this._events.map(this.CloneEvent);
+//		output.Events = this._events.map(this.CloneEvent);
+		output.Events = this._events;// OLD Chaos system, append only .map(this.CloneEvent);
+
+		this._events = [];
+
+		console.dir(`sending ${output.Events}`);
 
 		this.Model.Answer(output);
 	}
