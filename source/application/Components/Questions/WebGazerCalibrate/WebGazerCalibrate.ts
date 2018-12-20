@@ -218,7 +218,7 @@ class WebGazerCalibrate extends QuestionBase<any>
                             minimumCalibrationAccuracy = window.minimumCalibrationAccuracy;
                         }
 
-                        if (me.currentAccuracy > minimumCalibrationAccuracy) {
+                        if (me.currentAccuracy >= minimumCalibrationAccuracy) {
                             buttons['confirm'] = "Go on to the survey";
                         } else {
                             buttons['cancel'] = "Recalibrate";
