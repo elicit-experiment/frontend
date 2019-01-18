@@ -14,7 +14,7 @@ class Header extends QuestionBase<any>
 
 		if (!this.HeaderLabel) throw new Error("HeaderLabel not found for Header");
 
-		ExperimentManager.SlideTitle(this.GetFormatted(this.HeaderLabel));
+		ExperimentManager.SlideTitle(this.HeaderLabel);
 	}
 
 	public SlideCompleted(): boolean
