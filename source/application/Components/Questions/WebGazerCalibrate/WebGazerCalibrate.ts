@@ -15,11 +15,20 @@ class WebGazerCalibrate extends QuestionBase<any>
     public PointCalibrate = 0;
     public CalibrationPoints = <any>[];
     public currentAccuracy: number;
+    public MaxNoOfAttempts: number;
+    public NoOfAttempts: number = 1;
+    public MinCalibrationAccuracyPct: number;
+    public CalibrationFailed: boolean = false;
 
     constructor(question: QuestionModel) {
         super(question, true);
 
         this.hidePanelElements();
+
+        console.dir(question);
+
+        this.MaxNoOfAttempts = question.Input.MaxNoOfAttempts;
+        this.MinCalibrationAccuracyPct = question.Input.MinCalibrationAccuracyPct;
 
         const me = this;
         WebGazerManager.Init().then(() => {
@@ -77,6 +86,15 @@ class WebGazerCalibrate extends QuestionBase<any>
         return false;
     }
 
+    public FailedToCalibrate() {
+        console.log('Failed');
+        ExperimentManager.SlideTitle("Calibration failed");
+
+        WebGazerManager.End();
+        
+        this.CalibrationFailed = true;
+    }
+
     protected HasValidAnswer(answer: any): boolean {
         console.log(this.CanAnswer());
         return answer;
@@ -95,10 +113,19 @@ class WebGazerCalibrate extends QuestionBase<any>
     }
 
     private PopUpInstruction() {
+//        let instructions = "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements."
+        let instructions = "Click on each of the 9 points on the screen.  You must click on each point 5 times till it goes yellow. Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
+
+        if (!!this.GetMinCalibrationAccuracyPct()) {
+            instructions += `  You must score ${this.GetMinCalibrationAccuracyPct()}% accuracy to continue`;
+        }
+        if (!!this.MaxNoOfAttempts) {
+            instructions += `  You have ${this.MaxNoOfAttempts} attempts.`
+        }
         this.ClearCanvas();
         swal({
             title: "Calibration",
-            text: "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements.",
+            text: instructions,
             buttons: {
                 cancel: false,
                 confirm: true
@@ -213,10 +240,7 @@ class WebGazerCalibrate extends QuestionBase<any>
                         let buttons:any = {};
                         let title = `Your accuracy measure is ${precision_measurement}%`;
 
-                        let minimumCalibrationAccuracy = 80.0;
-                        if ('minimumCalibrationAccuracy' in window) {
-                            minimumCalibrationAccuracy = window.minimumCalibrationAccuracy;
-                        }
+                        let minimumCalibrationAccuracy = me.GetMinCalibrationAccuracyPct();
 
                         if (me.currentAccuracy >= minimumCalibrationAccuracy) {
                             buttons['confirm'] = "Go on to the survey";
@@ -224,7 +248,20 @@ class WebGazerCalibrate extends QuestionBase<any>
                             buttons['cancel'] = "Recalibrate";
                             title += `. The experiment requires a minimum of ${minimumCalibrationAccuracy}`;
                             title += '. Please try again.';
+                            
+                            if (!!me.MaxNoOfAttempts) {
+                                const remainingAttempts = me.MaxNoOfAttempts - me.NoOfAttempts;
+                                console.log(`remaining attempts ${remainingAttempts}`);
+                                if (remainingAttempts > 0) {
+                                    title += `  You have ${remainingAttempts} attempts remaining`;
+                                } else {
+                                    me.FailedToCalibrate();
+                                    return;
+                                }
+                            }
                         }
+
+                        me.NoOfAttempts += 1;
 
                         swal({
                             title,
@@ -328,6 +365,15 @@ class WebGazerCalibrate extends QuestionBase<any>
         }
         precision = precision / 50;
         return precision;
+    }
+
+    private GetMinCalibrationAccuracyPct() : number {
+        let minimumCalibrationAccuracy = this.MinCalibrationAccuracyPct;
+        if (!minimumCalibrationAccuracy) return null;
+        if ('minimumCalibrationAccuracy' in window) {
+            minimumCalibrationAccuracy = window.minimumCalibrationAccuracy;
+        }
+        return minimumCalibrationAccuracy
     }
 }
 

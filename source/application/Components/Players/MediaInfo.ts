@@ -44,10 +44,10 @@ class MediaInfo
 			});	
 	}
 
-	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true)):MediaInfo
+	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true), mimeType:string = null):MediaInfo
 	{
 		if (stimulus === null) return null;
-		const config = { Type: stimulus.Type, Source: stimulus.URI, IsPausable: !!stimulus.IsPausable };
+		const config = { Type: mimeType || stimulus.Type, Source: stimulus.URI, IsPausable: !!stimulus.IsPausable };
 		return new MediaInfo([config], startable);
 	}
 }

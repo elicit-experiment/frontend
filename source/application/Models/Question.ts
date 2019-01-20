@@ -29,7 +29,7 @@ class Question
 
 			if (question.Type == 'NewComponent::WebGazerCalibrate') {
 				questionMap = QuestionMap.Get('WebGazerCalibrate');
-				input = null
+				input = component
 			} else if (component.hasOwnProperty('Stimuli')) {
 				questionMap = QuestionMap.Get('SoloStimulus');
 				input = component.Stimuli; // TODO: Handle more than one stimulus ?

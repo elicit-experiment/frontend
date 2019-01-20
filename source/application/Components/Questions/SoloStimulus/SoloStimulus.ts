@@ -20,6 +20,7 @@ class SoloStimulus extends QuestionBase<any>
     public MediaComponentName: string = 'Players/Audio';
     public EventId: string = '/Instrument/SoloStimulus';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
+    public UsesWebGazer: false;
 
     protected _pointsSubscription: KnockoutSubscription;
 
@@ -30,7 +31,9 @@ class SoloStimulus extends QuestionBase<any>
 
         var stimulus = (this.GetComponent() as any).Stimuli[0];
 
-        if (!WebGazerManager.Ready()) {
+        this.UsesWebGazer = stimulus.Type.indexOf('+webgazer') !== -1;
+
+        if (this.UsesWebGazer && !WebGazerManager.Ready()) {
             WebGazerManager.Init().then(() => {
 
             //WebGazer.Restart(false);    
@@ -38,7 +41,7 @@ class SoloStimulus extends QuestionBase<any>
 
             swal({
                 title: "Calibration",
-                text: "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. This will calibrate your eye movements.",
+                text: "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
                 buttons: {
                     cancel: false,
                     confirm: true
@@ -120,7 +123,7 @@ class SoloStimulus extends QuestionBase<any>
 
         this.MediaLabel = this.GetFormatted(stimulus.Label);
 
-        this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying);
+        this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
         this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.EventId, this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
@@ -232,9 +235,15 @@ class SoloStimulus extends QuestionBase<any>
         event.preventDefault();
     }
 
+    public MimeType(type:string) {
+        return type.replace('+webgazer', '');
+    }
+
     public static MimeTypeToPlayerType: any = {
         'video/mp4': 'Players/Video',
         'video/youtube': 'Players/Video',
+        'video/mp4+webgazer': 'Players/Video',
+        'video/youtube+webgazer': 'Players/Video',
         'audio/mpeg': 'Players/Audio',
     };
 }
