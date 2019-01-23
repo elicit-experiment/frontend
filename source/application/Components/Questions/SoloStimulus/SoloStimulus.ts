@@ -20,7 +20,7 @@ class SoloStimulus extends QuestionBase<any>
     public MediaComponentName: string = 'Players/Audio';
     public EventId: string = '/Instrument/SoloStimulus';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
-    public UsesWebGazer: false;
+    public UsesWebGazer: boolean = false;
 
     protected _pointsSubscription: KnockoutSubscription;
 
