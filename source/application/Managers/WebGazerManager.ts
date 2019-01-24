@@ -21,6 +21,8 @@ class WebGazerManager extends DisposableComponent {
     public points: Array<any> = [];
     public sessionGuid: string;
 
+    public static VIDEO_ELEMENTS = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox', 'webgazerGazeDot'];
+
     public Ready(): boolean {
         return webgazer ? webgazer.isReady() : false;
     }
@@ -82,6 +84,13 @@ class WebGazerManager extends DisposableComponent {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    public HideCalibrationElements() {
+        WebGazerManager.VIDEO_ELEMENTS
+            .map((id:string) => document.getElementById(id))
+            .filter((el: HTMLElement|undefined) => !!el)
+            .forEach((el: HTMLElement) => el.style.display = 'none' );
     }
 
     public StartCalibration() {

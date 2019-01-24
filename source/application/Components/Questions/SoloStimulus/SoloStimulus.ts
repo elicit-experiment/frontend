@@ -24,8 +24,6 @@ class SoloStimulus extends QuestionBase<any>
 
     protected _pointsSubscription: KnockoutSubscription;
 
-    public VIDEO_ELEMENTS = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'];
-
     constructor(question: QuestionModel) {
         super(question, true);
 
@@ -36,7 +34,7 @@ class SoloStimulus extends QuestionBase<any>
         if (this.UsesWebGazer && !WebGazerManager.Ready()) {
             WebGazerManager.Init().then(() => {
 
-            //WebGazer.Restart(false);    
+            //WebGazer.Restart(false);
             document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video')
 
             swal({
@@ -52,14 +50,14 @@ class SoloStimulus extends QuestionBase<any>
                 WebGazerManager.StartCalibration();
 
                 const player = document.getElementById('player');
-                const playerBBox = player.getBoundingClientRect();        
+                const playerBBox = player.getBoundingClientRect();
                 const videoFeed = document.getElementById('webgazerVideoFeed');
                 const videoBBox = videoFeed.getBoundingClientRect();
                 const scale = Math.round(10.0*Math.min(playerBBox.width/videoBBox.width, playerBBox.height / videoBBox.height))/10.0;
                 const tx = Math.round(10.0*(playerBBox.left + playerBBox.width/2 - videoBBox.width/2))/10.0;
                 const ty = Math.round(10.0*(playerBBox.top + playerBBox.height/2 - videoBBox.height/2))/10.0;
                 const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
-                this.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
+                WebGazerManager.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
                              .forEach((el:HTMLElement) => el.style.transform = transform )
             });
 
@@ -140,7 +138,7 @@ class SoloStimulus extends QuestionBase<any>
 
     public SlideCompleted(): boolean {
         webgazer.showPredictionPoints(false);
-        
+
         this._pointsSubscription && this._pointsSubscription.dispose();
         this._pointsSubscription = null;
 

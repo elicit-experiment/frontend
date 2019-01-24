@@ -1,5 +1,7 @@
 import knockout = require("knockout");
+// TODO: fix this grossness
 import swal = require("sweetalert");
+import swal2 = require("sweetalert2");
 import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
@@ -18,7 +20,7 @@ class WebGazerCalibrate extends QuestionBase<any>
     public MaxNoOfAttempts: number;
     public NoOfAttempts: number = 1;
     public MinCalibrationAccuracyPct: number;
-    public CalibrationFailed: boolean = false;
+    public CalibrationFailed: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
     constructor(question: QuestionModel) {
         super(question, true);
@@ -32,7 +34,7 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         const me = this;
         WebGazerManager.Init().then(() => {
-            console.log('CALIBRATION: webgazer initted')
+            console.log('CALIBRATION: webgazer initted');
             me.ClearCanvas();
 
             me.ShowHelpModal();
@@ -90,9 +92,11 @@ class WebGazerCalibrate extends QuestionBase<any>
         console.log('Failed');
         ExperimentManager.SlideTitle("Calibration failed");
 
+        WebGazerManager.HideCalibrationElements();
+        this.ClearCanvas();
+        this.CalibrationFailed(true);
+
         WebGazerManager.End();
-        
-        this.CalibrationFailed = true;
     }
 
     protected HasValidAnswer(answer: any): boolean {
@@ -102,7 +106,7 @@ class WebGazerCalibrate extends QuestionBase<any>
 
     private ClearCanvas() {
         $(".Calibration").hide();
-        var canvas = <HTMLCanvasElement>document.getElementById("plotting_canvas");
+        const canvas = <HTMLCanvasElement>document.getElementById("plotting_canvas");
         if (canvas) {
             canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         }
@@ -113,19 +117,29 @@ class WebGazerCalibrate extends QuestionBase<any>
     }
 
     private PopUpInstruction() {
-//        let instructions = "Please click on each of the 9 points on the screen. You must click on each point 5 times till it goes yellow. This will calibrate your eye movements."
-        let instructions = "Click on each of the 9 points on the screen.  You must click on each point 5 times till it goes yellow. Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
+        let instructions = "<div>"+
+        "<ul class='calibrate-instructions'><li>Click on each of the 9 points on the screen.</li>" +
+        "<li>You must click on each point 5 times till it goes yellow.</li>"+
+        "<li>Please ensure that your face is visible within the rectangle within the webcam video.</li>"+
+        "<li>When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.</li>" +
+        "<li>Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow.</li>"+ 
+        "<li>Please try to hold your head steady during the process.  This will calibrate your eye movements.</li>" + 
+        "</ul></div>";
 
         if (!!this.GetMinCalibrationAccuracyPct()) {
-            instructions += `  You must score ${this.GetMinCalibrationAccuracyPct()}% accuracy to continue`;
+            instructions += `<b>You must score ${this.GetMinCalibrationAccuracyPct()}% accuracy to continue</b><br/>`;
         }
         if (!!this.MaxNoOfAttempts) {
-            instructions += `  You have ${this.MaxNoOfAttempts} attempts.`
+            instructions += `  You have <b>${this.MaxNoOfAttempts}</b> attempts.`
         }
         this.ClearCanvas();
-        swal({
+        swal2({
             title: "Calibration",
-            text: instructions,
+            html: instructions,
+            showLoaderOnConfirm: true,
+            buttonsStyling: false,
+            confirmButtonClass: 'btn btn-primary btn-lg',
+            cancelButtonClass: 'btn btn-lg',
             buttons: {
                 cancel: false,
                 confirm: true
@@ -248,7 +262,7 @@ class WebGazerCalibrate extends QuestionBase<any>
                             buttons['cancel'] = "Recalibrate";
                             title += `. The experiment requires a minimum of ${minimumCalibrationAccuracy}`;
                             title += '. Please try again.';
-                            
+
                             if (!!me.MaxNoOfAttempts) {
                                 const remainingAttempts = me.MaxNoOfAttempts - me.NoOfAttempts;
                                 console.log(`remaining attempts ${remainingAttempts}`);

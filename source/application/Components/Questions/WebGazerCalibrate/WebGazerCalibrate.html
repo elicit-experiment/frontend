@@ -1,6 +1,16 @@
 <div id="webgazer-calibration">
   <!-- ko if: CalibrationFailed -->
-  TODO: Add text for this case
+  <p class='calibration-failed'>
+    Calibration failed in <span data-bind="html: MaxNoOfAttempts"></span> attempts.<br/>
+
+    An accuracy of <span data-bind="html: currentAccuracy"></span> % was obtained and the requirement was <span data-bind="html: MinCalibrationAccuracyPct"></span> %.<br/>
+
+    Unfortunately you do not fulfill the requirements to continue this experiment.<br/>
+
+    We thank you for your time.<br/>
+
+    Goodbye.
+  </p>
   <!-- /ko -->
 
   <!-- ko ifnot: CalibrationFailed -->

@@ -8,6 +8,7 @@
 /// <reference path="../../TypeScriptDefinitions/SoundManager.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/videojs.d.ts" />
 /// <reference path="../../dependencies/sweetalert/typings/sweetalert.d.ts" />
+/// <reference path="../../dependencies/sweetalert2/sweetalert2.d.ts" />
 /// <reference path="../../dependencies/es6-promise/es6-promise.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/taggle.d.ts" />
 /// <reference path="../../TypeScriptDefinitions/webgazer.d.ts" />
@@ -35,6 +36,7 @@ requirejs.config({
 		webgazer: "../lib/webgazer/webgazer",
 		swal: "../lib/sweetalert/sweetalert.min",
 		sweetalert: "../lib/sweetalert/sweetalert.min",
+		sweetalert2: "../lib/sweetalert2/dist/sweetalert2.min",
 		'es6-promise': "../lib/es6-promise/es6-promise.auto",
 	},
 	map: {
@@ -77,7 +79,10 @@ requirejs.config({
 		},
 		Taggle: {
 			deps: ["css!../lib/taggle/taggle"]
-		}
+		},
+		sweetalert2: {
+			deps: ["css!../lib/sweetalert2/dist/sweetalert2.min.css"]
+		},
 	},
 	deps: ["Main", "bootstrap", "css!Style/default", "KnockoutBindings/KnockoutBindings"],
 	waitSeconds: 20,
