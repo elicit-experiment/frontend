@@ -117,6 +117,7 @@ class WebGazerCalibrate extends QuestionBase<any>
     }
 
     private PopUpInstruction() {
+        /*
         let instructions = "<div>"+
         "<ul class='calibrate-instructions'><li>Click on each of the 9 points on the screen.</li>" +
         "<li>You must click on each point 5 times till it goes yellow.</li>"+
@@ -132,6 +133,18 @@ class WebGazerCalibrate extends QuestionBase<any>
         if (!!this.MaxNoOfAttempts) {
             instructions += `  You have <b>${this.MaxNoOfAttempts}</b> attempts.`
         }
+*/
+
+        const accuracyRequirement = (!!this.GetMinCalibrationAccuracyPct() && !!this.MaxNoOfAttempts) ?
+            `You have ${this.MaxNoOfAttempts} attempts to achieve ${this.GetMinCalibrationAccuracyPct()}% accuracy.<br/>` : '';
+
+        const instructions = "<div>" +
+            "Ready to calibrate<br/>" +
+            accuracyRequirement +
+            "Remember to keep still during the entire experiment.<br/>" +
+            "<span class='soto-voce'>(press help in the upper right corner to see instructions again)</span>" +
+            "</div>"
+
         this.ClearCanvas();
         swal2({
             title: "Calibration",
@@ -251,23 +264,32 @@ class WebGazerCalibrate extends QuestionBase<any>
                         var accuracyLabel = "<a>Accuracy | " + precision_measurement + "%</a>";
                         document.getElementById("Accuracy").innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
                         me.currentAccuracy = precision_measurement;
-                        let buttons:any = {};
-                        let title = `Your accuracy measure is ${precision_measurement}%`;
-
+                        let title = '';
+                        let html = `Your accuracy measure is ${precision_measurement}%<br/>`;
+                        let showCancelButton = false;
                         let minimumCalibrationAccuracy = me.GetMinCalibrationAccuracyPct();
+                        let confirmButtonText = '';
+                        let cancelButtonText = '';
+                        let confirmIsRecalibrate = false;
 
                         if (me.currentAccuracy >= minimumCalibrationAccuracy) {
-                            buttons['confirm'] = "Go on to the survey";
+                            confirmButtonText = "Go on to the survey";
+                            cancelButtonText = "Recalibrate";
+                            showCancelButton = true;
                         } else {
-                            buttons['cancel'] = "Recalibrate";
-                            title += `. The experiment requires a minimum of ${minimumCalibrationAccuracy}`;
-                            title += '. Please try again.';
+                            confirmButtonText = "Recalibrate";
+                            confirmIsRecalibrate = true;
+                            title = "Calibration Failed";
+
+
+                            html += `The experiment requires a minimum of ${minimumCalibrationAccuracy}.<br/>`;
+                            html += 'Please try again.<br/>';
 
                             if (!!me.MaxNoOfAttempts) {
                                 const remainingAttempts = me.MaxNoOfAttempts - me.NoOfAttempts;
                                 console.log(`remaining attempts ${remainingAttempts}`);
                                 if (remainingAttempts > 0) {
-                                    title += `  You have ${remainingAttempts} attempts remaining`;
+                                    html += `  You have ${remainingAttempts} attempts remaining`;
                                 } else {
                                     me.FailedToCalibrate();
                                     return;
@@ -277,12 +299,15 @@ class WebGazerCalibrate extends QuestionBase<any>
 
                         me.NoOfAttempts += 1;
 
-                        swal({
+                        swal2({
                             title,
+                            html,
                             allowOutsideClick: false,
-                            buttons
+                            showCancelButton,
+                            confirmButtonText,
+                            cancelButtonText,
                         }).then((isConfirm: boolean) => {
-                            if (isConfirm) {
+                            if (isConfirm && !confirmIsRecalibrate) {
                                 //clear the calibration & hide the last middle button
                                 me.ClearCanvas();
                                 me.CalibrationCompleted();
@@ -381,7 +406,7 @@ class WebGazerCalibrate extends QuestionBase<any>
         return precision;
     }
 
-    private GetMinCalibrationAccuracyPct() : number {
+    private GetMinCalibrationAccuracyPct(): number {
         let minimumCalibrationAccuracy = this.MinCalibrationAccuracyPct;
         if (!minimumCalibrationAccuracy) return null;
         if ('minimumCalibrationAccuracy' in window) {
