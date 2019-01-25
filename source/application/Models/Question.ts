@@ -46,7 +46,7 @@ class Question {
 				if ((numStimuli == 1) && (numInstruments == 1)) {
 					input = [component.Instruments[0].Instrument]; // TODO: Handle more than one instrument
 					const type = Object.keys(input[0])[0];
-					input = input.map((x) => { return { Instrument: Object.assign({}, x[type], {Stimulus: component.Stimuli[0]}) }  });
+					input = input.map((x) => { return { Instrument: {...x[type], Stimulus: component.Stimuli[0] } }  });
 					questionMap = QuestionMap.Get(type);
 				}
 			}

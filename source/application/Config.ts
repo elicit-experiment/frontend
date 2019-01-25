@@ -38,6 +38,7 @@ requirejs.config({
 		sweetalert: "../lib/sweetalert/sweetalert.min",
 		sweetalert2: "../lib/sweetalert2/dist/sweetalert2.min",
 		'es6-promise': "../lib/es6-promise/es6-promise.auto",
+		'url-polyfill': "../lib/url-polyfill/url-polyfill",
 	},
 	map: {
 		"*": {

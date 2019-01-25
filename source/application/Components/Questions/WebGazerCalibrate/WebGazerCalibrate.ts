@@ -1,7 +1,11 @@
 import knockout = require("knockout");
 // TODO: fix this grossness
 import swal = require("sweetalert");
-import swal2 = require("sweetalert2");
+//import swal2 = require("sweetalert2");
+//import { swal as swal2 } from 'sweetalert2';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+const swal2=Swal;
+
 import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
@@ -29,8 +33,8 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         console.dir(question);
 
-        this.MaxNoOfAttempts = question.Input.MaxNoOfAttempts;
-        this.MinCalibrationAccuracyPct = question.Input.MinCalibrationAccuracyPct;
+        this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
+        this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
         const me = this;
         WebGazerManager.Init().then(() => {
@@ -153,10 +157,7 @@ class WebGazerCalibrate extends QuestionBase<any>
             buttonsStyling: false,
             confirmButtonClass: 'btn btn-primary btn-lg',
             cancelButtonClass: 'btn btn-lg',
-            buttons: {
-                cancel: false,
-                confirm: true
-            }
+            showCancelButton: true,
         }).then(() => {
             console.log('Starting calibration.');
             WebGazerManager.StartCalibration();
@@ -306,8 +307,8 @@ class WebGazerCalibrate extends QuestionBase<any>
                             showCancelButton,
                             confirmButtonText,
                             cancelButtonText,
-                        }).then((isConfirm: boolean) => {
-                            if (isConfirm && !confirmIsRecalibrate) {
+                        }).then((result: SweetAlertResult) => {
+                            if (result.value && !confirmIsRecalibrate) {
                                 //clear the calibration & hide the last middle button
                                 me.ClearCanvas();
                                 me.CalibrationCompleted();

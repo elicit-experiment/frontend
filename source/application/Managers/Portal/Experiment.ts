@@ -10,12 +10,11 @@ import CallQueue = require("Managers/CallQueue");
 import DisposableComponent = require("Components/DisposableComponent");
 import TestExperiment = require("Managers/Portal/TestExperiment");
 
-class Experiment extends DisposableComponent
-{
+class Experiment extends DisposableComponent {
 	private static TestId = "test";
 
-	public get IsTestExperiment():boolean { return this._id === Experiment.TestId; }
-	private _testExperiment:TestExperiment;
+	public get IsTestExperiment(): boolean { return this._id === Experiment.TestId; }
+	private _testExperiment: TestExperiment;
 
 	public IsReady: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
@@ -29,29 +28,26 @@ class Experiment extends DisposableComponent
 	public FooterLabel: KnockoutObservable<string> = knockout.observable(null);
 	public StyleSheet: KnockoutObservable<string> = knockout.observable(null);
 	public CompletedUrl: KnockoutObservable<string> = knockout.observable(null);
-	public ScrollToInvalidAnswerDuration:number = 2000;
+	public ScrollToInvalidAnswerDuration: number = 2000;
 
 	public CloseExperimentEnabled: KnockoutComputed<boolean>;
 	public CloseSlidesEnabled: KnockoutObservable<boolean> = knockout.observable(false);
 	public GoToPreviousSlideEnabled: KnockoutObservable<boolean> = knockout.observable(true);
-	
+
 	private _id: string;
 	private _hasLoadedCurrentSlide: boolean = false;
 	private _listExperiments: { [listId: string]: string } = {};
 	private _callQueue: CallQueue;
 
-	private _styleSheetElement:HTMLLinkElement;
+	private _styleSheetElement: HTMLLinkElement;
 
-	constructor()
-	{
+	constructor() {
 		super();
-		this.StyleSheet.subscribe(path =>
-		{
+		this.StyleSheet.subscribe(path => {
 			if (this._styleSheetElement != null)
 				document.head.removeChild(this._styleSheetElement);
 
-			if (path != null)
-			{
+			if (path != null) {
 				this._styleSheetElement = document.createElement("link");
 				this._styleSheetElement.rel = "stylesheet";
 				this._styleSheetElement.type = "text/css";
@@ -65,12 +61,10 @@ class Experiment extends DisposableComponent
 		this._callQueue = new CallQueue(true);
 
 
-		Navigation.ExperimentId.subscribe(id =>
-		{
-			if(id != null) this.Load(id);
+		Navigation.ExperimentId.subscribe(id => {
+			if (id != null) this.Load(id);
 		});
-		Navigation.ExperimentListId.subscribe(id =>
-		{
+		Navigation.ExperimentListId.subscribe(id => {
 			if (id != null) this.LoadNext(id);
 		});
 
@@ -80,9 +74,8 @@ class Experiment extends DisposableComponent
 			this.LoadNext(Navigation.ExperimentListId());
 	}
 
-	public ExperimentCompleted():void
-	{
-		CockpitPortal.Slide.Completed(this._id, this.NumberOfSlides()-1).WithCallback(response => {
+	public ExperimentCompleted(): void {
+		CockpitPortal.Slide.Completed(this._id, this.NumberOfSlides() - 1).WithCallback(response => {
 			if (response.Error != null)
 				Notification.Error(`Failed to complete experiment: ${response.Error.Message}`);
 		});
@@ -90,26 +83,21 @@ class Experiment extends DisposableComponent
 		this.IsExperimentCompleted(true);
 	}
 
-	public Load(id: string): void
-	{
+	public Load(id: string): void {
 		this._id = id;
 
 		this.IsReady(false);
 		this._hasLoadedCurrentSlide = false;
 
-		if(!this.IsTestExperiment)
-		{
+		if (!this.IsTestExperiment) {
 			this.AddAction(Portal.IsReady, () => {
-				CockpitPortal.Experiment.Get(this._id).WithCallback(response =>
-				{
-					if (response.Error != null)
-					{
+				CockpitPortal.Experiment.Get(this._id).WithCallback(response => {
+					if (response.Error != null) {
 						Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
 						Navigation.Navigate(`ExperimentNotFound/${id}`);
 						return;
 					}
-					if (response.Body.Results.length === 0)
-					{
+					if (response.Body.Results.length === 0) {
 						Navigation.Navigate(`ExperimentNotFound/${id}`);
 						Notification.Error("No Experiment data returned");
 						return;
@@ -132,8 +120,7 @@ class Experiment extends DisposableComponent
 				});
 			});
 		}
-		else
-		{
+		else {
 			this._testExperiment = new TestExperiment();
 			Notification.Debug("Loading test experiment");
 
@@ -150,26 +137,21 @@ class Experiment extends DisposableComponent
 		}
 	}
 
-	public LoadNext(listId:string):void
-	{
-		if (this._listExperiments[listId])
-		{
+	public LoadNext(listId: string): void {
+		if (this._listExperiments[listId]) {
 			Navigation.Navigate(`Experiment/${this._listExperiments[listId]}`);
 			return;
 		}
 
-		CockpitPortal.Experiment.Next(listId).WithCallback(response =>
-		{
-			if (response.Error != null)
-			{
+		CockpitPortal.Experiment.Next(listId).WithCallback(response => {
+			if (response.Error != null) {
 				Navigation.Navigate("NoMoreExperiments");
 				return;
 			}
 
 			if (response.Body.Results.length === 0)
 				Navigation.Navigate("NoMoreExperiments");
-			else
-			{
+			else {
 				this._listExperiments[listId] = response.Body.Results[0].Id;
 
 				Navigation.Navigate(`Experiment/${response.Body.Results[0].Id}`);
@@ -177,19 +159,16 @@ class Experiment extends DisposableComponent
 		});
 	}
 
-	public LoadNextSlide(callback: (slideIndex:number, questions: CockpitPortal.IQuestion[]) => void):void
-	{
+	public LoadNextSlide(callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
 		this.LoadSlide(this.CurrentSlideIndex() + (this._hasLoadedCurrentSlide ? 1 : 0), callback);
 	}
 
-	public LoadPreviousSlide(callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void
-	{
-		this.LoadSlide(this.CurrentSlideIndex() +  -1, callback);
+	public LoadPreviousSlide(callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
+		this.LoadSlide(this.CurrentSlideIndex() + -1, callback);
 	}
 
-	private LoadSlide(index: number, callback: (slideIndex:number, questions: CockpitPortal.IQuestion[]) => void): void
-	{
-		if(!this.IsTestExperiment) {
+	private LoadSlide(index: number, callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
+		if (!this.IsTestExperiment) {
 			CockpitPortal.Question.Get(this._id, index).WithCallback(response => {
 				if (response.Error != null) {
 					if (response.Error.Fullname === "Chaos.Cockpit.Core.Core.Exceptions.SlideLockedException")
@@ -215,8 +194,7 @@ class Experiment extends DisposableComponent
 				callback(index, response.Body.Results);
 			});
 		}
-		else
-		{
+		else {
 			setTimeout(() => {
 				Notification.Debug("Loading test slide: " + index);
 
@@ -229,18 +207,12 @@ class Experiment extends DisposableComponent
 		}
 	}
 
-	public SaveQuestionAnswer(id: string, answer: any, callback: (success:boolean) => void): void
-	{
-		this._callQueue.Queue(id, new CallRepeater((c) =>
-		{
-			if(!this.IsTestExperiment)
-			{
-				CockpitPortal.Answer.Set(id, answer).WithCallback(response =>
-				{
-					if (response.Error != null)
-					{
-						if (response.Error.Fullname !== "Chaos.Cockpit.Core.Core.Exceptions.ValidationException")
-						{
+	public SaveQuestionAnswer(id: string, answer: any, callback: (success: boolean) => void): void {
+		this._callQueue.Queue(id, new CallRepeater((c) => {
+			if (!this.IsTestExperiment) {
+				CockpitPortal.Answer.Set(id, answer).WithCallback(response => {
+					if (response.Error != null) {
+						if (response.Error.Fullname !== "Chaos.Cockpit.Core.Core.Exceptions.ValidationException") {
 							c(false, false);
 							Notification.Error(`Failed to save answer: ${response.Error.Message}`);
 						} else
@@ -249,8 +221,7 @@ class Experiment extends DisposableComponent
 						c(true, false);
 				});
 			}
-			else
-			{
+			else {
 				setTimeout(() => {
 					Notification.Debug("Saving test answer: " + id + "\n" + JSON.stringify(answer));
 					c(true, false);
@@ -260,23 +231,36 @@ class Experiment extends DisposableComponent
 		}, callback));
 	}
 
-	public CloseSlide(index: number): void
-	{
-		if(!this.IsTestExperiment) {
+	public CloseSlide(index: number): void {
+		if (!this.IsTestExperiment) {
 			CockpitPortal.Slide.Completed(this._id, index).WithCallback(response => {
 				if (response.Error != null)
 					Notification.Error(`Failed to close slide: ${response.Error.Message}`);
 			});
 		}
-		else
-		{
+		else {
 			Notification.Debug("Closing test slide: " + index);
 		}
 	}
 
-	public Close():any
-	{
-		document.location.href = this.CompletedUrl();
+	public Close(): any {
+		const completedUrl = new URL(this.CompletedUrl());
+
+		if (completedUrl.pathname === '/chaos/endexperiment') {
+			//let currentSearchParams = new URLSearchParams(window.location.search);
+			const queryParams = window.location.search.replace(/^\?(.*)/, '$1')
+				.split('&')
+				.map((p) => { const x = p.split(/=/); let y: { [param: string]: string } = {}; y[x[0]] = x[1]; return y; })
+				.reduce((l: object, r: object) => { return { ...l, ...r } }, {});
+
+			console.log(JSON.stringify(queryParams, null, 2));
+
+			for (let k in queryParams) {
+				completedUrl.searchParams.set(k, queryParams[k])
+			}
+		}
+
+		document.location.href = completedUrl.href;
 	}
 }
 

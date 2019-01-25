@@ -207,7 +207,7 @@ class SoloStimulus extends QuestionBase<any>
                     // TODO: refactor with calibration check in ctor
                     (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
 
-                    this.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
+                    WebGazerManager.VIDEO_ELEMENTS.map((id:string) => document.getElementById(id))
                                 .forEach((el:HTMLElement) => el.style.display = 'none');
 
                     WebGazerManager.StartTracking();
