@@ -2,6 +2,7 @@
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
+import { shuffleInPlace } from "Utility/ShuffleInPlace";
 
 type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean>; };
 type Item = { Label: string; Id: string; Selected: string };
@@ -33,6 +34,7 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 		this._minNoOfSelections = parseInt(this.GetInstrument("MinNoOfSelections"));
 		this._maxNoOfSelections = parseInt(this.GetInstrument("MaxNoOfSelections"));
+		var randomizeOrder = this.GetInstrument("RandomizeOrder");
 
 		var stimulus = this.GetStimulusInstrument("Stimulus");
 		if (stimulus != null)
@@ -49,6 +51,10 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		this.CanSelectMore = knockout.computed(() => this.Answer().length < this._maxNoOfSelections);
 
 		this.Items = this.GetItems<Item, ItemInfo>(v => this.CreateItemInfo(v));
+		if (randomizeOrder) {
+			this.Items = shuffleInPlace(this.Items)
+		}
+		this.AddEvent("Render", "RadioButtonGroup", "", JSON.stringify(this.Items))
 		this.RowedItems = this.RowItems(this.Items, 4);
 
 		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);

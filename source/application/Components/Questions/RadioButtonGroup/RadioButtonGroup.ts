@@ -2,6 +2,7 @@
 import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
 import AudioInfo = require("Components/Players/Audio/AudioInfo");
+import { shuffleInPlace } from "Utility/ShuffleInPlace";
 
 type ItemInfo = { Id: string; Label: string; };
 type Item = { Label: string; Id: string; Selected: string };
@@ -37,6 +38,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 
 		var alignForStimuli = this.GetInstrument("AlignForStimuli");
 		var questionsPerRow = this.GetInstrument("QuestionsPerRow");
+		var randomizeOrder = this.GetInstrument("RandomizeOrder");
         this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
         this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
         this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
@@ -56,6 +58,10 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
         this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
 		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
+		if (randomizeOrder) {
+			this.Items = shuffleInPlace(this.Items)
+		}
+		this.AddEvent("Render", "CheckBoxButtonGroup", "", JSON.stringify(this.Items))
 		this.RowedItems = this.RowItems(this.Items, this._questionsPerRow);
 
 		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);

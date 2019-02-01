@@ -32,6 +32,7 @@ class SoloStimulus extends QuestionBase<any>
         this.UsesWebGazer = stimulus.Type.indexOf('+webgazer') !== -1;
 
         if (this.UsesWebGazer && !WebGazerManager.Ready()) {
+            
             WebGazerManager.Init().then(() => {
 
             //WebGazer.Restart(false);

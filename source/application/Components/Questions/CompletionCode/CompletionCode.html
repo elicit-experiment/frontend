@@ -1,0 +1,13 @@
+<div class="container-fluid">
+    <div class="row container-fluid">
+        <div class="row QuestionBlock">
+            <div class="row">
+				<label class="CompletionCode"  data-bind="click: copyToClipboard">
+					<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
+					<input type="text" class="form-control" data-bind="textInput: Answer" readonly aria-readonly="true"/>
+					<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
+				</label>
+			</div>
+        </div>
+    </div>
+</div>
