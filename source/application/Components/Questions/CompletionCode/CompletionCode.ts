@@ -28,7 +28,7 @@ class CompletionCode extends FreetextBase<Answer>
 
 	protected UpdateAnswer(text: string): void
 	{
-		this.AddEvent("Change", "/Instrument", "Keyboard", text);
+		this.AddEvent("Change", "Keyboard", text);
 		super.UpdateAnswer(text);
 	}
 
@@ -47,6 +47,11 @@ class CompletionCode extends FreetextBase<Answer>
         inputEl.select();
         document.execCommand('copy');
         document.getSelection().removeAllRanges();
+  }
+  
+  public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "CompletionCode", "Instrument", method, data);
 	}
 }
 

@@ -11,14 +11,14 @@ class Monitor extends QuestionBase<{Context: {Type:string; Data:string}; TimeZon
 
 	public SlideLoaded(): void
 	{
-		this.AddEvent("Start", "/", "Monitor");
+		this.AddEvent("Start", "Monitor");
 
 		this.UpdateAnswer();
 	}
 
 	public SlideCompleted(): boolean
 	{
-		this.AddEvent("Stop", "/", "Monitor");
+		this.AddEvent("Stop", "Monitor");
 
 		this.UpdateAnswer();
 
@@ -28,6 +28,11 @@ class Monitor extends QuestionBase<{Context: {Type:string; Data:string}; TimeZon
 	private UpdateAnswer():void
 	{
 		this.SetAnswer({ Context: { Type: "UserAgent", Data: navigator.userAgent }, TimeZone: { Offset: new Date().getTimezoneOffset() } });
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "Monitor", "Instrument", method, data);
 	}
 }
 

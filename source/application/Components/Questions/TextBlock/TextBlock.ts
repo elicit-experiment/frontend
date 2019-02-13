@@ -16,6 +16,11 @@ class TextBlock extends QuestionBase<any>
 
 		this.Text = this.GetInstrumentFormatted("Text");
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "TextBlock", "Instrument", method, data);
+	}
 }
 
 export = TextBlock;

@@ -109,6 +109,7 @@ export interface IQuestionEvent
 {
 	Id: string;
 	Type: string;
+	EntityType: string;
 	Method: string;
 	Data: string;
 	DateTime:Date;

@@ -77,6 +77,11 @@ class AudioInformationRetrieval extends QuestionBase<{Selections:Selection[]}>
 			});
 		});
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "AudioInformationRetrieval", "Instrument", method, data);
+	}
 }
 
 export  = AudioInformationRetrieval;

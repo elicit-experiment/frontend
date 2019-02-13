@@ -61,7 +61,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 		if (randomizeOrder) {
 			this.Items = shuffleInPlace(this.Items)
 		}
-		this.AddEvent("Render", "CheckBoxButtonGroup", "", JSON.stringify(this.Items))
+		this.AddEvent("Render", "", JSON.stringify(this.Items))
 		this.RowedItems = this.RowItems(this.Items, this._questionsPerRow);
 
 		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
@@ -71,7 +71,7 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 		if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
 		this.Answer.subscribe(v =>
 		{
-			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v);
+			this.AddEvent("Change", "Mouse/Left/Down", v);
 			this.SetAnswer({ Id: v });
 		});
 	}
@@ -80,6 +80,11 @@ class RadioButtonGroup extends QuestionBase<{Id:string}>
 	{
 		if (this._isOptional) return true;
 		return answer.Id != undefined && answer.Id != null;
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "RadioButtonGroup", "Instrument", method, data);
 	}
 
 	private ItemInfo(data: Item): ItemInfo

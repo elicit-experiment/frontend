@@ -18,7 +18,7 @@ class SoloStimulus extends QuestionBase<any>
     public CalibrationPoints: Array<{ x: number, y: number }> = [];
     public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
     public MediaComponentName: string = 'Players/Audio';
-    public EventId: string = '/Instrument/SoloStimulus';
+    public EventId: string = 'SoloStimulus';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
     public UsesWebGazer: boolean = false;
 
@@ -125,7 +125,7 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.EventId, this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
 
         this.HasMedia = true;
 
@@ -245,6 +245,11 @@ class SoloStimulus extends QuestionBase<any>
         'video/youtube+webgazer': 'Players/Video',
         'audio/mpeg': 'Players/Audio',
     };
+
+    public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "SoloStimulus", "Stimulus", method, data);
+	}
 }
 
 export = SoloStimulus;
