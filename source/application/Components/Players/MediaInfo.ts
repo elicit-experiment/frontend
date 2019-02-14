@@ -46,7 +46,7 @@ class MediaInfo
 
 	public EventType():string
 	{
-		return this.Sources[0].Type.match(/.*[vV]ideo.*/) ? "Video" : "Audo"
+		return this.Sources[0].Type.match(/.*[vV]ideo.*/) ? "Video" : "Audio"
 	}
 
 	public static MimeTypeToPlayerType: any = {

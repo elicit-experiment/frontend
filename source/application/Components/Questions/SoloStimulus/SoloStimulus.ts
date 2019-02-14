@@ -125,7 +125,7 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', JSON.stringify(bbox)));
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
 
         this.HasMedia = true;
 
@@ -238,9 +238,12 @@ class SoloStimulus extends QuestionBase<any>
         return type.replace('+webgazer', '');
     }
 
-    public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+    public AddEvent(eventType:string, method:string = "SoloStimulus", data:string = "None"):void
 	{
-		super.AddRawEvent(eventType, "SoloStimulus", "Stimulus", method, data);
+        if (!method || method !== '') {
+            method = 'SoloStimulus';
+        }
+		super.AddRawEvent(eventType, this.MediaInfo.EventType(), "Stimulus", method, data);
 	}
 }
 
