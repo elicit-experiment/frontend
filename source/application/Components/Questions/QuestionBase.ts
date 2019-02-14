@@ -204,8 +204,8 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
 	protected TrackMediaInfo(id:string, mediaInfo:MediaInfo):void
 	{
-		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", mediaInfo.Sources[0].Type, "Stimulus", id, mediaInfo.Sources[0].Type));
-        mediaInfo.AddIsPlayedCallback(isPlayed => this.AddRawEvent(isPlayed ? "Completed" : "Incomplete", mediaInfo.Sources[0].Type, "Stimulus", id, mediaInfo.Sources[0].Type));
+		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
+        mediaInfo.AddIsPlayedCallback(isPlayed => this.AddRawEvent(isPlayed ? "Completed" : "Incomplete", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
 	}
 
 	protected WhenAllAudioHavePlayed(audio:AudioInfo|AudioInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>

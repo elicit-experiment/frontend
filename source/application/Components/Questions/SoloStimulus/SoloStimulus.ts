@@ -114,7 +114,7 @@ class SoloStimulus extends QuestionBase<any>
             points.push(dataPoint);
         });
 
-        this.MediaComponentName = SoloStimulus.MimeTypeToPlayerType[stimulus.Type];
+        this.MediaComponentName = MediaInfo.MimeTypeToPlayerType[stimulus.Type];
 
         if (this.MediaComponentName == undefined) {
             console.error(`MediaComponentName unknown for ${stimulus.Type}`);
@@ -125,7 +125,7 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.MediaInfo.EventType(), JSON.stringify(bbox)));
 
         this.HasMedia = true;
 
@@ -237,14 +237,6 @@ class SoloStimulus extends QuestionBase<any>
     public MimeType(type:string) {
         return type.replace('+webgazer', '');
     }
-
-    public static MimeTypeToPlayerType: any = {
-        'video/mp4': 'Players/Video',
-        'video/youtube': 'Players/Video',
-        'video/mp4+webgazer': 'Players/Video',
-        'video/youtube+webgazer': 'Players/Video',
-        'audio/mpeg': 'Players/Audio',
-    };
 
     public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
 	{
