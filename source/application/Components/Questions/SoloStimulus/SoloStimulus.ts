@@ -125,7 +125,7 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.MediaInfo.EventType(), JSON.stringify(bbox)));
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', JSON.stringify(bbox)));
 
         this.HasMedia = true;
 
