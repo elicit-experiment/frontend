@@ -21,9 +21,9 @@ class Question {
 		var input;
 
 		if (question.Type.indexOf('NewComponent') == 0) {
-			console.log(question.Type);
+			//console.log(question.Type);
 			const component = question.Component as any;
-			console.dir(component);
+			//console.dir(component);
 
 			if (question.Type == 'NewComponent::WebGazerCalibrate') {
 				questionMap = QuestionMap.Get('WebGazerCalibrate');
@@ -32,7 +32,7 @@ class Question {
 				const numStimuli = ('Stimuli' in component) ? component.Stimuli.length : 0;
 				const numInstruments= ('Instruments' in component) ? component.Instruments.length : 0;
 
-				console.log(`i: ${numInstruments} s: ${numStimuli}`);
+				//console.log(`i: ${numInstruments} s: ${numStimuli}`);
 				if ((numStimuli == 1) && (numInstruments == 0)) {
 					questionMap = QuestionMap.Get('SoloStimulus');
 					input = component.Stimuli; // TODO: Handle more than one stimulus ?
@@ -50,8 +50,8 @@ class Question {
 					questionMap = QuestionMap.Get(type);
 				}
 			}
-			console.dir(input);
-			console.dir(questionMap);
+			//console.dir(input);
+			//console.dir(questionMap);
 		} else {
 			input = question.Component;
 			questionMap = QuestionMap.Get(question.Type);

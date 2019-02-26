@@ -127,8 +127,6 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 		//		output.Events = this._events;
 		//this._events = [];
 
-		console.dir(`sending ${output.Events}`);
-
 		this.Model.Answer(output);
 	}
 
