@@ -312,10 +312,16 @@ class WebGazerCalibrate extends QuestionBase<any>
                                 me.ClearCanvas();
                                 me.CalibrationCompleted();
                             } else {
-                                //use restart function to restart the calibration
+                                // TODO: I cannot figure out how to clear the webgazer calibration and restart it.
+                                // It fails to begin() after end() is called.  See WebgazerManager#ClearCalibration.
+                                // So the best that seems possible is this gross hack.
+
+                                window.location.reload();
+                        /*
                                 me.ClearCalibration();
                                 me.ClearCanvas();
                                 me.ShowCalibrationPoint();
+                                */
                             }
                         });
                     });

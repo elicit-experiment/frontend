@@ -60,6 +60,9 @@ class WebGazerManager extends DisposableComponent {
     }
 
     public Start() {
+        const self = this;
+        delete localStorage.webgazerGlobalData;
+
         return new Promise<void>((resolve) => {
             //start the webgazer tracker
             webgazer
@@ -110,16 +113,19 @@ class WebGazerManager extends DisposableComponent {
     }
 
     public ClearCalibration() {
-        this.End();
+        //this.End();
 
-        // TODO: this is too aggressive; we should just kill the webgazer localstoarage
-        window.localStorage.clear();
+        delete localStorage.webgazerGlobalData;
 
-        this.Start().then(() => {});
+        //this.Start().then(() => {});
     }
 
     public StartTracking() {
         this.SetState(WebGazerState.Running);
+        // TODO: there is very likely a race condition here between us sending off the final
+        // webgazer data and the user hitting "end experiment" which will trigger a page nav.
+        // I think the best solution is to add plubbing to CallQueue to check if it's empty, and
+        // only un-disable the end experiment button when that's empty.
         ExperimentManager.IsExperimentCompleted.subscribe((completed: boolean) => {
             this.End();
         })
@@ -241,7 +247,10 @@ class WebGazerManager extends DisposableComponent {
                 .catch((err) => reject(err));
         })
 
-        // Test both:
+        ExperimentManager.CallOnQueue('webgazer', () => {
+            return new Promise((resolve, reject) => {
+
+            // Test both:
 /*
         postWebgazerJSON()
             .then(() => postWebgazerTsv())
@@ -249,9 +258,10 @@ class WebGazerManager extends DisposableComponent {
             .catch((err) => console.error(err));
             */
            postWebgazerTsv()
-           .then(() => console.log('Success'))
-           .catch((err) => console.error(err));
+           .then(resolve)
+           .catch((err) => reject(true));
 
+        })})
     }
 }
 

@@ -231,6 +231,25 @@ class Experiment extends DisposableComponent {
 		}, callback));
 	}
 
+	public CallOnQueue(queueId:string, caller: () => Promise<any>): Promise<void> {
+		return new Promise<void>( (resolve) => {
+			this._callQueue.Queue(queueId, new CallRepeater((c) => {
+				if (!this.IsTestExperiment) {
+					caller()
+						.then( () => c(true, false) )
+						.catch( (retry) => c(false, !!retry) )
+				}
+				else {
+					setTimeout(() => {
+						c(true, false);
+					}, 100)
+				}
+	
+			}, () => resolve()));
+
+		})
+	}
+
 	public CloseSlide(index: number): void {
 		if (!this.IsTestExperiment) {
 			CockpitPortal.Slide.Completed(this._id, index).WithCallback(response => {
