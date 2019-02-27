@@ -18,7 +18,7 @@ class SoloStimulus extends QuestionBase<any>
     public CalibrationPoints: Array<{ x: number, y: number }> = [];
     public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
     public MediaComponentName: string = 'Players/Audio';
-    public EventId: string = '/Instrument/SoloStimulus';
+    public EventId: string = 'SoloStimulus';
     public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
     public UsesWebGazer: boolean = false;
 
@@ -114,7 +114,7 @@ class SoloStimulus extends QuestionBase<any>
             points.push(dataPoint);
         });
 
-        this.MediaComponentName = SoloStimulus.MimeTypeToPlayerType[stimulus.Type];
+        this.MediaComponentName = MediaInfo.MimeTypeToPlayerType[stimulus.Type];
 
         if (this.MediaComponentName == undefined) {
             console.error(`MediaComponentName unknown for ${stimulus.Type}`);
@@ -125,7 +125,7 @@ class SoloStimulus extends QuestionBase<any>
         this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
         this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', this.EventId, this.MediaInfo.Sources[0].Type, JSON.stringify(bbox)));
+        this.MediaInfo.AddScreenElementLocationCallback(bbox => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
 
         this.HasMedia = true;
 
@@ -238,13 +238,13 @@ class SoloStimulus extends QuestionBase<any>
         return type.replace('+webgazer', '');
     }
 
-    public static MimeTypeToPlayerType: any = {
-        'video/mp4': 'Players/Video',
-        'video/youtube': 'Players/Video',
-        'video/mp4+webgazer': 'Players/Video',
-        'video/youtube+webgazer': 'Players/Video',
-        'audio/mpeg': 'Players/Audio',
-    };
+    public AddEvent(eventType:string, method:string = "SoloStimulus", data:string = "None"):void
+	{
+        if (!method || method !== '') {
+            method = 'SoloStimulus';
+        }
+		super.AddRawEvent(eventType, this.MediaInfo.EventType(), "Stimulus", method, data);
+	}
 }
 
 export = SoloStimulus;

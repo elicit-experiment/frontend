@@ -12,7 +12,7 @@ class Freetext extends FreetextBase<Answer>
 
 	protected UpdateAnswer(text: string): void
 	{
-		this.AddEvent("Change", "/Instrument", "Keyboard", text);
+		this.AddEvent("Change", "Keyboard", text);
 		super.UpdateAnswer(text);
 	}
 
@@ -24,6 +24,11 @@ class Freetext extends FreetextBase<Answer>
 	protected SaveText(answer: string): Answer
 	{
 		return { Text: answer };
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "Freetext", "Instrument", method, data);
 	}
 }
 

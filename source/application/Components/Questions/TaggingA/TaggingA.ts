@@ -163,7 +163,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		tag.IsAdded(true);
 		this.AddedItems.push(tag);
 
-		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
+		this.AddEvent("Change", "Mouse/Left/Down", tag.Data.Label);
 		this.UpdateAnswer();
 
 		return true;
@@ -176,7 +176,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		tag.IsAdded(false);
 		this.AddedItems.remove(tag);
 
-		this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", tag.Data.Label);
+		this.AddEvent("Change", "Mouse/Left/Down", tag.Data.Label);
 		this.UpdateAnswer();
 	}
 
@@ -214,6 +214,11 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	protected HasValidAnswer(answer: any): boolean
 	{
 		return !this.AnswerIsRequired || answer != undefined && answer.Tags != undefined && answer.Tags.length !== 0;
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "TaggingA", "Instrument", method, data);
 	}
 }
 

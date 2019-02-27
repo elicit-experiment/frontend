@@ -179,6 +179,11 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[]}>
 			data: [answer]
 		};
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "TwoDScaleK", "Instrument", method, data);
+	}
 }
 
 export = TwoDScaleK;

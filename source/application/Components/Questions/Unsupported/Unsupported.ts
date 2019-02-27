@@ -9,6 +9,11 @@ class Unsupported extends QuestionBase<any>
 		super(question, false);
 		console.log("Unsupported question type: " + question.APIType);
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "Unsupported", "Instrument", method, data);
+	}
 }
 
 export = Unsupported; 

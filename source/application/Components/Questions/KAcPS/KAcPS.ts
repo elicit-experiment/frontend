@@ -38,7 +38,7 @@ class KacPS extends QuestionBase<{Id:string}>
 		if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
 		this.Answer.subscribe(v =>
 		{
-			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v);
+			this.AddEvent("Change", "Mouse/Left/Down", v);
 			this.SetAnswer({ Id: v });
 		});
 		this.CanAnswer.subscribe(v =>
@@ -75,6 +75,11 @@ class KacPS extends QuestionBase<{Id:string}>
 		};
 
 		return info;
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "KAcPs", "Instrument", method, data);
 	}
 }
 

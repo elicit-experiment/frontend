@@ -10,6 +10,11 @@ class EndOfExperiment extends QuestionBase<any>
 
 		ExperimentManager.ExperimentCompleted();
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "EndOfExperiment", "Instrument", method, data);
+	}
 }
 
 export = EndOfExperiment;

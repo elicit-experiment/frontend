@@ -414,6 +414,11 @@ class WebGazerCalibrate extends QuestionBase<any>
         }
         return minimumCalibrationAccuracy
     }
+
+    public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "WebGazerCalibrate", "Instrument", method, data);
+	}
 }
 
 

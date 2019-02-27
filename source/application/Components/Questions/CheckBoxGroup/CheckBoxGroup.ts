@@ -26,6 +26,9 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 	public AddOneFillerItem: KnockoutComputed<boolean>;
 	public AddHalfFillerItem: KnockoutComputed<boolean>;
 
+	public IsStimuliBlockVisible: boolean = true;
+    private _alignForStimuli: boolean = true;
+
 	constructor(question: QuestionModel)
 	{
 		super(question);
@@ -35,6 +38,10 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		this._minNoOfSelections = parseInt(this.GetInstrument("MinNoOfSelections"));
 		this._maxNoOfSelections = parseInt(this.GetInstrument("MaxNoOfSelections"));
 		var randomizeOrder = this.GetInstrument("RandomizeOrder");
+		var alignForStimuli = this.GetInstrument("AlignForStimuli");
+		var randomizeOrder = this.GetInstrument("RandomizeOrder");
+        this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
+        this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
 
 		var stimulus = this.GetStimulusInstrument("Stimulus");
 		if (stimulus != null)
@@ -54,7 +61,7 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		if (randomizeOrder) {
 			this.Items = shuffleInPlace(this.Items)
 		}
-		this.AddEvent("Render", "RadioButtonGroup", "", JSON.stringify(this.Items))
+		this.AddEvent("Render", "", JSON.stringify(this.Items))
 		this.RowedItems = this.RowItems(this.Items, 4);
 
 		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
@@ -71,7 +78,7 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		
 		this.Answer.subscribe(v =>
 		{
-			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v.join(","));
+			this.AddEvent("Change", "Mouse/Left/Down", v.join(","));
 			this.SetAnswer({ Selections: v });
 		});
 	}
@@ -96,6 +103,11 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		};
 
 		return info;
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "CheckBoxGroup", "Instrument", method, data);
 	}
 }
 

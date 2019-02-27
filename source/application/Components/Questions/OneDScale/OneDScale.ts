@@ -82,7 +82,7 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 		this.Answer.subscribe(v =>
 		{
-			this.AddEvent("Change", "/Instrument", "Mouse/Left/Down", v.toString());
+			this.AddEvent("Change", "Mouse/Left/Down", v.toString());
 			this.SetAnswer({ Position: v });
 		});
 	}
@@ -115,6 +115,11 @@ class OneDScale extends QuestionBase<{Position:number}>
 			IsMinPosition: position === OneDScale._positionMinValue,
 			IsMaxPosition: position === OneDScale._positionMaxValue
 		}
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "OneDScale", "Instrument", method, data);
 	}
 }
 

@@ -23,6 +23,11 @@ class Header extends QuestionBase<any>
 
 		return false;
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "Header", "Instrument", method, data);
+	}
 }
 
 export = Header;

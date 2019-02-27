@@ -44,6 +44,19 @@ class MediaInfo
 			});	
 	}
 
+	public EventType():string
+	{
+		return this.Sources[0].Type.match(/.*[vV]ideo.*/) ? "Video" : "Audio"
+	}
+
+	public static MimeTypeToPlayerType: any = {
+        'video/mp4': 'Players/Video',
+        'video/youtube': 'Players/Video',
+        'video/mp4+webgazer': 'Players/Video',
+        'video/youtube+webgazer': 'Players/Video',
+        'audio/mpeg': 'Players/Audio',
+    };
+
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true), mimeType:string = null):MediaInfo
 	{
 		if (stimulus === null) return null;

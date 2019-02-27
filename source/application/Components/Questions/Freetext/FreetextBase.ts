@@ -78,6 +78,11 @@ class FreetextBase<T> extends QuestionBase<T>
 
 		return this._validation.test(text);
 	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "FreeText", "Instrument", method, data);
+	}
 }
 
 export = FreetextBase;

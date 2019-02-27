@@ -6,7 +6,7 @@ import MediaInfo = require("Components/Players/MediaInfo");
 import DisposableComponent = require("Components/DisposableComponent");
 import TextFormatter = require("Managers/TextFormatter");
 
-class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
+abstract class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 {
 	protected Model: QuestionModel;
 	protected HasAnswer: KnockoutComputed<boolean>;
@@ -127,8 +127,6 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		//		output.Events = this._events;
 		//this._events = [];
 
-		console.dir(`sending ${output.Events}`);
-
 		this.Model.Answer(output);
 	}
 
@@ -162,11 +160,14 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		return result;
 	}
 
-	protected AddEvent(type:string, id:string = null, method:string = "None", data:string = "None"):void
+	abstract AddEvent(eventType:string, method:string, data:string):void
+
+	protected AddRawEvent(eventType:string, id:string = null, entityType: string = "Unknown", method:string = "None", data:string = "None"):void
 	{
 		var event = {
 			Id: id === null ? "None" : id,
-			Type: type,
+			Type: eventType,
+			EntityType: entityType,
 			Method: method,
 			Data: data,
 			DateTime: new Date()
@@ -187,6 +188,7 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 		return {
 			Id: event.Id,
 			Type: event.Type,
+			EntityType: event.EntityType,
 			Method: event.Method,
 			Data: event.Data,
 			DateTime: event.DateTime
@@ -195,13 +197,13 @@ class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel
 
 	protected TrackAudioInfo(id:string, audioInfo:AudioInfo):void
 	{
-		audioInfo.AddIsPlayingCallback(isPlaying => this.AddEvent(isPlaying ? "Start" : "Stop", id, "AudioDevice"));
+		audioInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", "Audio", "Stimulus", id, "AudioDevice"));
 	}
 
 	protected TrackMediaInfo(id:string, mediaInfo:MediaInfo):void
 	{
-		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddEvent(isPlaying ? "Start" : "Stop", id, mediaInfo.Sources[0].Type));
-        mediaInfo.AddIsPlayedCallback(isPlayed => this.AddEvent(isPlayed ? "Completed" : "Incomplete", id, mediaInfo.Sources[0].Type));
+		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
+        mediaInfo.AddIsPlayedCallback(isPlayed => this.AddRawEvent(isPlayed ? "Completed" : "Incomplete", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
 	}
 
 	protected WhenAllAudioHavePlayed(audio:AudioInfo|AudioInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>

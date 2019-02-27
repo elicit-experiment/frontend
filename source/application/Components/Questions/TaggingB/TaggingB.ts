@@ -54,13 +54,17 @@ class TaggingB extends TaggingA
 		});
 	}
 
-
 	private RemoveTagByLabel(tagLabel: string)
 	{
 		let existingTag = this.GetTagByLabel(tagLabel);
 
 		if(existingTag != null)
 			this.RemoveTag(existingTag);
+	}
+
+	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
+	{
+		super.AddRawEvent(eventType, "TaggingB", "Instrument", method, data);
 	}
 }
 
