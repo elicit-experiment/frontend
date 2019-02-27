@@ -174,7 +174,7 @@ class WebGazerCalibrate extends QuestionBase<any>
     * This function clears the calibration buttons memory
     */
     private ClearCalibration() {
-        window.localStorage.clear();
+        WebGazerManager.ClearCalibration();
 
         $(".Calibration").css('background-color', 'red');
         $(".Calibration").css('opacity', 0.2);
@@ -206,7 +206,6 @@ class WebGazerCalibrate extends QuestionBase<any>
      * Restart the calibration process by clearing the local storage and reseting the calibration point
      */
     private RestartCalibration() {
-        console.log('HELLO');
         this.Restart(true);
     }
 

@@ -2,6 +2,7 @@ import webgazer = require("webgazer");
 import Configuration = require("Managers/Configuration");
 import DisposableComponent = require("Components/DisposableComponent");
 import knockout = require("knockout");
+import EndOfExperiment = require("../Components/Questions/EndOfExperiment/EndOfExperiment");
 
 enum WebGazerState {
     NotStarted,
@@ -29,6 +30,24 @@ class WebGazerManager extends DisposableComponent {
 
     public Init(): Promise<void> {
         const self = this;
+
+        // Set up the webgazer video feedback.
+        var setupVideoCanvas = function () {
+            // Set up the main canvas. The main canvas is used to calibrate the webgazer.
+            var canvas = <HTMLCanvasElement>document.getElementById("plotting_canvas");
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.position = 'fixed';
+            }
+        };
+
+        return new Promise<void>((resolve) => {
+            self.Start().then(setupVideoCanvas).then(resolve);
+        });
+    }
+
+    public Start() {
         return new Promise<void>((resolve) => {
             //start the webgazer tracker
             webgazer
@@ -37,20 +56,8 @@ class WebGazerManager extends DisposableComponent {
                 .setGazeListener((data: any, clock: number) => self.ProcessPoint(data, clock))
                 .begin();
 
-            // Set up the webgazer video feedback.
-            var setup = function () {
-                // Set up the main canvas. The main canvas is used to calibrate the webgazer.
-                var canvas = <HTMLCanvasElement>document.getElementById("plotting_canvas");
-                if (canvas) {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                    canvas.style.position = 'fixed';
-                }
-            };
-
             function checkIfReady() {
                 if (webgazer.isReady()) {
-                    setup();
                     self.state = WebGazerState.Started;
                     /*
                     setInterval( ()=> self.SendPoints([{
@@ -75,8 +82,8 @@ class WebGazerManager extends DisposableComponent {
 
             setTimeout(checkIfReady, 100);
         });
-
     }
+
 
     public End() {
         try {
@@ -95,6 +102,15 @@ class WebGazerManager extends DisposableComponent {
 
     public StartCalibration() {
         this.SetState(WebGazerState.Calibrating);
+    }
+
+    public ClearCalibration() {
+        this.End();
+
+        // TODO: this is too aggressive; we should just kill the webgazer localstoarage
+        window.localStorage.clear();
+
+        this.Start().then(() => {});
     }
 
     public StartTracking() {
