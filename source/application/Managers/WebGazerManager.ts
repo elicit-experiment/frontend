@@ -19,12 +19,24 @@ class WebGazerManager extends DisposableComponent {
     }
 
     static POINT_BUFFER_SIZE: number = 1000;
+    static AUTO_SEND_INTERVAL: number = 3000;
+    static unloadListener = (event: any) => {
+        // Cancel the event as stated by the standard.
+        event.preventDefault();
+        event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
+//			const confirmed = window.confirm(event.returnValue);
+//			return confirmed;
+        // Chrome requires returnValue to be set.
+        return event.returnValue;
+    }
 
     public currentPoint = knockout.observable({});
     public state = WebGazerState.NotStarted;
     public pointIndex: number = 0;
     public points: Array<any> = new Array<any>(WebGazerManager.POINT_BUFFER_SIZE);
     public sessionGuid: string;
+
+    public _autoSendTimer: number = null;
 
     public VIDEO_ELEMENTS = ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox', 'webgazerGazeDot'];
 
@@ -86,18 +98,28 @@ class WebGazerManager extends DisposableComponent {
 
 
     public End() {
+        window.removeEventListener('beforeunload', WebGazerManager.unloadListener);
+
         try {
-            console.log("Webgazer finit")
+            console.log("Webgazer finit");
+            this.clearAutoSendTimer();
             if (this.state === WebGazerState.Running) {
                 console.log(`Sending final ${this.pointIndex} points`);
                 if (this.pointIndex > 0) {
-                    this.SendPoints(this.points.slice(0, this.pointIndex));
+                    this.SendAllPoints();
                 }
             }
             this.SetState(WebGazerState.Ended)
             webgazer.end();
         } catch (e) {
             console.error(e);
+        }
+    }
+
+    private clearAutoSendTimer() {
+        if (this._autoSendTimer) {
+            clearInterval(this._autoSendTimer);
+            this._autoSendTimer = null;
         }
     }
 
@@ -121,6 +143,10 @@ class WebGazerManager extends DisposableComponent {
     }
 
     public StartTracking() {
+        this.clearAutoSendTimer();
+
+        setInterval(this.SendAllPoints.bind(this), WebGazerManager.AUTO_SEND_INTERVAL)
+
         this.SetState(WebGazerState.Running);
         // TODO: there is very likely a race condition here between us sending off the final
         // webgazer data and the user hitting "end experiment" which will trigger a page nav.
@@ -129,6 +155,9 @@ class WebGazerManager extends DisposableComponent {
         ExperimentManager.IsExperimentCompleted.subscribe((completed: boolean) => {
             this.End();
         })
+
+
+		window.addEventListener('beforeunload', WebGazerManager.unloadListener);
     }
 
     public SetState(newState: WebGazerState) {
@@ -186,7 +215,8 @@ class WebGazerManager extends DisposableComponent {
     }
 
     private SendAllPoints(): void {
-        const pointsToSend = this.points;
+        const pointsToSend = this.points.slice(0, this.pointIndex);
+        this.pointIndex = 0;
         this.points = new Array<any>(WebGazerManager.POINT_BUFFER_SIZE);
         this.SendPoints(pointsToSend);
     }
@@ -207,9 +237,9 @@ class WebGazerManager extends DisposableComponent {
             const formData = new FormData();
             let tsv = WebGazerManager.WEBGAZER_HEADERS.join("\t") + "\n";
 
-            // TODO: iideally we would generate a separate stream of points to send, already in the CSV format.
+            // TODO: ideally we would generate a separate stream of points to send, already in the CSV format.
             // There wasn't enough time to do it in the Feb 2019 timeframe, but since the post-as-file is so much 
-            // faster it makes sense to transition away from the "points" datastructure to one that mirrows the rows.
+            // faster it makes sense to transition away from the "points" datastructure to one that mirrors the rows.
             for (let point of pointsToSend) {
                 const pointToRow = (header: any) => ((Object.prototype.toString.call(point[header]) === '[object Date]') ? point[header].toJSON() : point[header]);
                 tsv += WebGazerManager.WEBGAZER_HEADERS.map(pointToRow).join("\t") + "\n";
@@ -247,9 +277,13 @@ class WebGazerManager extends DisposableComponent {
                 .catch((err) => reject(err));
         })
 
-        ExperimentManager.CallOnQueue('webgazer', () => {
-            return new Promise((resolve, reject) => {
+        const batchTimeStamp = (new Date()).getTime();
 
+        const span = pointsToSend[pointsToSend.length - 1]['timeStamp'] - pointsToSend[0]['timeStamp']
+
+        const batchMessage = `${pointsToSend.length} points spanning ${span}ms starting at ${pointsToSend[0]['timeStamp']}`;
+
+        const queueCaller = () => new Promise((resolve, reject) => {
             // Test both:
 /*
         postWebgazerJSON()
@@ -257,11 +291,21 @@ class WebGazerManager extends DisposableComponent {
             .then(() => console.log('Success'))
             .catch((err) => console.error(err));
             */
-           postWebgazerTsv()
-           .then(resolve)
-           .catch((err) => reject(true));
 
-        })})
+            /*
+            if (Math.random() > 0.5) {
+                console.warn(`faking error in points upload for ${batchTimeStamp}...`);
+                reject(true);
+                return;
+            }
+            */
+           postWebgazerTsv()
+           .then(() => { console.log(`upload ${batchTimeStamp} ${batchMessage} success`); resolve() })
+           .catch((err) => { console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`); reject(true) } );
+
+        });
+
+        ExperimentManager.CallOnQueue('webgazer', queueCaller)
     }
 }
 
