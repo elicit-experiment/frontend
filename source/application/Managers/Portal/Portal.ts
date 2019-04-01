@@ -21,6 +21,16 @@ class Portal
 
 	public get ServiceCaller():CHAOS.Portal.Client.IServiceCaller { return <CHAOS.Portal.Client.IServiceCaller><any>this.Client; }
 
+	public static unloadListener = (event: any) => {
+        // Cancel the event as stated by the standard.
+        event.preventDefault();
+        event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
+        //			const confirmed = window.confirm(event.returnValue);
+        //			return confirmed;
+        // Chrome requires returnValue to be set.
+        return event.returnValue;
+    }
+
 	constructor()
 	{
 		function getCookie(key: string) {
@@ -56,16 +66,7 @@ class Portal
 
 		CHAOS.Portal.Client.Session.Create(this.ServiceCaller);
 
-		window.addEventListener('beforeunload', (event: any) => {
-			// Cancel the event as stated by the standard.
-			event.preventDefault();
-			event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
-			//			const confirmed = window.confirm(event.returnValue);
-			//			return confirmed;
-			// Chrome requires returnValue to be set.
-			return event.returnValue;
-		}
-	);
+		window.addEventListener('beforeunload', Portal.unloadListener);
 		
 		if (currentSessionGuid === session_guid) {
 			// wait till the experiment manager starts up, then kill it
@@ -76,6 +77,11 @@ class Portal
 		}
 	}
 
+	public AllowPageLoads(): void
+	{
+		window.removeEventListener('beforeunload', Portal.unloadListener);
+	}
+	
 	public LogOut(): void
 	{
 		this.ServiceCaller.UpdateSession(null);

@@ -75,6 +75,8 @@ class Experiment extends DisposableComponent {
 	}
 
 	public ExperimentCompleted(): void {
+		Portal.AllowPageLoads();
+
 		CockpitPortal.Slide.Completed(this._id, this.NumberOfSlides() - 1).WithCallback(response => {
 			if (response.Error != null)
 				Notification.Error(`Failed to complete experiment: ${response.Error.Message}`);

@@ -127,7 +127,7 @@ class WebGazerManager extends DisposableComponent {
 
 
     public End() {
-        window.removeEventListener('beforeunload', WebGazerManager.unloadListener);
+//        window.removeEventListener('beforeunload', WebGazerManager.unloadListener);
 
         try {
             console.log("Webgazer finit");
