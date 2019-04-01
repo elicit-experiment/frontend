@@ -31,8 +31,6 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         this.hidePanelElements();
 
-        console.dir(question);
-
         this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
         this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
@@ -44,7 +42,9 @@ class WebGazerCalibrate extends QuestionBase<any>
             me.ShowHelpModal();
 
             $(".Calibration").on('click', (event) => me.HandleCalibrationClick(event))
-        }).catch(() => {
+        }).catch((x) => {
+            console.error('failed to upload test packet')
+            console.error(x);
             swal2({
                 title: "Calibration",
                 html: "Failed to initialize calibration.  Experiment cannot be taken",
@@ -56,7 +56,6 @@ class WebGazerCalibrate extends QuestionBase<any>
             }).then(() => {
                 ExperimentManager.ExperimentCompleted();
             });
-    
         });
 
         this.CanAnswer = knockout.computed(() => true);

@@ -1,13 +1,12 @@
 import knockout = require("knockout");
 import PortalClient = require("PortalClient");
 import Configuration = require("Managers/Configuration");
-import { currentPoint } from "Components/WebGazer/WebGazerCalibration";
 
 class MyCallHandler<T> implements CHAOS.Portal.Client.ICallHandler {
 	public ProcessResponse<T>(response: CHAOS.Portal.Client.IPortalResponse<T>, recaller:(resetSession:boolean)=>void):boolean {
 		if (response.Error) {
 			console.log(response.Error);
-			location.href = Configuration.PortalPath  +"/participant";
+			location.href = Configuration.PortalPath + "/participant";
 			return false;
 		}
 		return true;
@@ -57,6 +56,17 @@ class Portal
 
 		CHAOS.Portal.Client.Session.Create(this.ServiceCaller);
 
+		window.addEventListener('beforeunload', (event: any) => {
+			// Cancel the event as stated by the standard.
+			event.preventDefault();
+			event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
+			//			const confirmed = window.confirm(event.returnValue);
+			//			return confirmed;
+			// Chrome requires returnValue to be set.
+			return event.returnValue;
+		}
+	);
+		
 		if (currentSessionGuid === session_guid) {
 			// wait till the experiment manager starts up, then kill it
 			setTimeout(() => {

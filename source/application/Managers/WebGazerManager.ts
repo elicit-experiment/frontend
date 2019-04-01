@@ -20,7 +20,7 @@ class WebGazerManager extends DisposableComponent {
 
     static POINT_BUFFER_SIZE: number = 1000;
     static AUTO_SEND_INTERVAL: number = 3000;
-    static unloadListener = (event: any) => {
+    public static unloadListener = (event: any) => {
         // Cancel the event as stated by the standard.
         event.preventDefault();
         event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
@@ -29,6 +29,7 @@ class WebGazerManager extends DisposableComponent {
         // Chrome requires returnValue to be set.
         return event.returnValue;
     }
+    public getUnloadListener() : (event:any) => void { return WebGazerManager.unloadListener; };
 
     public currentPoint = knockout.observable({});
     public state = WebGazerState.NotStarted;
@@ -45,7 +46,7 @@ class WebGazerManager extends DisposableComponent {
         'left_image_x', 'left_image_y',
         'left_width', 'left_height',
         'right_image_x', 'right_image_y',
-        'right_width', 'right_height']
+        'right_width', 'right_height'];
 
 
     public Ready(): boolean {
@@ -80,22 +81,22 @@ class WebGazerManager extends DisposableComponent {
                 right_image_y: 0,
                 right_width: 0,
                 right_height: 0,
-            }
+            };
 
             this.SendPoints([testPoint])
                 .then((callCount) => {
                     console.log(`resolve after ${callCount}`);
-                    resolve()
+                    resolve();
                 })
-                .catch(() => reject());
-        })
+                .catch((x) => reject(x));
+        });
 
         return new Promise<void>((resolve, reject) => {
             self.Start()
                 .then(setupVideoCanvas)
                 .then(testPointsUpload)
                 .then(() => resolve())
-                .catch(() => reject());
+                .catch((x) => reject(x));
         });
     }
 
@@ -173,7 +174,7 @@ class WebGazerManager extends DisposableComponent {
     public StartTracking() {
         this.clearAutoSendTimer();
 
-        setInterval(this.SendAllPoints.bind(this), WebGazerManager.AUTO_SEND_INTERVAL)
+        setInterval(this.SendAllPoints.bind(this), WebGazerManager.AUTO_SEND_INTERVAL);
 
         this.SetState(WebGazerState.Running);
         // TODO: there is very likely a race condition here between us sending off the final
@@ -182,10 +183,10 @@ class WebGazerManager extends DisposableComponent {
         // only un-disable the end experiment button when that's empty.
         ExperimentManager.IsExperimentCompleted.subscribe((completed: boolean) => {
             this.End();
-        })
+        });
 
-
-        window.addEventListener('beforeunload', WebGazerManager.unloadListener);
+        // Moved to Portal
+        //window.addEventListener('beforeunload', WebGazerManager.unloadListener);
     }
 
     public SetState(newState: WebGazerState) {
@@ -266,7 +267,7 @@ class WebGazerManager extends DisposableComponent {
             let tsv = WebGazerManager.WEBGAZER_HEADERS.join("\t") + "\n";
 
             // TODO: ideally we would generate a separate stream of points to send, already in the CSV format.
-            // There wasn't enough time to do it in the Feb 2019 timeframe, but since the post-as-file is so much 
+            // There wasn't enough time to do it in the Feb 2019 timeframe, but since the post-as-file is so much
             // faster it makes sense to transition away from the "points" datastructure to one that mirrors the rows.
             for (let point of pointsToSend) {
                 const pointToRow = (header: any) => ((Object.prototype.toString.call(point[header]) === '[object Date]') ? point[header].toJSON() : point[header]);
