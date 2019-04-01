@@ -231,13 +231,39 @@ class Experiment extends DisposableComponent {
 		}, callback));
 	}
 
-	public CallOnQueue(queueId:string, caller: () => Promise<any>): Promise<void> {
-		return new Promise<void>( (resolve) => {
-			this._callQueue.Queue(queueId, new CallRepeater((c) => {
+	public SendSlideDataPoint(id: string, datapoint: any, callback: (success: boolean) => void): void {
+		this._callQueue.Queue(id, new CallRepeater((c) => {
+			if (!this.IsTestExperiment) {
+				CockpitPortal.Slide.DataPoint(id, datapoint).WithCallback(response => {
+					if (response.Error != null) {
+						if (response.Error.Fullname !== "Chaos.Cockpit.Core.Core.Exceptions.ValidationException") {
+							c(false, false);
+							Notification.Error(`Failed to save datapoint: ${response.Error.Message}`);
+						} else
+							c(false, true);
+					} else
+						c(true, false);
+				});
+			}
+			else {
+				setTimeout(() => {
+					Notification.Debug("Saving test answer: " + id + "\n" + JSON.stringify(datapoint));
+					c(true, false);
+				}, 100)
+			}
+
+		}, callback));
+	}
+
+	public CallOnQueue(queueId:string, caller: () => Promise<any>): Promise<number> {
+		return new Promise<number>( (resolve) => {
+			let callCount = 0;
+			this._callQueue.Queue(queueId, new CallRepeater((c: (sucess: boolean, fatal: boolean) => void) => {
 				if (!this.IsTestExperiment) {
+					callCount++;
 					caller()
 						.then( () => c(true, false) )
-						.catch( (retry) => c(false, !!retry) )
+						.catch( (fatal) => c(false, !!fatal) )
 				}
 				else {
 					setTimeout(() => {
@@ -245,7 +271,7 @@ class Experiment extends DisposableComponent {
 					}, 100)
 				}
 	
-			}, () => resolve()));
+			}, () => resolve(callCount)));
 
 		})
 	}

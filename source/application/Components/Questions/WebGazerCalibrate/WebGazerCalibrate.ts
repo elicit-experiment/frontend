@@ -44,6 +44,19 @@ class WebGazerCalibrate extends QuestionBase<any>
             me.ShowHelpModal();
 
             $(".Calibration").on('click', (event) => me.HandleCalibrationClick(event))
+        }).catch(() => {
+            swal2({
+                title: "Calibration",
+                html: "Failed to initialize calibration.  Experiment cannot be taken",
+                showLoaderOnConfirm: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-primary btn-lg',
+                cancelButtonClass: 'btn btn-lg',
+                showCancelButton: true,
+            }).then(() => {
+                ExperimentManager.ExperimentCompleted();
+            });
+    
         });
 
         this.CanAnswer = knockout.computed(() => true);
@@ -315,6 +328,9 @@ class WebGazerCalibrate extends QuestionBase<any>
                                 // TODO: I cannot figure out how to clear the webgazer calibration and restart it.
                                 // It fails to begin() after end() is called.  See WebgazerManager#ClearCalibration.
                                 // So the best that seems possible is this gross hack.
+
+                                // delete the session GUID so we don't kill the experiment because of USER reload
+                                document.cookie = "session_guid=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/";
 
                                 window.location.reload();
                         /*

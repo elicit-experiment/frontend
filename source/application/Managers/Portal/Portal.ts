@@ -1,7 +1,7 @@
 import knockout = require("knockout");
 import PortalClient = require("PortalClient");
 import Configuration = require("Managers/Configuration");
-
+import { currentPoint } from "Components/WebGazer/WebGazerCalibration";
 
 class MyCallHandler<T> implements CHAOS.Portal.Client.ICallHandler {
 	public ProcessResponse<T>(response: CHAOS.Portal.Client.IPortalResponse<T>, recaller:(resetSession:boolean)=>void):boolean {
@@ -24,12 +24,20 @@ class Portal
 
 	constructor()
 	{
+		function getCookie(key: string) {
+            const keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+            return keyValue ? keyValue[2] : null;
+		}
+		
 		let session_guid_regex = new RegExp('[\\?&]' + 'session_guid' + '=([^&#]*)');
 		let results = session_guid_regex.exec(location.search);
 		let session_guid = results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 		let d = new Date();
 		d.setTime(d.getTime() + (1*24*60*60*1000));
-		var expires = "expires="+ d.toUTCString();
+		var expires = "expires=" + d.toUTCString();
+
+		const currentSessionGuid = getCookie('session_guid');
+
 		document.cookie = "session_guid=" + session_guid + ";" + expires + ";path=/";
 		
 		var client = PortalClient.Initialize(Configuration.PortalPath, null, false);
@@ -48,6 +56,14 @@ class Portal
 		});
 
 		CHAOS.Portal.Client.Session.Create(this.ServiceCaller);
+
+		if (currentSessionGuid === session_guid) {
+			// wait till the experiment manager starts up, then kill it
+			setTimeout(() => {
+				console.error('RELOADING CURRENT SESSION. TERMINATING EXPERIMENT.');
+				require("Managers/Portal/Experiment").Close();	
+			}, 2000);
+		}
 	}
 
 	public LogOut(): void

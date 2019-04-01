@@ -24,8 +24,8 @@ class WebGazerManager extends DisposableComponent {
         // Cancel the event as stated by the standard.
         event.preventDefault();
         event.returnValue = "You must complete the experiment without refreshing or going back to get credit!";
-//			const confirmed = window.confirm(event.returnValue);
-//			return confirmed;
+        //			const confirmed = window.confirm(event.returnValue);
+        //			return confirmed;
         // Chrome requires returnValue to be set.
         return event.returnValue;
     }
@@ -66,8 +66,36 @@ class WebGazerManager extends DisposableComponent {
             }
         };
 
-        return new Promise<void>((resolve) => {
-            self.Start().then(setupVideoCanvas).then(resolve);
+        const testPointsUpload = () => new Promise<void>((resolve, reject) => {
+            const testPoint = {
+                x: 0,
+                y: 0,
+                clock_ms: 0,
+                timeStamp: new Date(),
+                left_image_x: 0,
+                left_image_y: 0,
+                left_width: 0,
+                left_height: 0,
+                right_image_x: 0,
+                right_image_y: 0,
+                right_width: 0,
+                right_height: 0,
+            }
+
+            this.SendPoints([testPoint])
+                .then((callCount) => {
+                    console.log(`resolve after ${callCount}`);
+                    resolve()
+                })
+                .catch(() => reject());
+        })
+
+        return new Promise<void>((resolve, reject) => {
+            self.Start()
+                .then(setupVideoCanvas)
+                .then(testPointsUpload)
+                .then(() => resolve())
+                .catch(() => reject());
         });
     }
 
@@ -157,7 +185,7 @@ class WebGazerManager extends DisposableComponent {
         })
 
 
-		window.addEventListener('beforeunload', WebGazerManager.unloadListener);
+        window.addEventListener('beforeunload', WebGazerManager.unloadListener);
     }
 
     public SetState(newState: WebGazerState) {
@@ -218,10 +246,10 @@ class WebGazerManager extends DisposableComponent {
         const pointsToSend = this.points.slice(0, this.pointIndex);
         this.pointIndex = 0;
         this.points = new Array<any>(WebGazerManager.POINT_BUFFER_SIZE);
-        this.SendPoints(pointsToSend);
+        this.SendPoints(pointsToSend).then((callCount)=>{console.log(`Point upload success after ${callCount}`)});
     }
 
-    private SendPoints(pointsToSend: Array<any>): void {
+    private SendPoints(pointsToSend: Array<any>): Promise<number> {
         function getCookie(key: string) {
             const keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
             return keyValue ? keyValue[2] : null;
@@ -250,11 +278,18 @@ class WebGazerManager extends DisposableComponent {
 
             fetch(url.href, {
                 method: 'POST',
-                mode: "cors", // no-cors, cors, *same-origin
+                mode: 'cors', // no-cors, cors, *same-origin
                 headers: {
                     'Accept': 'application/json',
                 },
+                credentials: 'include',
                 body: formData
+            }).then(rawResponse => {
+                if (rawResponse.ok) {
+                    return rawResponse;
+                } else {
+                    throw Error(`Request rejected with status ${rawResponse.status}`);
+                }
             }).then((rawResponse) => rawResponse.json())
                 .then((json) => resolve(json))
                 .catch((err) => reject(err));
@@ -271,7 +306,14 @@ class WebGazerManager extends DisposableComponent {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ sessionGUID: this.sessionGuid, points: pointsToSend })
+            }).then(rawResponse => {
+                if (rawResponse.ok) {
+                    return rawResponse;
+                } else {
+                    throw Error(`Request rejected with status ${rawResponse.status}`);
+                }
             }).then((rawResponse) => rawResponse.json())
                 .then((json) => resolve(json))
                 .catch((err) => reject(err));
@@ -279,18 +321,38 @@ class WebGazerManager extends DisposableComponent {
 
         const batchTimeStamp = (new Date()).getTime();
 
-        const span = pointsToSend[pointsToSend.length - 1]['timeStamp'] - pointsToSend[0]['timeStamp']
+        let startTime = batchTimeStamp, endTime = batchTimeStamp;
+        if (pointsToSend.length > 0) {
+            startTime = pointsToSend[0]['timeStamp'];
+            endTime = pointsToSend[pointsToSend.length - 1]['timeStamp'];
+        }
+        const span = endTime - startTime
 
-        const batchMessage = `${pointsToSend.length} points spanning ${span}ms starting at ${pointsToSend[0]['timeStamp']}`;
+        const batchMessage = `${pointsToSend.length} points spanning ${span}ms starting at ${startTime}`;
+
+        const dataPoint = {
+            kind: 'webgazer',
+            point_type: 'send_points_summary',
+            method: '',
+            value: '',
+            datetime: new Date()
+        }
+        const dataPointValue = {
+            numPoints: pointsToSend.length,
+            spanInMs: span,
+            startTime: startTime,
+            endTime: endTime,
+            status: 'success'
+        }
 
         const queueCaller = () => new Promise((resolve, reject) => {
             // Test both:
-/*
-        postWebgazerJSON()
-            .then(() => postWebgazerTsv())
-            .then(() => console.log('Success'))
-            .catch((err) => console.error(err));
-            */
+            /*
+                    postWebgazerJSON()
+                        .then(() => postWebgazerTsv())
+                        .then(() => console.log('Success'))
+                        .catch((err) => console.error(err));
+                        */
 
             /*
             if (Math.random() > 0.5) {
@@ -299,13 +361,24 @@ class WebGazerManager extends DisposableComponent {
                 return;
             }
             */
-           postWebgazerTsv()
-           .then(() => { console.log(`upload ${batchTimeStamp} ${batchMessage} success`); resolve() })
-           .catch((err) => { console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`); reject(true) } );
+            postWebgazerTsv()
+                .then(() => {
+                    console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
+                    dataPoint.value = JSON.stringify(dataPointValue);
+                    ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => { console.log('dp success'); })
+                    resolve()
+                })
+                .catch((err) => {
+                    console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`);
+                    dataPointValue.status = err.toString();
+                    dataPoint.value = JSON.stringify(dataPointValue);
+                    ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => { console.log('dp fail'); })
+                    reject(/* fatal: */false)
+                });
 
         });
 
-        ExperimentManager.CallOnQueue('webgazer', queueCaller)
+        return ExperimentManager.CallOnQueue('webgazer', queueCaller)
     }
 }
 

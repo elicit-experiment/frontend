@@ -1,5 +1,6 @@
 "use strict";
 
+require('newrelic');
 var gulp = require("gulp");
 var del = require("del");
 var replace = require("gulp-replace");

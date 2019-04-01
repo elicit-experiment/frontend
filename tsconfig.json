@@ -9,7 +9,7 @@
             "node_modules/@types"
         ],
         "types": [ "youtube" ],
-        "lib": ["dom", "es2015.promise", "es5"] 
+        "lib": ["es2017", "dom"]
     },
     "include": [
         "source/**/*"
