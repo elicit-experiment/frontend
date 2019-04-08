@@ -130,7 +130,7 @@ class WebGazerManager extends DisposableComponent {
 //        window.removeEventListener('beforeunload', WebGazerManager.unloadListener);
 
         try {
-            console.log("Webgazer finit");
+            console.log("WebGazerManager: Webgazer finit");
             this.clearAutoSendTimer();
             if (this.state === WebGazerState.Running) {
                 console.log(`Sending final ${this.pointIndex} points`);

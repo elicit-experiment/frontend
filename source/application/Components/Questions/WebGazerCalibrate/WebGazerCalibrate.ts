@@ -4,7 +4,7 @@ import swal = require("sweetalert");
 //import swal2 = require("sweetalert2");
 //import { swal as swal2 } from 'sweetalert2';
 import Swal, { SweetAlertResult } from 'sweetalert2';
-const swal2=Swal;
+const swal2 = Swal;
 
 import ExperimentManager = require("Managers/Portal/Experiment");
 import QuestionBase = require("Components/Questions/QuestionBase");
@@ -15,8 +15,8 @@ class WebGazerCalibrate extends QuestionBase<any>
 {
     public AnswerIsRequired: boolean = true;
     public HasMedia: boolean = false;
-    public CanAnswer: KnockoutObservable<boolean>;
-    public Answer: KnockoutObservable<boolean> = knockout.observable<boolean>(null);
+    public CanAnswer: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
+    public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
 
     public PointCalibrate = 0;
     public CalibrationPoints = <any>[];
@@ -36,14 +36,14 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         const me = this;
         WebGazerManager.Init().then(() => {
-            console.log('CALIBRATION: webgazer initted');
+            console.log('WebGazerCalibration: webgazer initted');
             me.ClearCanvas();
 
             me.ShowHelpModal();
 
             $(".Calibration").on('click', (event) => me.HandleCalibrationClick(event))
         }).catch((x) => {
-            console.error('failed to upload test packet')
+            console.error('WebGazerCalibration: failed to upload test packet')
             console.error(x);
             swal2({
                 title: "Calibration",
@@ -58,10 +58,8 @@ class WebGazerCalibrate extends QuestionBase<any>
             });
         });
 
-        this.CanAnswer = knockout.computed(() => true);
-        //this.Answer(true); // we can immediately go to next slide
-
-        this.Answer.subscribe(v => {
+        this.Answer.subscribe(calibrationPct => {
+            this.SetAnswer({CalibrationAccuracy: calibrationPct}); 
             this.HideWebGazerVideo();
             this.showPanelElements();
         });
@@ -98,14 +96,14 @@ class WebGazerCalibrate extends QuestionBase<any>
     }
 
     public SlideCompleted(): boolean {
-        console.log('completed');
+        console.log('WebGazerCalibration: Completed');
         ExperimentManager.SlideTitle("");
 
         return false;
     }
 
     public FailedToCalibrate() {
-        console.log('Failed');
+        console.log('WebGazerCalibration: Failed');
         ExperimentManager.SlideTitle("Calibration failed");
 
         WebGazerManager.HideCalibrationElements();
@@ -116,8 +114,16 @@ class WebGazerCalibrate extends QuestionBase<any>
     }
 
     protected HasValidAnswer(answer: any): boolean {
-        console.log(this.CanAnswer());
-        return answer;
+        answer = answer || this.GetAnswer();
+
+        /*
+        console.log(`WGCalibrate CanAnswer: ${this.CanAnswer()}`);
+        console.log(`WGCalibrate answer: ${answer}`);
+        console.log(`WGCalibrate answer: ${this.GetAnswer()}`);
+        console.dir(answer);
+*/
+
+		return ("CalibrationAccuracy" in answer) && (answer.CalibrationAccuracy > this.GetMinCalibrationAccuracyPct());
     }
 
     private ClearCanvas() {
@@ -206,7 +212,9 @@ class WebGazerCalibrate extends QuestionBase<any>
 
         const slideShell = knockout.contextFor($('.panel').get(0)).$data
 
-        wgCalibrate.$data.Answer(true);
+        wgCalibrate.$data.CanAnswer = knockout.computed(() => true);
+
+        wgCalibrate.$data.Answer(wgCalibrate.$data.currentAccuracy);
 
         WebGazerManager.StartTracking();
 

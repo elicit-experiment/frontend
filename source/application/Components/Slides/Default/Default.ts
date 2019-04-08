@@ -10,7 +10,9 @@ class Default
 	private _slide: SlideModel;
 	private _uiLessQuestions: IQuestionViewModel[] = [];
 	private _activeAnsweSets: KnockoutObservable<number> = knockout.observable(0);
-	private _isWorking:KnockoutObservable<boolean> = knockout.observable(false);
+	private _isWorking: KnockoutObservable<boolean> = knockout.observable(false);
+
+	private _loadingQuestions: KnockoutObservable<boolean> = knockout.observable(true);
 
 	public Questions: QuestionModel[] = [];
 	public HaveActiveAnswersSets:KnockoutComputed<boolean>;
@@ -18,6 +20,8 @@ class Default
 	constructor(slide: SlideModel)
 	{
 		this._slide = slide;
+		this._slide.CanGoToNextSlide(false);
+		this._loadingQuestions(true);
 		slide.SlideCompleted = callback => this.SlideCompleted(callback);
 		slide.ScrollToFirstInvalidAnswerCallback = () => this.ScrollToFirstInvalidAnswer();
 
@@ -29,6 +33,8 @@ class Default
 
 	private InitializeQuestions(questions: CockpitPortal.IQuestion[]):void
 	{
+		this._slide.SetIsWorking(knockout.computed(() => true));
+		//console.log('Default.ts:InitializeQuestions');
 		var numberToLoad = questions.length;
 		var loaded = () => { if (--numberToLoad === 0) this.SlideLoaded(); }
 
@@ -42,16 +48,21 @@ class Default
 				((m: QuestionModel) => require([NameConventionLoader.GetFilePath(questionModel.Type)],(vm: any) => this._uiLessQuestions.push(new vm(m))))(questionModel);
 		}
 
-		if (questions.length === 0)
+		if (questions.length === 0) {
 			this.SlideLoaded();
+		}
 	}
 
 	private SlideLoaded(): void
 	{
+		console.log('Default.ts:SlideLoaded');
+
 		for (var i = 0; i < this._uiLessQuestions.length; i++)
 			this._uiLessQuestions[i].SlideLoaded();
 
+		this._loadingQuestions(false);
 		this.CheckIfAllQuestionsAreAnswered();
+		this._slide.SetIsWorking(knockout.computed(() => false));
 	}
 
 	private SlideCompleted(completed: () => void):void
@@ -106,9 +117,16 @@ class Default
 
 	private GetFirstQuestionWithoutValidAnswer(): QuestionModel
 	{
+		//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer for ${this.Questions.length} questions`);
+
 		for (var i = 0; i < this.Questions.length; i++)
 		{
-			if (this.Questions[i].RequiresInput && !this.Questions[i].HasValidAnswer()) return this.Questions[i];
+			//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${this.Questions[i].RequiresInput} Has Valid Answer ${this.Questions[i].HasValidAnswer()}`);
+			// This is Question.ts:HasValidAnswer(). NOT the HasValidAnswer of the question models
+			if (this.Questions[i].RequiresInput && !this.Questions[i].HasValidAnswer()) {
+				//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
+				return this.Questions[i];
+			}
 		}
 
 		return null;
@@ -116,7 +134,15 @@ class Default
 
 	private CheckIfAllQuestionsAreAnswered():void
 	{
-		this._slide.CanGoToNextSlide(this.GetFirstQuestionWithoutValidAnswer() == null && !this.HaveActiveAnswersSets());
+		const firstQUestionWithInvalidAnswer = this.GetFirstQuestionWithoutValidAnswer();
+
+		const allAnswered = !firstQUestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
+
+		//console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQUestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
+
+		if (this._loadingQuestions()) return this._slide.CanGoToNextSlide(false);
+
+		this._slide.CanGoToNextSlide(allAnswered);
 	}
 }
 

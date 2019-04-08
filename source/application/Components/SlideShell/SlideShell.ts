@@ -31,7 +31,10 @@ class SlideShell
 
 	constructor()
 	{
-		this.IsLoadingSlide = knockout.computed(() => this.SlideData() == null);
+		this.IsLoadingSlide = knockout.computed(() => {
+			//console.log(`SlideShell.ts: IsLoadingSlide: ${this.SlideData()} `);
+			return !this.SlideData();
+		});
 		this.SlideIndex = ExperimentManager.CurrentSlideIndex;
 		this.SlideNumber = knockout.computed(() => this.SlideIndex() + 1);
 		this.NumberOfSlides = ExperimentManager.NumberOfSlides;
@@ -40,8 +43,14 @@ class SlideShell
 
 		this.IsPreviousSlideVisible = knockout.computed(() => ExperimentManager.GoToPreviousSlideEnabled() && !ExperimentManager.CloseSlidesEnabled());
 		this.IsPreviousSlideEnabled = knockout.computed(() => this.IsPreviousSlideVisible() && !this.IsLoadingSlide() && this.SlideIndex() !== 0 && !this.IsWaiting());
-		this.IsNextSlideVisible = knockout.computed(() => this.SlideNumber() !== this.NumberOfSlides());
-		this.IsNextSlideEnabled = knockout.computed(() => this.IsNextSlideVisible() && !this.IsLoadingSlide() && !this.IsWaiting());
+		this.IsNextSlideVisible = knockout.computed(() => {
+			return this.SlideNumber() !== this.NumberOfSlides();
+		});
+		this.IsNextSlideEnabled = knockout.computed(() => {
+			const enabled = this.IsNextSlideVisible() && !this.IsLoadingSlide() && !this.IsWaiting()
+			//console.log(`SlideShell.ts: IsNextSlideEnabled: visible: ${this.IsNextSlideVisible()} not-loading: ${!this.IsLoadingSlide()} not waiting: ${!this.IsWaiting()} => ${enabled}`);
+			return enabled;
+		});
 		this.IsCloseExperimentVisible = knockout.computed(() => ExperimentManager.IsExperimentCompleted() && ExperimentManager.CloseExperimentEnabled());
 		this.IsCloseExperimentEnabled = knockout.computed(() => this.IsCloseExperimentVisible() && !this.IsWaiting());
 
@@ -60,6 +69,8 @@ class SlideShell
 			if (value) setTimeout(() => this.IsHighlighted(false), 3000); //TODO: add binding to listen to the event for animation complete instead of timeout
 		});
 
+		//this.AreAllQuestionsAnswered.subscribe(value => console.log(`AreAllQuestionsAnswered: ${value}`))
+
 		if (ExperimentManager.IsReady()) this.LoadNextSlide();
 	}
 
@@ -69,14 +80,17 @@ class SlideShell
 
 		this.DoWhenDone(() => !this.IsLoadingSlide() && !this.SlideData().IsWorking(), () =>
 		{
+			//console.log('SlideShell.ts: GoToNextSlide Going to next slide?');
 			this.IsWaitingForNext(false);
 
 			if (this.AreAllQuestionsAnswered())
 			{
+				//console.log('SlideShell.ts: GoToNextSlide All questions are answered!');
 				this.LoadNextSlide();
 			}
 			else
 			{
+				//console.log('SlideShell.ts: GoToNextSlide NOT all questions are answered!');
 				this.SlideData().ScrollToFirstInvalidAnswer();
 
 				if (this.IsHighlighted())
