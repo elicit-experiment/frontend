@@ -1,35 +1,25 @@
-FROM node
+FROM node:10-alpine
 
 ARG API_URL
 ARG ELICIT_LANDING_URL
 ARG API_SCHEME
 
-RUN apt-get update
-RUN apt-get install -y ruby-dev build-essential
+RUN apk add git
 
 RUN npm uninstall gulp -g
-RUN npm install -g gulp
-RUN npm install gulp-coffee
-RUN npm install gulp-concat
-RUN npm install gulp-uglify
-RUN npm install gulp-compass
-
-# to handle running as a normal user
-#RUN dnf -y install sudo
-
-#RUN adduser --disabled-password elicituser
-# && \
-#    echo "elicituser ALL=(root) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN mkdir /experiment-frontend
 
 WORKDIR /experiment-frontend
 
-COPY ./package.json /experiment-frontend
-COPY ./package-lock.json /experiment-frontend
-COPY ./yarn.lock /experiment-frontend
+COPY ./package.json /experiment-frontend/
+# COPY ./package-lock.json /experiment-frontend/
+
+RUN ls -als
 
 RUN npm install
+
+RUN npm install -g gulp
 
 COPY . /experiment-frontend
 
@@ -43,10 +33,7 @@ RUN npm --version
 RUN node --version
 
 RUN gulp  --version
-#RUN chown -R elicituser:elicituser /experiment-frontend
-
-#USER elicituser
 
 RUN gulp build
 
-CMD ["/bin/bash", "./run.sh"]
+CMD ["/bin/sh", "./run.sh"]
