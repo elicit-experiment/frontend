@@ -36,6 +36,7 @@ var config = {
 		module: "amd",
 		outDir: "app",
 		target: "ES5",
+		types: ["youtube"],
 		lib: ["dom", "es2015.promise", "es5"]
 	},
 	parameters: {

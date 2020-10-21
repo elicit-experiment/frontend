@@ -6,7 +6,7 @@ class MyCallHandler<T> implements CHAOS.Portal.Client.ICallHandler {
 	public ProcessResponse<T>(response: CHAOS.Portal.Client.IPortalResponse<T>, recaller:(resetSession:boolean)=>void):boolean {
 		if (response.Error) {
 			console.log(response.Error);
-			location.href = Configuration.PortalPath + "/participant";
+			location.href = Configuration.PortalPath + "participant";
 			return false;
 		}
 		return true;
@@ -47,9 +47,7 @@ class Portal
 
 		const currentSessionGuid = getCookie('session_guid');
 
-		document.cookie = "session_guid=" + session_guid + ";" + expires + ";path=/";
-		
-		var client = PortalClient.Initialize(Configuration.PortalPath, null, false);
+		var client = PortalClient.Initialize(Configuration.PortalPath, session_guid, false);
 		this.Client = client;
 		client.SetCallHandler(new MyCallHandler<CHAOS.Portal.Client.IPagedPortalResult<CHAOS.Portal.Client.ISession>>());
 
@@ -64,10 +62,14 @@ class Portal
 			this.IsReady(true)
 		});
 
-		CHAOS.Portal.Client.Session.Create(this.ServiceCaller);
+		// Hack to get the session guid into the create
+		// CHAOS.Portal.Client.Session.Create(this.ServiceCaller);
+
+		const sc = this.ServiceCaller;
+				this.ServiceCaller.CallService("Session/Create", 0, {sessionGUID:session_guid}, false).WithCallback(function(response:any) {
+					response.Error == null && sc.UpdateSession(response.Body.Results[0])});
 
 		window.addEventListener('beforeunload', Portal.unloadListener);
-		
 		if (currentSessionGuid === session_guid) {
 			// wait till the experiment manager starts up, then kill it
 			setTimeout(() => {
