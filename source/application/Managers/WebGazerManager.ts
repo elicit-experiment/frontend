@@ -4,6 +4,7 @@ import DisposableComponent = require("Components/DisposableComponent");
 import ExperimentManager = require("Managers/Portal/Experiment");
 import knockout = require("knockout");
 import EndOfExperiment = require("../Components/Questions/EndOfExperiment/EndOfExperiment");
+import PortalClient = require("PortalClient");
 
 enum WebGazerState {
     NotStarted,
@@ -16,6 +17,10 @@ enum WebGazerState {
 class WebGazerManager extends DisposableComponent {
     constructor() {
         super();
+
+        const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
+
+        this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
     }
 
     static POINT_BUFFER_SIZE: number = 1000;
