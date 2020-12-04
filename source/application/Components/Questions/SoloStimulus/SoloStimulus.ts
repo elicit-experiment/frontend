@@ -19,7 +19,7 @@ class SoloStimulus extends QuestionBase<any>
     public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
     public MediaComponentName: string = 'Players/Audio';
     public EventId: string = 'SoloStimulus';
-    public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(false);
+    public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(true);
     public UsesWebGazer: boolean = false;
 
     protected _pointsSubscription: KnockoutSubscription;
@@ -129,12 +129,17 @@ class SoloStimulus extends QuestionBase<any>
 
         this.HasMedia = true;
 
-        this.WhenAllMediaHavePlayed(this.MediaInfo, true).subscribe( () => this.CanAnswer(true) );
         this.CanAnswer.subscribe(v => {
             if (!!v) {
                 this.SetAnswer({ completed: v });
             }
         });
+
+        const played = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
+        if (played)
+            this.CanAnswer( true);
+        else
+            played.subscribe( () => this.CanAnswer(true) );
     }
 
     public SlideCompleted(): boolean {
@@ -149,7 +154,7 @@ class SoloStimulus extends QuestionBase<any>
     }
 
     protected HasValidAnswer(answer: any): boolean {
-        console.log(`HasValidAnswer: ${answer}`);
+        console.log(`HasValidAnswer: %o`, answer);
         return answer.completed;
     }
 

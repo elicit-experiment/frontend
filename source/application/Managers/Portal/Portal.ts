@@ -37,7 +37,7 @@ class Portal
             const keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
             return keyValue ? keyValue[2] : null;
 		}
-		
+
 		let session_guid_regex = new RegExp('[\\?&]' + 'session_guid' + '=([^&#]*)');
 		let results = session_guid_regex.exec(location.search);
 		let session_guid = results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
@@ -74,7 +74,7 @@ class Portal
 			// wait till the experiment manager starts up, then kill it
 			setTimeout(() => {
 				console.error('RELOADING CURRENT SESSION. TERMINATING EXPERIMENT.');
-				require("Managers/Portal/Experiment").Close();	
+				require("Managers/Portal/Experiment").Close();
 			}, 2000);
 		}
 	}
@@ -83,7 +83,7 @@ class Portal
 	{
 		window.removeEventListener('beforeunload', Portal.unloadListener);
 	}
-	
+
 	public LogOut(): void
 	{
 		this.ServiceCaller.UpdateSession(null);
@@ -101,7 +101,7 @@ class Portal
 			  if (expire_time < (new Date()).getTime()) {
 				console.log('EXPIRED!');
 			  } else {
-				return token				
+				return token
 			  }
 		  } catch (e) {
 		   console.warn("Bad stuff in localstorage for usertoken.")

@@ -12,10 +12,15 @@ declare global {
 class Video {
 	public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
 	public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
+	public PlayButtonElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Sources: Source[];
 	public IsPlaying: KnockoutObservable<boolean>;
 	public IsPlayed: KnockoutObservable<boolean>;
 	public IsPausable: boolean;
+	public IsReplayable: boolean;
+	public MaxReplayCount: number;
+	public PlayCount: KnockoutObservable<number> = knockout.observable(0);
+	public IsOptional: boolean;
 	public SourceType: string;
 	public PlayerElementId: string;
 
@@ -35,6 +40,9 @@ class Video {
 		this.Sources = this._info.Sources;
 		this.SourceType = this._info.Sources[0].Type == 'video/youtube' ? 'youtube' : 'html5';
 		this.IsPausable = this._info.Sources[0].IsPausable;
+		this.IsReplayable = this._info.Sources[0].IsReplayable;
+		this.MaxReplayCount = this._info.Sources[0].MaxReplayCount;
+		this.IsOptional = this._info.Sources[0].IsOptional;
 
 		var sub = this.PlayerElement.subscribe(e => {
 			sub.dispose();
@@ -47,7 +55,6 @@ class Video {
 	}
 
 	public TogglePlay(): void {
-		console.log(this._info.IsStartable());
 		if (!this._info.IsStartable()) {
 			return;
 		}
@@ -146,7 +153,7 @@ class Video {
 				self._info.IsPlaying(false);
 			}
 			if (event.data == YT.PlayerState.ENDED) {
-				self._info.IsPlayed(true);
+				self.Played();
 			}
 		}
 		function stopVideo() {
@@ -161,7 +168,7 @@ class Video {
 			.on("pause", () => this._info.IsPlaying(false))
 			.on("ended", () => {
 				this._info.IsPlaying(false);
-				this._info.IsPlayed(true);
+				this.Played();
 			});
 
 		this.Sources.forEach(s => $player.append(`<Source type="${s.Type}" src="${s.Source}"/>`));
@@ -169,6 +176,19 @@ class Video {
 		const playerBBox = player.getBoundingClientRect();
 
 		this._info.IsLayedOut(playerBBox);
+	}
+
+	private Played() : void {
+		this._info.IsPlayed(true);
+		this.PlayCount(this.PlayCount() + 1);
+		console.log(`PlayCount ${this.PlayCount()}/ ${this.MaxReplayCount}`);
+		if (this.IsReplayable) {
+			if (!this.MaxReplayCount || this.PlayCount() < this.MaxReplayCount) {
+				return;
+			}
+		}
+		console.log(this.PlayButtonElement());
+		$(this.PlayButtonElement()).prop('disabled', true);
 	}
 }
 

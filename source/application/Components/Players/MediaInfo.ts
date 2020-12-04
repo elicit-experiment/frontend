@@ -1,6 +1,13 @@
 import knockout = require("knockout");
 
-type Source = {Type:string; Source:string; IsPausable: boolean};
+type Source = {
+	Type:string;
+	Source:string;
+	IsPausable: boolean;
+	IsReplayable: boolean;
+	IsOptional: boolean;
+	MaxReplayCount: number | undefined;
+};
 
 class MediaInfo
 {
@@ -14,6 +21,10 @@ class MediaInfo
 	{
 		this.Sources = sources;
 		this.IsStartable = startable;
+	}
+
+	public IsOptional() : boolean {
+		return this.Sources[0].IsOptional;
 	}
 
 	public AddIsPlayingCallback(callback: (isPlaying: boolean) => void, onlyCallOnce:boolean = false)
@@ -60,7 +71,14 @@ class MediaInfo
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true), mimeType:string = null):MediaInfo
 	{
 		if (stimulus === null) return null;
-		const config = { Type: mimeType || stimulus.Type, Source: stimulus.URI, IsPausable: !!stimulus.IsPausable };
+		const config = {
+			Type: mimeType || stimulus.Type,
+			Source: stimulus.URI,
+			IsPausable: !!stimulus.IsPausable,
+			IsReplayable: !!stimulus.IsReplayable,
+			IsOptional: !!stimulus.IsOptional,
+			MaxReplayCount: stimulus.MaxReplayCount,
+		};
 		return new MediaInfo([config], startable);
 	}
 }

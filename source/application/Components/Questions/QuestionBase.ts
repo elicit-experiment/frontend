@@ -235,27 +235,34 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
 	protected WhenAllMediaHavePlayed(media:MediaInfo|MediaInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
 	{
-		if (media == null) return knockout.computed(() => true);
+		media = media || [];
 
 		if (media instanceof MediaInfo)
 			media = [<MediaInfo>media];
 
+		const requiredMedia : MediaInfo[] = media.filter((medium) => !medium.IsOptional());
+
+		console.log(requiredMedia);
+		if (requiredMedia.length === 0) {
+			return knockout.computed(() => true);
+		}
+
 		var allHavePlayed = knockout.observable(false);
 		var numberOfPlays = 0;
 
-		(<MediaInfo[]>media).forEach(a =>
+		(<MediaInfo[]>requiredMedia).forEach(a =>
 		{
 			if (a === null)
 				numberOfPlays++;
 			else
 			{
 				a.AddIsPlayedCallback(() => {
-					if (++numberOfPlays === (<AudioInfo[]>media).length) allHavePlayed(true);
+					if (++numberOfPlays === (<MediaInfo[]>requiredMedia).length) allHavePlayed(true);
 				}, true);
 			}
 		});
 
-		allHavePlayed(numberOfPlays === (<MediaInfo[]>media).length);
+		allHavePlayed(numberOfPlays === (<MediaInfo[]>requiredMedia).length);
 
 		return knockout.computed(() => this.HasAnswer() || allHavePlayed());
 	}

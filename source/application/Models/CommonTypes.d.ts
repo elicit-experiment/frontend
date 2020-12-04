@@ -4,4 +4,7 @@
 	Label: string;
 	URI: string;
 	IsPausable: boolean;
-} 
+	IsReplayable: boolean,
+	IsOptional: number,
+	MaxReplayCount: number,
+}
