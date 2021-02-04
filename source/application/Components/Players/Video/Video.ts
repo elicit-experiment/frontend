@@ -2,7 +2,7 @@ import knockout = require("knockout");
 import jquery = require("jquery");
 import MediaInfo = require("Components/Players/MediaInfo");
 
-type Source = { Type: string; Source: string; };
+type Source = { Type: string; Source: string; Width: string; Height: string; };
 
 declare global {
 	interface Window { onYouTubeIframeAPIReady: any; }
@@ -112,11 +112,18 @@ class Video {
 
 	private CreateYouTubePlayer() {
 		// TODO: safer url to id mappings?
-		const videoId = this.Sources[0].Source.replace('https://youtu.be', '');
+		const source = this.Sources[0];
+		const videoId = source.Source.replace('https://youtu.be', '');
+
+		let height = window.innerHeight * 0.65;
+		let width = window.innerWidth * 0.80;
+
+		if (source.Width) { width = parseInt(source.Width); }
+		if (source.Height) { height = parseInt(source.Height); }
 
 		this._youTubePlayer = new YT.Player('player', {
-			height: window.innerHeight * 0.65,
-			width: window.innerWidth * 0.80,
+			height,
+			width,
 			videoId: videoId,
 			playerVars: {
 				autoplay: 0,

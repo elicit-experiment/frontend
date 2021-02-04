@@ -7,4 +7,6 @@
 	IsReplayable: boolean,
 	IsOptional: number,
 	MaxReplayCount: number,
+	Width: string,
+	Height: string,
 }

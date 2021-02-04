@@ -136,7 +136,7 @@ class SoloStimulus extends QuestionBase<any>
         });
 
         const played = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
-        if (played)
+        if (played())
             this.CanAnswer( true);
         else
             played.subscribe( () => this.CanAnswer(true) );

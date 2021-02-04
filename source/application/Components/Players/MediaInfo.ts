@@ -7,6 +7,8 @@ type Source = {
 	IsReplayable: boolean;
 	IsOptional: boolean;
 	MaxReplayCount: number | undefined;
+	Width: string;
+	Height: string;
 };
 
 class MediaInfo
@@ -66,6 +68,7 @@ class MediaInfo
         'video/mp4+webgazer': 'Players/Video',
         'video/youtube+webgazer': 'Players/Video',
         'audio/mpeg': 'Players/Audio',
+				'image': 'Players/Image',
     };
 
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true), mimeType:string = null):MediaInfo
@@ -78,6 +81,8 @@ class MediaInfo
 			IsReplayable: !!stimulus.IsReplayable,
 			IsOptional: !!stimulus.IsOptional,
 			MaxReplayCount: stimulus.MaxReplayCount,
+			Width: stimulus.Width,
+			Height: stimulus.Height,
 		};
 		return new MediaInfo([config], startable);
 	}
