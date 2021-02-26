@@ -48,6 +48,13 @@ class Portal
 		const currentSessionGuid = getCookie('session_guid');
 
 		var client = PortalClient.Initialize(Configuration.PortalPath, session_guid, false);
+		/*
+		console.log(`currentSessionGuid=${currentSessionGuid} session_guid=${session_guid}`)
+
+		document.cookie = "session_guid=" + session_guid + ";" + expires + ";path=/";
+
+		var client = PortalClient.Initialize(Configuration.PortalPath + 'chaos/' + session_guid, session_guid, false);
+		 */
 		this.Client = client;
 		client.SetCallHandler(new MyCallHandler<CHAOS.Portal.Client.IPagedPortalResult<CHAOS.Portal.Client.ISession>>());
 

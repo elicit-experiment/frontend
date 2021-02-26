@@ -1,61 +1,41 @@
 ﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
+import QuestionWithStimulusBase = require("Components/Questions/QuestionWithStimulusBase");
 import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
 import { shuffleInPlace } from "Utility/ShuffleInPlace";
 
 type ItemInfo = { Id: string; Label: string; };
 type Item = { Label: string; Id: string; Selected: string };
 
-class RadioButtonGroup extends QuestionBase<{Id:string}>
+class RadioButtonGroup extends QuestionWithStimulusBase<{Id:string}>
 {
     private _isOptional: boolean;
 
     public Id: string;
 	public HeaderLabel: string;
-	public AudioLabel: string;
-	public AudioInfo: AudioInfo = null;
 	public Items: ItemInfo[];
 	public RowedItems: ItemInfo[][];
 	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-	public HasMedia: boolean = false;
-	public CanAnswer: KnockoutObservable<boolean>; 
 	public AddFillerItem:KnockoutComputed<boolean>;
 	public AddOneFillerItem:KnockoutComputed<boolean>;
 	public AddHalfFillerItem:KnockoutComputed<boolean>;
 
-    public IsStimuliBlockVisible: boolean = true;
-
-    private _alignForStimuli: boolean = true;
     private _questionsPerRow: number = 4;
 
-    constructor(question: QuestionModel)
+  public QuestionsPerRow() { return this._questionsPerRow };
+
+  constructor(question: QuestionModel)
 	{
 		super(question);
 
 		this.Id = this.Model.Id;
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 
-		var alignForStimuli = this.GetInstrument("AlignForStimuli");
 		var questionsPerRow = this.GetInstrument("QuestionsPerRow");
 		var randomizeOrder = this.GetInstrument("RandomizeOrder");
-        this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
-        this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
-        this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
+		this._isOptional = parseInt(this.GetInstrument("IsOptional")) == 1;
+		this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
 
-		var stimulus = this.GetInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
-
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
-
-        this._isOptional = parseInt(this.GetInstrument("IsOptional")) == 1;
-
-        this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
+		console.log(`qpr: ${this._questionsPerRow}`)
 
 		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
 		if (randomizeOrder) {

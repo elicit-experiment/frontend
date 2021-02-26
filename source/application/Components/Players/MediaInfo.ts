@@ -38,7 +38,6 @@ class MediaInfo
 		});
 	}
 
-
 	public AddIsPlayedCallback(callback: (isPlaying: boolean) => void, onlyCallOnce:boolean = false)
 	{
 		var sub = this.IsPlayed.subscribe(v =>
@@ -69,7 +68,12 @@ class MediaInfo
         'video/youtube+webgazer': 'Players/Video',
         'audio/mpeg': 'Players/Audio',
 				'image': 'Players/Image',
-    };
+	};
+
+	public ComponentName(): string
+	{
+		return MediaInfo.MimeTypeToPlayerType[this.Sources[0].Type];
+	}
 
 	public static Create(stimulus:IStimulus, startable: KnockoutObservable<boolean> = knockout.observable(true), mimeType:string = null):MediaInfo
 	{

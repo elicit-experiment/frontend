@@ -1,6 +1,5 @@
 "use strict";
 
-require('newrelic');
 var gulp = require("gulp");
 var del = require("del");
 var replace = require("gulp-replace");
@@ -47,8 +46,6 @@ var config = {
 		}
 	}
 };
-
-var server = CreateServer();
 
 gulp.task("compileTypeScript", gulp.series(function(){
 	return gulp.src(config.projectPath + config.appDirBase + "/**/*.ts")
@@ -148,10 +145,19 @@ gulp.task("watch", gulp.series(function()
 }));
 
 gulp.task("serve", gulp.series(function () {
+	var server = CreateServer();
+
 	server.listen(config.servePort);
 }));
 
-gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
+gulp.task("buildx", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
+
+gulp.task("cleanx", gulp.series(function (callback)
+{
+	callback();
+}));
+
+gulp.task("build", gulp.series("cleanx"));
 
 gulp.task("default", gulp.series(["build"]));
 

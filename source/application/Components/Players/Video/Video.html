@@ -1,5 +1,7 @@
 <!-- ko if: SourceType === 'youtube' -->
-<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
+<div class="video-wrapper">
+	<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
+</div>
 <!-- /ko -->
 <!-- ko if: SourceType === 'html5' -->
 <video class="VideoPlayer" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">

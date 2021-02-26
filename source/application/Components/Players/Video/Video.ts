@@ -115,8 +115,8 @@ class Video {
 		const source = this.Sources[0];
 		const videoId = source.Source.replace('https://youtu.be', '');
 
-		let height = window.innerHeight * 0.65;
-		let width = window.innerWidth * 0.80;
+		let height: string|number = '100%'//window.innerHeight * 0.65;
+		let width: string|number = '100%';//window.innerWidth * 0.80;
 
 		if (source.Width) { width = parseInt(source.Width); }
 		if (source.Height) { height = parseInt(source.Height); }
