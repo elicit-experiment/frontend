@@ -150,14 +150,7 @@ gulp.task("serve", gulp.series(function () {
 	server.listen(config.servePort);
 }));
 
-gulp.task("buildx", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
-
-gulp.task("cleanx", gulp.series(function (callback)
-{
-	callback();
-}));
-
-gulp.task("build", gulp.series("cleanx"));
+gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
 
 gulp.task("default", gulp.series(["build"]));
 
