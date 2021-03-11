@@ -17,7 +17,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 	public TextInput = knockout.observable("");
 
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public AudioInfo: AudioInfo = null;
 
 	public SelectionItems = knockout.observableArray<Tag>();
@@ -44,7 +44,7 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 		let stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
 		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+			this.MediaLabel = this.GetFormatted(stimulus.Label);
 
 			this.AudioInfo = AudioInfo.Create(stimulus);
 			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);

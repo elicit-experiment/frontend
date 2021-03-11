@@ -14,7 +14,7 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 
 	public Id: string;
 	public HeaderLabel: string;
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public AudioInfo: AudioInfo = null;
 	public Items: ItemInfo[];
 	public RowedItems: ItemInfo[][];
@@ -46,7 +46,7 @@ class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
 		var stimulus = this.GetStimulusInstrument("Stimulus");
 		if (stimulus != null)
 		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+			this.MediaLabel = this.GetFormatted(stimulus.Label);
 
 			this.AudioInfo = new AudioInfo([{ Type: stimulus.Type, Source: stimulus.URI }]);
 			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);

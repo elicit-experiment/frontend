@@ -53,10 +53,15 @@ class Video {
 			sub2.dispose();
 			this.InitYouTube(e);
 		});
+		var sub3 = this.PlayerControlsElement.subscribe( e => {
+			sub3.dispose();
+			e.classList.remove('loading');
+		})
 	}
 
 	public TogglePlay(): void {
 		if (!this._info.IsStartable()) {
+			console.warn('video not startable');
 			return;
 		}
 		if (this.SourceType == 'youtube') {
@@ -72,12 +77,13 @@ class Video {
 				this._youTubePlayer.playVideo();
 			}
 		} else {
+			console.log(`ohao ${this.IsPlaying()} ${this.IsPausable	}`);
 			if (this.IsPlaying() && this.IsPausable) {
 				Video._activePlayer = null;
 				this.PlayerElement().pause();
 				this.PlayerElement().currentTime = 0;
-			}
-			else {
+			} else {
+				console.log(Video._activePlayer);
 				if (Video._activePlayer !== null && Video._activePlayer !== this && Video._activePlayer.IsPlaying())
 					Video._activePlayer.TogglePlay();
 
@@ -108,6 +114,7 @@ class Video {
 			window.onYouTubeIframeAPIReady = () => { self.CreateYouTubePlayer(); self.PlayerControlsElement().classList.remove('loading') }
 		} else {
 			this.CreateYouTubePlayer();
+			self.PlayerControlsElement().classList.remove('loading');
 		}
 	}
 

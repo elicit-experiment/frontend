@@ -10,7 +10,7 @@ class LikertScale extends QuestionBase<{Id:string}>
 {
 	public Id: string;
 	public HeaderLabel: string;
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public AudioInfo: AudioInfo = null;
 	public Items: ItemInfo[];
 	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
@@ -31,7 +31,7 @@ class LikertScale extends QuestionBase<{Id:string}>
 		var stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
 		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+			this.MediaLabel = this.GetFormatted(stimulus.Label);
 
 			this.AudioInfo = AudioInfo.Create(stimulus);
 			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);

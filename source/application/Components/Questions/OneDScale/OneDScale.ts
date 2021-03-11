@@ -26,7 +26,7 @@ class OneDScale extends QuestionBase<{Position:number}>
 	public HasY2Ticks: boolean;
 
 	public AudioInfo: AudioInfo = null;
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public HasMedia: boolean = false;
 
 	public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
@@ -63,7 +63,7 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 		if (stimulus != null)
 		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+			this.MediaLabel = this.GetFormatted(stimulus.Label);
 			this.AudioInfo = AudioInfo.Create(stimulus);
 			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
 			this.HasMedia = true;

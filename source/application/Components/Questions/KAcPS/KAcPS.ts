@@ -10,7 +10,7 @@ class KacPS extends QuestionBase<{Id:string}>
 {
 	public Id: string;
 	public HeaderLabel: string;
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public Items: ItemInfo[];
 	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
 	public CanAnswer: KnockoutObservable<boolean>;

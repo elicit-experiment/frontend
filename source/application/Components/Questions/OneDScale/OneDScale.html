@@ -8,7 +8,7 @@
 		<div class="col-xs-2" data-bind="visible: IsStimuliBlockVisible">
 			<!-- ko if: HasMedia -->
 			<div data-bind="component: {name: 'Players/Audio', params: AudioInfo}"></div>
-			<p data-bind="html: AudioLabel"></p>
+			<p data-bind="html: MediaLabel"></p>
 			<!-- /ko -->
 		</div>
 		<div class="ScaleContainer" data-bind="css: {'col-xs-10': IsStimuliBlockVisible, 'col-xs-12': !IsStimuliBlockVisible}">

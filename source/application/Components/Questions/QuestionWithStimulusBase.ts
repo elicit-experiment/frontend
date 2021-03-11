@@ -18,7 +18,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 	protected _layout: string = 'row';
 	protected _columnWidthPercent: number = 100.0;
 
-	public AudioLabel: string;
+	public MediaLabel: string;
 	public MediaInfo: MediaInfo = null;
 
 	public HasMedia: boolean = false;
@@ -51,7 +51,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 		var stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
 		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+			this.MediaLabel = this.GetFormatted(stimulus.Label);
 
 			this.MediaInfo = MediaInfo.Create(stimulus);
 			this.TrackMediaInfo("/Instrument/Stimulus", this.MediaInfo);
