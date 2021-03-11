@@ -11,6 +11,7 @@ declare global {
 // TODO: probably should be refactored into a container for HTMLVideo or YouTubeVideo children
 class Video {
 	public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
+	public PlayerControlsElement: KnockoutObservable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
 	public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public PlayButtonElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
 	public Sources: Source[];
@@ -104,7 +105,7 @@ class Video {
 			// 3. This function creates an <iframe> (and YouTube player)
 			//    after the API code downloads.
 			var self = this;
-			window.onYouTubeIframeAPIReady = () => { self.CreateYouTubePlayer(); }
+			window.onYouTubeIframeAPIReady = () => { self.CreateYouTubePlayer(); self.PlayerControlsElement().classList.remove('loading') }
 		} else {
 			this.CreateYouTubePlayer();
 		}
