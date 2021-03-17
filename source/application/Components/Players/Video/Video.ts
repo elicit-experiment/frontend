@@ -111,10 +111,9 @@ class Video {
 			// 3. This function creates an <iframe> (and YouTube player)
 			//    after the API code downloads.
 			var self = this;
-			window.onYouTubeIframeAPIReady = () => { self.CreateYouTubePlayer(); self.PlayerControlsElement().classList.remove('loading') }
+			window.onYouTubeIframeAPIReady = () => { self.CreateYouTubePlayer(); }
 		} else {
 			this.CreateYouTubePlayer();
-			self.PlayerControlsElement().classList.remove('loading');
 		}
 	}
 
