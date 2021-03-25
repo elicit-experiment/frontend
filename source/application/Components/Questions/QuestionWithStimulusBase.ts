@@ -1,10 +1,5 @@
-﻿import knockout = require("knockout");
-import CockpitPortal = require("Managers/Portal/Cockpit");
-import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
+﻿import QuestionModel = require("Models/Question");
 import MediaInfo = require("Components/Players/MediaInfo");
-import DisposableComponent = require("Components/DisposableComponent");
-import TextFormatter = require("Managers/TextFormatter");
 
 import QuestionsBase = require("Components/Questions/QuestionBase");
 
@@ -14,6 +9,8 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 	public StimulusCssClass: string = 'col-xs-12';
 	public InstrumentCssClass: string = 'col-xs-12';
 
+	private _questionsPerRow: number = 4;
+
 	protected _alignForStimuli: boolean = true;
 	protected _layout: string = 'row';
 	protected _columnWidthPercent: number = 100.0;
@@ -21,14 +18,18 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 	public MediaLabel: string;
 	public MediaInfo: MediaInfo = null;
 
+	public Id: string;
+	public HeaderLabel: string;
 	public HasMedia: boolean = false;
-
 	public CanAnswer: KnockoutObservable<boolean>;
-
 	public IsColumnLayout: boolean = false;
+	public QuestionsPerRow() { return this._questionsPerRow };
 
 	constructor(question: QuestionModel) {
 		super(question);
+
+		this.Id = this.Model.Id;
+		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 
 		var alignForStimuli = this.GetInstrument("AlignForStimuli");
 		this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
@@ -37,6 +38,9 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 		this._layout = layout === 'row' ? 'row' : 'column';
 
 		this.IsColumnLayout = this._layout !== 'row';
+
+		var questionsPerRow = this.GetInstrument("QuestionsPerRow");
+		this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
 
 		var columnWidthPercent = this.GetInstrument("ColumnWidthPercent") || '30';
 		this._columnWidthPercent = parseInt(columnWidthPercent || "100", 10);
