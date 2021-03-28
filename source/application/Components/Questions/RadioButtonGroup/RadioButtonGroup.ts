@@ -16,6 +16,8 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string }> {
   public AddOneFillerItem: KnockoutComputed<boolean>;
   public AddHalfFillerItem: KnockoutComputed<boolean>;
 
+  protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
+
   constructor(question: QuestionModel) {
     super(question);
 

@@ -18,6 +18,8 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[] }> {
   public AddOneFillerItem: KnockoutComputed<boolean>;
   public AddHalfFillerItem: KnockoutComputed<boolean>;
 
+  protected readonly InstrumentTemplateName = 'CheckboxGroupButtons';
+
   constructor(question: QuestionModel) {
     super(question);
 

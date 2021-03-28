@@ -1,8 +1,8 @@
 ﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
 import QuestionModel = require("Models/Question");
+import QuestionWithStimulusBase = require("Components/Questions/QuestionWithStimulusBase");
 
-class FreetextBase<T> extends QuestionBase<T>
+class FreetextBase<T> extends QuestionWithStimulusBase<T>
 {
 	public Id: string;
 	public Label: string = "";
@@ -14,12 +14,12 @@ class FreetextBase<T> extends QuestionBase<T>
 	public LabelPositionBottom:boolean = false;
 
 	private _validation: RegExp;
+	private _boxHeight: string = null;
+	private _boxWidth: string = null;
 
 	constructor(question: QuestionModel)
 	{
 		super(question);
-
-		this.Id = this.Model.Id;
 
 		if (this.HasInstrument())
 		{
@@ -28,6 +28,9 @@ class FreetextBase<T> extends QuestionBase<T>
 			var validation = this.GetInstrument("Validation");
 
 			if (validation) this._validation = new RegExp(validation);
+
+			this._boxHeight = this.GetInstrumentFormatted("BoxHeight");
+			this._boxWidth = this.GetInstrumentFormatted("BoxWidth");
 		}
 
 		this.LabelPosition = this.GetInstrument("LabelPosition");
@@ -54,6 +57,11 @@ class FreetextBase<T> extends QuestionBase<T>
 		this.Answer.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 200 } });
 		this.Answer.subscribe(v => this.UpdateAnswer(v));
 	}
+
+	protected BoxHeight(): string { return this._boxHeight || '100%' }
+	protected BoxWidth(): string { return this._boxWidth || '100%' }
+
+	protected ContainerCss() { return { width: this.BoxWidth(), height: this.BoxHeight() } };
 
 	protected UpdateAnswer(text:string):void
 	{

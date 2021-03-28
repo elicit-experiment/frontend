@@ -14,41 +14,4 @@
     </div>
 </script>
 
-<div class="container-fluid">
-    <!-- ko if: IsColumnLayout -->
-    <div class="container-fluid" data-bind="visible: IsStimuliBlockVisible, css: StimulusCssClass">
-        <!-- ko if: HasMedia -->
-        <p class="stimulus-label" data-bind="html: MediaLabel"></p>
-        <div data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
-        <!-- /ko -->
-    </div>
-    <div class="row container-fluid m-4"
-         data-bind="css: InstrumentCssClass">
-        <div class="row">
-            <div data-bind="css: IsStimuliBlockVisible ? 'col-xs-offset-2 col-xs-10' : 'col-xs-12'">
-                <h3 class="QuestionHeader" data-bind="html: HeaderLabel"></h3>
-            </div>
-        </div>
-
-        <div class="container-fluid" data-bind="template: {name: 'CheckboxGroupButtons'}"></div>
-    </div>
-    <!-- /ko -->
-
-    <!-- ko if: !IsColumnLayout -->
-    <div class="row" data-bind="visible: IsStimuliBlockVisible">
-        <!-- ko if: HasMedia -->
-        <p class="stimulus-label" data-bind="html: MediaLabel"></p>
-        <div data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
-        <!-- /ko -->
-    </div>
-    <div class="row container-fluid col-xs-12">
-        <div class="row">
-            <div class="col-xs-12">
-                <h3 class="QuestionHeader" data-bind="html: HeaderLabel"></h3>
-            </div>
-        </div>
-
-        <div data-bind="template: {name: 'CheckboxGroupButtons'}"></div>
-    </div>
-    <!-- /ko -->
-</div>
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>

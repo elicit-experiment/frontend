@@ -1,13 +1,16 @@
-﻿<div class="container-fluid">
-    <div class="row container-fluid">
-        <div class="row QuestionBlock">
-            <div class="row">
-				<label class="Freetext">
-					<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
-					<input type="text" class="form-control" data-bind="textInput: Answer"/>
-					<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
-				</label>
-			</div>
-        </div>
-    </div>
+﻿<script type="text/html" id="Freetext">
+<div class="row QuestionBlock">
+	<div class="row">
+		<div class="freetext-container" data-bind="style: ContainerCss()">
+			<label class="Freetext">
+				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
+				<input type="text" class="form-control" data-bind="textInput: Answer"/>
+				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
+			</label>
+		</div>
+	</div>
 </div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+

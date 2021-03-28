@@ -10,6 +10,8 @@ class Freetext extends FreetextBase<Answer>
 		super(question);
 	}
 
+	protected readonly InstrumentTemplateName = 'Freetext';
+
 	protected UpdateAnswer(text: string): void
 	{
 		this.AddEvent("Change", "Keyboard", text);

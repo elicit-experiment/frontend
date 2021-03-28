@@ -1,4 +1,47 @@
-﻿<div data-bind="foreach: Questions" class="SlideContainer">
+﻿
+<script type="text/html" id="StimulusBlock">
+	<!-- ko if: HasMedia -->
+	<p class="stimulus-label" data-bind="html: MediaLabel"></p>
+	<div data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
+	<!-- /ko -->
+</script>
+
+<script type="text/html" id="StimulusInstrumentLayout">
+	<div class="container-fluid">
+		<!-- ko if: IsColumnLayout -->
+		<div class="container-fluid" data-bind="visible: IsStimuliBlockVisible, css: StimulusCssClass">
+			<div class="container-fluid" data-bind="template: {name: 'StimulusBlock'}"></div>
+		</div>
+		<div class="row container-fluid m-4"
+			 data-bind="css: InstrumentCssClass">
+			<div class="row">
+				<div data-bind="css: IsStimuliBlockVisible ? 'col-xs-offset-2 col-xs-10' : 'col-xs-12'">
+					<h3 class="QuestionHeader" data-bind="html: HeaderLabel"></h3>
+				</div>
+			</div>
+
+			<div class="container-fluid" data-bind="template: {name: InstrumentTemplateName}"></div>
+		</div>
+		<!-- /ko -->
+
+		<!-- ko if: !IsColumnLayout -->
+		<div class="row" data-bind="visible: IsStimuliBlockVisible">
+			<div class="container-fluid" data-bind="template: {name: 'StimulusBlock'}"></div>
+		</div>
+		<div class="row container-fluid col-xs-12">
+			<div class="row">
+				<div class="col-xs-12">
+					<h3 class="QuestionHeader" data-bind="html: HeaderLabel"></h3>
+				</div>
+			</div>
+
+			<div data-bind="template: {name: InstrumentTemplateName}"></div>
+		</div>
+		<!-- /ko -->
+	</div>
+</script>
+
+<div data-bind="foreach: Questions" class="SlideContainer">
 	<!-- ko if: HasUIElement -->
 	<div data-bind="component: {name: Type, params: $data}, css: {DoesNotHaveValidAnswer: !HasValidAnswer()}, ScrollTo: ScrollToCallback"></div>
 	<hr />
