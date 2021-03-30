@@ -1,10 +1,15 @@
 ﻿<script type="text/html" id="Freetext">
 <div class="row QuestionBlock">
 	<div class="row">
-		<div class="freetext-container" data-bind="style: ContainerCss()">
+		<div class="freetext-container">
 			<label class="Freetext">
 				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
-				<input type="text" class="form-control" data-bind="textInput: Answer"/>
+				<!-- ko if: IsResizeable -->
+					<textarea type="textarea" class="form-control" data-bind="textInput: Answer, attr: GetResizableDimensions()"/>
+				<!-- /ko -->
+				<!-- ko if: !IsResizeable -->
+					<input type="text" class="form-control" data-bind="textInput: Answer"/>
+				<!-- /ko -->
 				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
 			</label>
 		</div>

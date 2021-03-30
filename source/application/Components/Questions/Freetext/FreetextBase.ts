@@ -16,6 +16,7 @@ class FreetextBase<T> extends QuestionWithStimulusBase<T>
 	private _validation: RegExp;
 	private _boxHeight: string = null;
 	private _boxWidth: string = null;
+	private _resizeable: boolean = false;
 
 	constructor(question: QuestionModel)
 	{
@@ -29,6 +30,7 @@ class FreetextBase<T> extends QuestionWithStimulusBase<T>
 
 			if (validation) this._validation = new RegExp(validation);
 
+			this._resizeable = !!this.GetInstrument("Resizeable");
 			this._boxHeight = this.GetInstrumentFormatted("BoxHeight");
 			this._boxWidth = this.GetInstrumentFormatted("BoxWidth");
 		}
@@ -58,10 +60,19 @@ class FreetextBase<T> extends QuestionWithStimulusBase<T>
 		this.Answer.subscribe(v => this.UpdateAnswer(v));
 	}
 
-	protected BoxHeight(): string { return this._boxHeight || '100%' }
-	protected BoxWidth(): string { return this._boxWidth || '100%' }
+	protected IsResizeable(): boolean { console.log(this._resizeable); return this._resizeable }
+	protected BoxHeight(): string { return this._boxHeight }
+	protected BoxWidth(): string { return this._boxWidth }
 
-	protected ContainerCss() { return { width: this.BoxWidth(), height: this.BoxHeight() } };
+	protected GetResizableDimensions() {
+		let properties:any = {};
+		if (this._boxWidth) { properties.cols = this._boxWidth; }
+		if (this._boxHeight) { properties.rows = this._boxHeight; }
+
+		console.dir(properties);
+
+		return properties;
+	}
 
 	protected UpdateAnswer(text:string):void
 	{
