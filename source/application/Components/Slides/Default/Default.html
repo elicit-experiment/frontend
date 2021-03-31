@@ -1,8 +1,10 @@
 ﻿
 <script type="text/html" id="StimulusBlock">
 	<!-- ko if: HasMedia -->
-	<p class="stimulus-label" data-bind="html: MediaLabel"></p>
-	<div data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
+	<div class="container-fluid stimulus-container">
+		<h4 class="stimulus-label" data-bind="html: MediaLabel"></h4>
+		<div data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
+	</div>
 	<!-- /ko -->
 </script>
 
