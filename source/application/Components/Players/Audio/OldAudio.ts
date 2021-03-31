@@ -1,20 +1,19 @@
 ﻿import knockout = require("knockout");
 import jquery = require("jquery");
-import MediaInfo = require("Components/Players/MediaInfo");
+import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type Source = { Type: string; Source: string; };
 
-class Audio
+class OldAudio
 {
 	public PlayerElement: KnockoutObservable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
 	public Sources: Source[];
 	public IsPlaying: KnockoutObservable<boolean>;
-	public IsPlayed: KnockoutObservable<boolean>;
 
-	private _info: MediaInfo;
-	private static _activePlayer:Audio = null;
+	private _info: AudioInfo;
+	private static _activePlayer:OldAudio = null;
 
-	constructor(info:MediaInfo)
+	constructor(info:AudioInfo)
 	{
 		this._info = info;
 		this.IsPlaying = this._info.IsPlaying;
@@ -32,16 +31,16 @@ class Audio
 	{
 		if (this.IsPlaying())
 		{
-			Audio._activePlayer = null;
+			OldAudio._activePlayer = null;
 			this.PlayerElement().pause();
 			this.PlayerElement().currentTime = 0;
 		}
 		else
 		{
-			if (Audio._activePlayer !== null && Audio._activePlayer !== this && Audio._activePlayer.IsPlaying())
-				Audio._activePlayer.TogglePlay();
+			if (OldAudio._activePlayer !== null && OldAudio._activePlayer !== this && OldAudio._activePlayer.IsPlaying())
+				OldAudio._activePlayer.TogglePlay();
 
-			Audio._activePlayer = this;
+			OldAudio._activePlayer = this;
 			this.PlayerElement().play();
 		}
 			
@@ -60,11 +59,10 @@ class Audio
 		}).on("ended", () =>
 		{
 			this._info.IsPlaying(false);
-			this._info.IsPlayed(true);
 		});
 
 		this.Sources.forEach(s => $player.append(`<Source type="${s.Type}" src="${s.Source}"/>`));
 	}
 }
 
-export = Audio;
+export = OldAudio;

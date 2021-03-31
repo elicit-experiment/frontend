@@ -40,6 +40,7 @@ class MediaInfo
 
 	public AddIsPlayedCallback(callback: (isPlaying: boolean) => void, onlyCallOnce:boolean = false)
 	{
+		console.log(`AddIsPlayedCallback`)
 		var sub = this.IsPlayed.subscribe(v =>
 		{
 			if (onlyCallOnce) sub.dispose();

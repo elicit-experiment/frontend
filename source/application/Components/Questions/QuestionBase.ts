@@ -195,42 +195,10 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 		};
 	}
 
-	protected TrackAudioInfo(id:string, audioInfo:AudioInfo):void
-	{
-		audioInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", "Audio", "Stimulus", id, "AudioDevice"));
-	}
-
 	protected TrackMediaInfo(id:string, mediaInfo:MediaInfo):void
 	{
 		mediaInfo.AddIsPlayingCallback(isPlaying => this.AddRawEvent(isPlaying ? "Start" : "Stop", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
         mediaInfo.AddIsPlayedCallback(isPlayed => this.AddRawEvent(isPlayed ? "Completed" : "Incomplete", mediaInfo.EventType(), "Stimulus", id, mediaInfo.Sources[0].Type));
-	}
-
-	protected WhenAllAudioHavePlayed(audio:AudioInfo|AudioInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
-	{
-		if (audio == null) return knockout.computed(() => true);
-
-		if (audio instanceof AudioInfo)
-			audio = [<AudioInfo>audio];
-
-		var allHavePlayed = knockout.observable(false);
-		var numberOfPlays = 0;
-
-		(<AudioInfo[]>audio).forEach(a =>
-		{
-			if (a === null)
-				numberOfPlays++;
-			else
-			{
-				a.AddIsPlayingCallback(() => {
-					if (++numberOfPlays === (<AudioInfo[]>audio).length) allHavePlayed(true);
-				}, true);
-			}
-		});
-
-		allHavePlayed(numberOfPlays === (<AudioInfo[]>audio).length);
-
-		return knockout.computed(() => this.HasAnswer() || allHavePlayed());
 	}
 
 	protected WhenAllMediaHavePlayed(media:MediaInfo|MediaInfo[], returnTrueOnAnswer:boolean = false):KnockoutComputed<boolean>
@@ -257,7 +225,10 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 			else
 			{
 				a.AddIsPlayedCallback(() => {
-					if (++numberOfPlays === (<MediaInfo[]>requiredMedia).length) allHavePlayed(true);
+					const allPlayed = ++numberOfPlays === (<MediaInfo[]>requiredMedia).length;
+					console.log('is played');
+					console.log(allPlayed);
+					if (allPlayed) allHavePlayed(true);
 				}, true);
 			}
 		});
