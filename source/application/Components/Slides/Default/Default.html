@@ -17,12 +17,12 @@
 		<div class="row container-fluid m-4"
 			 data-bind="css: InstrumentCssClass">
 			<div class="row">
-				<div data-bind="css: IsStimuliBlockVisible ? 'col-xs-offset-2 col-xs-10' : 'col-xs-12'">
+				<div>
 					<h3 class="QuestionHeader" data-bind="html: HeaderLabel"></h3>
 				</div>
 			</div>
 
-			<div class="container-fluid" data-bind="template: {name: InstrumentTemplateName}"></div>
+			<div class="container-fluid flex flex-col" data-bind="template: {name: InstrumentTemplateName}"></div>
 		</div>
 		<!-- /ko -->
 
