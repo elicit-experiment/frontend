@@ -32,7 +32,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 
 		var alignForStimuli = this.GetInstrument("AlignForStimuli");
-		this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
+		this._alignForStimuli = !(alignForStimuli === undefined || alignForStimuli === "0");
 
 		var layout = this.GetInstrument("Layout");
 		this._layout = layout === 'row' ? 'row' : 'column';
@@ -45,13 +45,6 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 		var columnWidthPercent = this.GetInstrument("ColumnWidthPercent") || '30';
 		this._columnWidthPercent = parseInt(columnWidthPercent || "100", 10);
 
-		if (this.IsColumnLayout) {
-			const instrumentCols = Math.ceil(this._columnWidthPercent * 12 / 100);
-			const stimulusCols = 12 - instrumentCols;
-			this.StimulusCssClass = `col-xs-${stimulusCols}`;
-			this.InstrumentCssClass = `col-xs-${instrumentCols}`;
-		}
-
 		var stimulus = this.GetInstrument("Stimulus");
 		if (stimulus != null)
 		{
@@ -63,6 +56,15 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T>
 		}
 
 		this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
+
+		if (this.IsColumnLayout && this.IsStimuliBlockVisible) {
+			const instrumentCols = Math.ceil(this._columnWidthPercent * 12 / 100);
+			const stimulusCols = 12 - instrumentCols;
+			this.StimulusCssClass = `col-xs-${stimulusCols}`;
+			this.InstrumentCssClass = `col-xs-${instrumentCols}`;
+		}
+
+		console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass}`)
 
 		this.CanAnswer = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
 	}
