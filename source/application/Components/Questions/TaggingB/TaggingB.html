@@ -1,34 +1,31 @@
-﻿<div class="container-fluid TaggingB">
-	<div class="row">
-		<div class="AudioBlock" data-bind="if: HasMedia">
-			<div data-bind="component: {name: 'Players/Audio', params: AudioInfo}"></div>
-			<span data-bind="html: MediaLabel"></span>
-		</div>
-	</div>
-	<div class="row">
-		<h3 data-bind="html: HeaderLabel" class="QuestionHeader"></h3>
-	</div>
-	<div class="row container-fluid">
-		<div class="col-xs-7">
-			<div class="tagBox" data-bind="Element: TagBoxElement"></div>
-		</div>
-		<div class="col-xs-5">
-			<div class="TagContainer" data-bind="visible: HasSelectionItems">
-				<p data-bind="html: SelectionTagsLabel"></p>
-				<ul data-bind="foreach: SelectionItems">
-					<li data-bind="click: Toggle, visible: !IsAdded()">
-						<span class="badge" data-bind="text: Data.Label"></span>
-					</li>
-				</ul>
+﻿<script type="text/html" id="TaggingB">
+	<div class="TaggingB">
+		<div class="row container-fluid">
+			<div class="col-xs-7">
+				<div class="tagBox" data-bind="Element: TagBoxElement"></div>
 			</div>
-			<div class="TagContainer" data-bind="visible: HasUserItems">
-				<p data-bind="html: UserTagsLabel"></p>
-				<ul data-bind="foreach: UserItems">
-					<li data-bind="click: Toggle, visible: !IsAdded()">
-						<span class="badge" data-bind="text: Data.Label"></span>
-					</li>
-				</ul>
+			<div class="col-xs-5" style="min-width:300px">
+				<div class="TagContainer" data-bind="visible: HasSelectionItems">
+					<p data-bind="html: SelectionTagsLabel"></p>
+					<ul data-bind="foreach: SelectionItems">
+						<li data-bind="click: Toggle, visible: !IsAdded()">
+							<span class="badge" data-bind="text: Data.Label"></span>
+						</li>
+					</ul>
+				</div>
+				<div class="TagContainer" data-bind="visible: HasUserItems">
+					<p data-bind="html: UserTagsLabel"></p>
+					<ul data-bind="foreach: UserItems">
+						<li data-bind="click: Toggle, visible: !IsAdded()">
+							<span class="badge" data-bind="text: Data.Label"></span>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+
+

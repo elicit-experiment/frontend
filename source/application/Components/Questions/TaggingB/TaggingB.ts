@@ -1,6 +1,4 @@
 ﻿import knockout = require("knockout");
-import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
 import TaggingA = require("Components/Questions/TaggingA/TaggingA");
 import Taggle = require("Taggle");
 
@@ -11,6 +9,7 @@ type Tag = {Data:TagData, IsAdded:KnockoutObservable<boolean>, Toggle:()=>void};
 class TaggingB extends TaggingA
 {
 	public TagBoxElement = knockout.observable<HTMLElement>();
+	protected readonly InstrumentTemplateName = TaggingB.name;
 
 	constructor(question: QuestionModel)
 	{

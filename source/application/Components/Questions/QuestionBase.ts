@@ -210,7 +210,6 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
 		const requiredMedia : MediaInfo[] = media.filter((medium) => !medium.IsOptional());
 
-		console.log(requiredMedia);
 		if (requiredMedia.length === 0) {
 			return knockout.computed(() => true);
 		}

@@ -1,24 +1,18 @@
 ﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
+import QuestionWithStimulusBase = require("Components/Questions/QuestionWithStimulusBase");
 import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type PredefinedTag = { Label:string; Id:string; Position:number };
 type TagData = {Id: string; Label: string;};
-type Tag = {Data:TagData, IsAdded:KnockoutObservable<boolean>, Toggle:()=>void};
+type Tag = { Data:TagData, IsAdded:KnockoutObservable<boolean>, Toggle:() => void };
 
-class TaggingA extends QuestionBase<{Tags:TagData[]}>
+class TaggingA extends QuestionWithStimulusBase<{ Tags:TagData[] }>
 {
-	public Id: string;
-	public HeaderLabel: string;
 	public SelectionTagsLabel: string;
 	public UserTagsLabel: string;
 	public InputPlaceholder: string;
 
 	public TextInput = knockout.observable("");
-
-	public MediaLabel: string;
-	public AudioInfo: AudioInfo = null;
 
 	public SelectionItems = knockout.observableArray<Tag>();
 	public UserItems = knockout.observableArray<Tag>();
@@ -28,28 +22,15 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 	public HasUserItems:KnockoutComputed<boolean>;
 	public HasAddedItems:KnockoutComputed<boolean>;
 
-	public HasMedia: boolean = false;
-	public AnswerIsRequired: boolean = true;
+	protected readonly InstrumentTemplateName = TaggingA.name;
 
 	constructor(question: QuestionModel)
 	{
 		super(question);
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
 		this.SelectionTagsLabel = this.GetInstrumentFormatted("SelectionTagBoxLabel");
 		this.UserTagsLabel = this.GetInstrumentFormatted("UserTagBoxLabel");
 		this.InputPlaceholder = this.GetInstrument("TextField");
-
-		let stimulus = this.GetInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.MediaLabel = this.GetFormatted(stimulus.Label);
-
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
 
 		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
 		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
@@ -63,11 +44,11 @@ class TaggingA extends QuestionBase<{Tags:TagData[]}>
 
 	private InitializeAnswer():void
 	{
-		if(!this.HasAnswer()) return;
+		if (!this.HasAnswer()) return;
 
 		let answer = this.GetAnswer();
 
-		if(!answer.Tags || answer.Tags.length == 0) return;
+		if (!answer.Tags || answer.Tags.length == 0) return;
 
 		for(let tag of answer.Tags)
 		{

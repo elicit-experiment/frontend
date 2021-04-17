@@ -1,48 +1,24 @@
 ﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
+import QuestionWithStimulusBase = require("Components/Questions/QuestionWithStimulusBase");
 import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type ItemInfo = { Id: string; Label: string; };
 type Item = { Label:string; Id:string; Selected:string };
 
-class LikertScale extends QuestionBase<{Id:string}>
+class LikertScale extends QuestionWithStimulusBase<{Id:string}>
 {
-	public Id: string;
-	public HeaderLabel: string;
-	public MediaLabel: string;
-	public AudioInfo: AudioInfo = null;
 	public Items: ItemInfo[];
 	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-	public HasMedia: boolean = false;
 	public CanAnswer: KnockoutObservable<boolean>;
 	public AnswerIsRequired: boolean = true;
 	public IsStimuliBlockVisible:boolean = true;
 
-	private _alignForStimuli:boolean = true;
+	protected readonly InstrumentTemplateName = 'LikertScale';
 
 	constructor(question: QuestionModel)
 	{
 		super(question);
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
-
-		var stimulus = this.GetInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.MediaLabel = this.GetFormatted(stimulus.Label);
-
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
-
-		var alignForStimuli = this.GetInstrument("AlignForStimuli");
-		this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
-		this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
-
-		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 		this.AnswerIsRequired = this.GetInstrument("MinNoOfScalings") !== "0";
 
 		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
@@ -53,6 +29,8 @@ class LikertScale extends QuestionBase<{Id:string}>
 			this.AddEvent("Change", "Mouse/Left/Down", v);
 			this.SetAnswer({ Id: v });
 		});
+
+		console.log(this.HasMedia)
 	}
 
 	protected HasValidAnswer(answer: any): boolean

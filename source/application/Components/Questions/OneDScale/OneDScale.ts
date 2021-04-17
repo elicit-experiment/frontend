@@ -1,18 +1,14 @@
 ﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
+import QuestionWithStimulusBase = require("Components/Questions/QuestionWithStimulusBase");
 import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
 
 type Tick = { Label: string; Position: number; RelativePosition:number; IsMinPosition:boolean; IsMaxPosition:boolean;}
 type TickData = {Label:string; Position:string;}
 
-class OneDScale extends QuestionBase<{Position:number}>
+class OneDScale extends QuestionWithStimulusBase<{ Position:number }>
 {
 	private static _positionMinValue: number = -1;
 	private static _positionMaxValue: number = 1;
-
-	public Id: string;
-	public HeaderLabel: string;
 
 	public X1Ticks: Tick[];
 	public X2Ticks: Tick[];
@@ -25,27 +21,21 @@ class OneDScale extends QuestionBase<{Position:number}>
 	public HasY1Ticks: boolean;
 	public HasY2Ticks: boolean;
 
-	public AudioInfo: AudioInfo = null;
-	public MediaLabel: string;
-	public HasMedia: boolean = false;
-
 	public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
 	public IsValueNotSet: KnockoutComputed<boolean>;
 	public CanAnswer: KnockoutObservable<boolean>;
 
 	public IsStimuliBlockVisible: boolean = true;
 
-    public DefaultPosition: number;
+	public DefaultPosition: number;
 
-    private _alignForStimuli: boolean = true;
+	protected readonly InstrumentTemplateName = OneDScale.name;
 
 	constructor(question: QuestionModel)
 	{
 		super(question);
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
-        this.DefaultPosition = undefined;
+		this.DefaultPosition = undefined;
 		this.X1Ticks = this.GetTicks("X1AxisTicks");
 		this.X2Ticks = this.GetTicks("X2AxisTicks");
 		this.Y1Ticks = this.GetTicks("Y1AxisTicks");
@@ -53,27 +43,10 @@ class OneDScale extends QuestionBase<{Position:number}>
 		this.HasY1Ticks = this.Y1Ticks.length !== 0;
 		this.HasY2Ticks = this.Y2Ticks.length !== 0;
 
-		var defaultPos = this.GetInstrumentFormatted("Position")
-		if (defaultPos)
-            this.DefaultPosition = parseFloat(defaultPos);
+		const defaultPos = this.GetInstrumentFormatted("Position")
+		if (defaultPos) this.DefaultPosition = parseFloat(defaultPos);
 
 		this.IsValueNotSet = knockout.computed(() => !( (this.HasAnswer() && this.HasValidAnswer()) || (this.DefaultPosition !== undefined) ));
-
-		var stimulus = this.GetInstrument("Stimulus");
-
-		if (stimulus != null)
-		{
-			this.MediaLabel = this.GetFormatted(stimulus.Label);
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
-
-		var alignForStimuli = this.GetInstrument("AlignForStimuli");
-		this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
-		this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
-
-		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
 
 		if (this.HasAnswer())
 			this.Answer(this.GetAnswer().Position);
@@ -89,11 +62,12 @@ class OneDScale extends QuestionBase<{Position:number}>
 
 	private GetTicks(name:string):Tick[]
 	{
-		var ticksContainer = this.GetInstrument(name);
+		const ticksContainer = this.GetInstrument(name);
 
 		if (!ticksContainer) return new Array<Tick>();
 
-		var ticks = this.GetArray<TickData>(ticksContainer[name.slice(0, -1)]).map(t => this.CreateTick(t)).filter(t => t != null);
+		const singularTickName = ticksContainer[name.slice(0, -1)];
+		const ticks = this.GetArray<TickData>(singularTickName).map(t => this.CreateTick(t)).filter(t => t != null);
 
 		return ticks;
 	}
@@ -102,7 +76,7 @@ class OneDScale extends QuestionBase<{Position:number}>
 	{
 		if (data.Label == null || data.Position == null)
 		{
-			console.log("OneDScale tick skipped because of missing data: " + JSON.stringify(data));
+			console.warn("OneDScale tick skipped because of missing data: " + JSON.stringify(data));
 			return null;
 		}
 
