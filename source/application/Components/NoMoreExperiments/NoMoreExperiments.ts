@@ -1,6 +1,3 @@
-﻿class NoMoreExperiments
-{
+﻿class NoMoreExperiments {}
 
-}
-
-export = NoMoreExperiments; 
+export = NoMoreExperiments;

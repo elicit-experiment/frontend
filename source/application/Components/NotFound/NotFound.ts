@@ -1,6 +1,3 @@
-﻿class NotFound
-{
-	
-}
+﻿class NotFound {}
 
 export = NotFound;

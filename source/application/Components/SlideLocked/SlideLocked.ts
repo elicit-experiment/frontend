@@ -1,6 +1,3 @@
-﻿class SlideLocked
-{
+﻿class SlideLocked {}
 
-}
-
-export = SlideLocked; 
+export = SlideLocked;

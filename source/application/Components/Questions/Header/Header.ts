@@ -1,33 +1,29 @@
-﻿import ExperimentManager = require("Managers/Portal/Experiment");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
+﻿import ExperimentManager = require('Managers/Portal/Experiment');
+import QuestionBase = require('Components/Questions/QuestionBase');
+import QuestionModel = require('Models/Question');
 
-class Header extends QuestionBase<any>
-{
-	public HeaderLabel : string;
+class Header extends QuestionBase<any> {
+  public HeaderLabel: string;
 
-	constructor(question: QuestionModel)
-	{
-		super(question, false);
+  constructor(question: QuestionModel) {
+    super(question, false);
 
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
+    this.HeaderLabel = this.GetInstrumentFormatted('HeaderLabel');
 
-		if (!this.HeaderLabel) throw new Error("HeaderLabel not found for Header");
+    if (!this.HeaderLabel) throw new Error('HeaderLabel not found for Header');
 
-		ExperimentManager.SlideTitle(this.HeaderLabel);
-	}
+    ExperimentManager.SlideTitle(this.HeaderLabel);
+  }
 
-	public SlideCompleted(): boolean
-	{
-		ExperimentManager.SlideTitle("");
+  public SlideCompleted(): boolean {
+    ExperimentManager.SlideTitle('');
 
-		return false;
-	}
+    return false;
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "Header", "Instrument", method, data);
-	}
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'Header', 'Instrument', method, data);
+  }
 }
 
 export = Header;

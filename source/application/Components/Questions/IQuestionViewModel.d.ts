@@ -1,5 +1,4 @@
-﻿interface IQuestionViewModel
-{
-	SlideLoaded(): void;
-	SlideCompleted():boolean;
+﻿interface IQuestionViewModel {
+  SlideLoaded(): void;
+  SlideCompleted(): boolean;
 }

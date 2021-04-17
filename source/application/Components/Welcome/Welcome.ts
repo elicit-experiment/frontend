@@ -1,6 +1,3 @@
-﻿class Welcome
-{
-	
-}
+﻿class Welcome {}
 
 export = Welcome;
