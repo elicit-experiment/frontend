@@ -26,8 +26,6 @@ class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
       this.AddEvent('Change', 'Mouse/Left/Down', v);
       this.SetAnswer({ Id: v });
     });
-
-    console.log(this.HasMedia);
   }
 
   protected HasValidAnswer(answer: any): boolean {

@@ -1,8 +1,10 @@
 ﻿import knockout = require('knockout');
-import QuestionBase = require('Components/Questions/QuestionBase');
+import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 
-class ContinousScale2D {
+type ContinousScale2DAnswer = { X: number; Y: number; T: number } | null;
+
+class ContinousScale2D extends QuestionWithStimulusBase<ContinousScale2DAnswer> {
   private static BackgroundStrokeColor = '#eee';
   private static BackgroundLineSpacing = 10;
   private static BorderStrokeColor = '#000';
@@ -11,6 +13,11 @@ class ContinousScale2D {
   private static PositionFillColor = '#999';
   private static LabelColor = '#000';
   private static LabelMargin = 5;
+
+  private DefaultPosition: ContinousScale2DAnswer = null;
+  private Position: ContinousScale2DAnswer = null;
+  public Answer: KnockoutObservable<ContinousScale2DAnswer> = knockout.observable<ContinousScale2DAnswer>(null);
+  public IsValueNotSet: KnockoutComputed<boolean>;
 
   public Context: KnockoutObservable<CanvasRenderingContext2D> = knockout.observable<CanvasRenderingContext2D>();
   public Width: KnockoutObservable<number> = knockout.observable<number>();
@@ -21,12 +28,29 @@ class ContinousScale2D {
   private YMinLabel = 'Cool';
   private YMaxLabel = 'Uncool';
 
-  private _subscriptions: KnockoutSubscription[] = [];
+  protected readonly InstrumentTemplateName = 'TwoDScale';
 
-  constructor() {
-    this._subscriptions.push(this.Context.subscribe(() => this.Update()));
-    this._subscriptions.push(this.Width.subscribe(() => this.Update()));
-    this._subscriptions.push(this.Height.subscribe(() => this.Update()));
+  constructor(question: QuestionModel) {
+    super(question);
+
+    this.Subscribe(this.Context, () => this.Update());
+    this.Subscribe(this.Width, () => this.Update());
+    this.Subscribe(this.Height, () => this.Update());
+
+    const defaultPos = this.GetInstrumentFormatted('Position');
+    if (defaultPos) this.DefaultPosition = JSON.parse(defaultPos);
+
+    this.IsValueNotSet = knockout.computed(
+      () => !((this.HasAnswer() && this.HasValidAnswer()) || this.DefaultPosition !== undefined),
+    );
+
+    if (this.HasAnswer()) this.Answer(this.GetAnswer());
+    else this.Answer(this.DefaultPosition);
+
+    this.Answer.subscribe((v) => {
+      this.AddEvent('Change', 'Mouse/Left/Down', v.toString());
+      this.SetAnswer(v);
+    });
   }
 
   public SetPosition(x: number, y: number): void {
@@ -37,6 +61,11 @@ class ContinousScale2D {
 
     context.beginPath();
 
+    const canvasRect = context.canvas.getBoundingClientRect();
+
+    x -= canvasRect.left - context.canvas.offsetLeft;
+    y -= canvasRect.top - context.canvas.offsetTop;
+
     context.arc(x, y, 5, 0, Math.PI * 2, false);
 
     context.closePath();
@@ -45,6 +74,8 @@ class ContinousScale2D {
     context.stroke();
     context.fillStyle = ContinousScale2D.PositionFillColor;
     context.fill();
+
+    this.Answer({ X: x / canvasRect.width - 0.5, Y: y / canvasRect.height - 0.5, T: 0 });
   }
 
   private Update(): void {
@@ -130,8 +161,8 @@ class ContinousScale2D {
     context.stroke();
   }
 
-  public dispose(): void {
-    for (let i = 0; i < this._subscriptions.length; i++) this._subscriptions[i].dispose();
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'TwoDScale', 'Instrument', method, data);
   }
 }
 

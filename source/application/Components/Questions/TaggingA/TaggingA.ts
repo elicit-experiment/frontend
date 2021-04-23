@@ -10,6 +10,7 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
   public UserTagsLabel: string;
   public InputPlaceholder: string;
+  public AnswerIsRequired = true;
 
   public TextInput = knockout.observable('');
 
@@ -29,6 +30,7 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
     this.SelectionTagsLabel = this.GetInstrumentFormatted('SelectionTagBoxLabel');
     this.UserTagsLabel = this.GetInstrumentFormatted('UserTagBoxLabel');
     this.InputPlaceholder = this.GetInstrument('TextField');
+    this.AnswerIsRequired = this.GetInstrument('MinNoOfScalings') !== '0';
 
     this.SelectionItems.push(
       ...this.CreateTags(

@@ -1,6 +1,7 @@
 ﻿import knockout = require('knockout');
 import TaggingA = require('Components/Questions/TaggingA/TaggingA');
 import Taggle = require('Taggle');
+import QuestionModel = require('Models/Question');
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
