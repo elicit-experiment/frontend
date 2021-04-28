@@ -53,12 +53,49 @@ class Video {
     });
     const sub2 = this.YouTubePlayerElement.subscribe((e) => {
       sub2.dispose();
-      this.InitYouTube(e);
+      const callback = this.CreateYouTubePlayer.bind(this);
+      Video.OnYouTubeInit(callback);
     });
     const sub3 = this.PlayerControlsElement.subscribe((e) => {
       sub3.dispose();
       e.classList.remove('loading');
     });
+  }
+
+  private static _isYouTubeLoaded = false;
+  private static _youTubeInitList: Array<CallableFunction> = [];
+
+  private static OnYouTubeInit(cb: CallableFunction): void {
+    if (Video._isYouTubeLoaded) {
+      cb();
+      return;
+    }
+
+    // From: https://developers.google.com/youtube/iframe_api_reference#Getting_Started
+
+    // 2. This code loads the IFrame Player API code asynchronously.
+    const youtubeScriptId = 'youtube-api';
+    const youtubeScript = document.getElementById(youtubeScriptId);
+
+    if (youtubeScript === null) {
+      const tag = document.createElement('script');
+      const firstScript = document.getElementsByTagName('script')[0];
+
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.id = youtubeScriptId;
+      firstScript.parentNode.insertBefore(tag, firstScript);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      Video._youTubeInitList.push(cb);
+      window.onYouTubeIframeAPIReady = () => {
+        Video._youTubeInitList.forEach((initCallback) => initCallback());
+        Video._youTubeInitList = [];
+        Video._isYouTubeLoaded = true;
+      };
+    } else {
+      Video._youTubeInitList.push(cb);
+    }
   }
 
   public TogglePlay(): void {

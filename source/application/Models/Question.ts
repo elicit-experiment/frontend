@@ -13,6 +13,7 @@ class Question {
   public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
   public RequiresInput: boolean;
   public ScrollToCallback: KnockoutObservable<(duration: number) => void> = knockout.observable(null);
+  public AllRequiredMediaHavePlayed = knockout.observable(false);
 
   private _loadedCallback: () => void;
 

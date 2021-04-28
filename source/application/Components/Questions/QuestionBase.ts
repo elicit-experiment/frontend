@@ -205,7 +205,6 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
       return knockout.computed(() => true);
     }
 
-    const allHavePlayed = knockout.observable(false);
     let numberOfPlays = 0;
 
     (<MediaInfo[]>requiredMedia).forEach((a) => {
@@ -215,14 +214,14 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
           const allPlayed = ++numberOfPlays === (<MediaInfo[]>requiredMedia).length;
           console.log('is played');
           console.log(allPlayed);
-          if (allPlayed) allHavePlayed(true);
+          if (allPlayed) this.Model.AllRequiredMediaHavePlayed(true);
         }, true);
       }
     });
 
-    allHavePlayed(numberOfPlays === (<MediaInfo[]>requiredMedia).length);
+    this.Model.AllRequiredMediaHavePlayed(numberOfPlays === (<MediaInfo[]>requiredMedia).length);
 
-    return knockout.computed(() => this.HasAnswer() || allHavePlayed());
+    return knockout.computed(() => this.HasAnswer() || this.Model.AllRequiredMediaHavePlayed());
   }
 
   public SlideLoaded(): void {}

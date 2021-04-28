@@ -109,7 +109,11 @@ class Default {
     for (let i = 0; i < this.Questions.length; i++) {
       //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${this.Questions[i].RequiresInput} Has Valid Answer ${this.Questions[i].HasValidAnswer()}`);
       // This is Question.ts:HasValidAnswer(). NOT the HasValidAnswer of the question models
-      if (this.Questions[i].RequiresInput && !this.Questions[i].HasValidAnswer()) {
+      if (
+        this.Questions[i].RequiresInput &&
+        !this.Questions[i].HasValidAnswer() &&
+        !this.Questions[i].AllRequiredMediaHavePlayed()
+      ) {
         //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
         return this.Questions[i];
       }
