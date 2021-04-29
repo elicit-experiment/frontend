@@ -64,7 +64,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
       this.InstrumentCssClass = `col-xs-${instrumentCols}`;
     }
 
-    console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
+    // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
 
     this.CanAnswer = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
   }

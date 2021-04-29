@@ -115,13 +115,10 @@ class Video {
         this._youTubePlayer.playVideo();
       }
     } else {
-      console.log(`ohao ${this.IsPlaying()} ${this.IsPausable}`);
       if (this.IsPlaying() && this.IsPausable) {
         Video._activePlayer = null;
         this.PlayerElement().pause();
-        this.PlayerElement().currentTime = 0;
       } else {
-        console.log(Video._activePlayer);
         if (Video._activePlayer !== null && Video._activePlayer !== this && Video._activePlayer.IsPlaying())
           Video._activePlayer.TogglePlay();
 
@@ -242,13 +239,12 @@ class Video {
   private Played(): void {
     this._info.IsPlayed(true);
     this.PlayCount(this.PlayCount() + 1);
-    console.log(`PlayCount ${this.PlayCount()}/ ${this.MaxReplayCount}`);
+    // console.log(`PlayCount ${this.PlayCount()}/ ${this.MaxReplayCount}`);
     if (this.IsReplayable) {
       if (!this.MaxReplayCount || this.PlayCount() < this.MaxReplayCount) {
         return;
       }
     }
-    console.log(this.PlayButtonElement());
     $(this.PlayButtonElement()).prop('disabled', true);
   }
 }
