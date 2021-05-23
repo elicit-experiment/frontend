@@ -17,6 +17,8 @@ class MediaInfo {
   public IsPlayed: KnockoutObservable<boolean> = knockout.observable(false);
   public IsStartable: KnockoutObservable<boolean>;
   public IsLayedOut: KnockoutObservable<ClientRect | DOMRect> = knockout.observable(null);
+  public OnEvent: KnockoutSubscribable<{ eventName: string; entityType: string }> = new knockout.subscribable();
+  public MediaStateProviders = new Array<() => { PlaybackTimestamp: number }>();
 
   constructor(sources: Source[], startable: KnockoutObservable<boolean> = knockout.observable(true)) {
     this.Sources = sources;
@@ -48,8 +50,16 @@ class MediaInfo {
     });
   }
 
+  public AddMediateStateProvider(provider: () => { PlaybackTimestamp: number }) {
+    this.MediaStateProviders.push(provider);
+  }
+
   public EventType(): string {
     return this.Sources[0].Type.match(/.*[vV]ideo.*/) ? 'Video' : 'Audio';
+  }
+
+  public AddEvent(eventName: string): void {
+    this.OnEvent.notifySubscribers({ eventName, entityType: this.EventType() });
   }
 
   public static MimeTypeToPlayerType: any = {

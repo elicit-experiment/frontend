@@ -189,6 +189,9 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
         mediaInfo.Sources[0].Type,
       ),
     );
+    mediaInfo.OnEvent.subscribe((newValue: { eventName: string; entityType: string }) => {
+      this.AddRawEvent(newValue.eventName, mediaInfo.EventType(), 'Stimulus', id, newValue.entityType);
+    });
   }
 
   protected WhenAllMediaHavePlayed(
@@ -212,8 +215,6 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
       else {
         a.AddIsPlayedCallback(() => {
           const allPlayed = ++numberOfPlays === (<MediaInfo[]>requiredMedia).length;
-          console.log('is played');
-          console.log(allPlayed);
           if (allPlayed) this.Model.AllRequiredMediaHavePlayed(true);
         }, true);
       }

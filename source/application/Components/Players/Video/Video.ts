@@ -23,6 +23,7 @@ class Video {
   public IsReplayable: boolean;
   public MaxReplayCount: number;
   public PlayCount: KnockoutObservable<number> = knockout.observable(0);
+  public PlayTimestamp: KnockoutComputed<number>;
   public IsOptional: boolean;
   public SourceType: string;
   public PlayerElementId: string;
@@ -59,6 +60,16 @@ class Video {
     const sub3 = this.PlayerControlsElement.subscribe((e) => {
       sub3.dispose();
       e.classList.remove('loading');
+    });
+
+    this.PlayTimestamp = knockout.computed(() => {
+      return this._youTubePlayer?.getCurrentTime();
+    });
+
+    this._info.AddMediateStateProvider(() => {
+      return {
+        PlaybackTimestamp: this._youTubePlayer?.getCurrentTime(),
+      };
     });
   }
 
@@ -162,6 +173,13 @@ class Video {
     let height: string | number = '100%'; //window.innerHeight * 0.65;
     let width: string | number = '100%'; //window.innerWidth * 0.80;
 
+    const playerStateName: { [index: string]: string } = {};
+    // @ts-ignore
+    Object.keys(YT.PlayerState).forEach((key) => {
+      // @ts-ignore
+      playerStateName[YT.PlayerState[key]] = key;
+    });
+
     if (source.Width) {
       width = parseInt(source.Width);
     }
@@ -199,6 +217,8 @@ class Video {
 
     // 5. The API calls this function when the player's state changes.
     function onPlayerStateChange(event: any) {
+      self._info.AddEvent(playerStateName[<string>event.data]);
+
       if (event.data == YT.PlayerState.PLAYING) {
         self._info.IsPlaying(true);
       }

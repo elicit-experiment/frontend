@@ -21,6 +21,7 @@ function Initialize() {
     FreetextHash: new QuestionMap('Questions/FreetextHash'),
     CompletionCode: new QuestionMap('Questions/CompletionCode'),
     OneDScale: new QuestionMap('Questions/OneDScale'),
+    OneDScaleT: new QuestionMap('Questions/OneDScaleT'),
     TwoDScale: new QuestionMap('Questions/ContinousScale2D'),
     TwoDKScaleDD: new QuestionMap('Questions/TwoDScaleK'),
     TextBlock: new QuestionMap('Questions/TextBlock'),
