@@ -58,7 +58,7 @@ class OneDScaleT extends QuestionWithStimulusBase<{ Position: number; Time: numb
     else this.Answer(this.DefaultPosition);
 
     this.Answer.subscribe((v) => {
-      const times = this.MediaInfo.MediaStateProviders.map((mediaStateProvider) => mediaStateProvider());
+      const times = this.MediaInfo?.MediaStateProviders?.map((mediaStateProvider) => mediaStateProvider()) || [];
       this.AddEvent('Change', 'Mouse/Left/Down', v.toString());
       this.SetAnswer({ Position: v, Time: times[0]?.PlaybackTimestamp });
     });
