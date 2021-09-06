@@ -100,7 +100,7 @@ class OneDScaleT extends QuestionWithStimulusBase<{ Position: number; Time: numb
   }
 
   public valueUpdated(self: OneDScaleT, event: InputEvent) {
-    const times = this.MediaInfo.MediaStateProviders.map((mediaStateProvider) => mediaStateProvider());
+    const times = this.MediaInfo?.MediaStateProviders?.map((mediaStateProvider) => mediaStateProvider()) || [];
     const value = parseFloat((<HTMLInputElement>event.currentTarget).value);
     this.AddEvent('Change', 'Mouse/Left/Down', JSON.stringify({ Position: value, Times: times }));
   }
