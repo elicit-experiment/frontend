@@ -25,7 +25,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     setTimeout(() => {
       this.UpdateIsAnswerValid();
       this.Model.Loaded();
-    }, 0); //Give decendent time to override HasValidAnswer
+    }, 0); //Give descendant time to override HasValidAnswer
   }
 
   protected UpdateIsAnswerValid(answer?: T): void {
@@ -82,7 +82,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
       if (inputs[i].Instrument) return inputs[i].Instrument;
     }
 
-    throw new Error('Intrument object not found in input');
+    throw new Error('Instrument object not found in input');
   }
 
   protected HasInstrument(): boolean {

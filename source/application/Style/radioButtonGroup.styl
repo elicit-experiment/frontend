@@ -1,0 +1,62 @@
+
+label.radio-button-group {
+  display: block;
+  padding-left: 20px;
+  cursor: inherit;
+}
+
+label.checkbox-button-group > input[type=checkbox],
+label.radio-button-group > input[type=radio] {
+  float: left;
+  width: 20px;
+  margin-left: -20px;
+  padding: 0;
+  -webkit-appearance: radio;
+}
+
+label.radio-button-group > span {
+  display: inline-block;
+  margin: 0 0 0 10px;
+}
+
+
+label.checkbox-button-group > span {
+}
+
+.correct {
+  border: 2px solid green;
+  padding: 0.1rem 2.0rem !important;
+}
+
+.incorrect {
+  border: 2px solid red;
+  padding: 0.1rem 2.0rem !important;
+}
+
+.feedback {
+  margin-top: 1.5rem;
+  padding: 0.1rem 2.0rem !important;
+
+  .correctness-icon {
+    margin-top: -1.25rem;
+  }
+}
+
+.correctable-question {
+  position: relative;
+}
+
+.correctness-icon.incorrect {
+  color: red;
+}
+.correctness-icon.correct {
+  color: green;
+}
+
+.correctness-icon {
+  position: absolute;
+  left: -3em;
+  margin-top: 0em;
+  font-size: 36px;
+  border: none;
+}

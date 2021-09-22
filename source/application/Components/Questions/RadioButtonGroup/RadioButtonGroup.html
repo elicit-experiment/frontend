@@ -1,16 +1,39 @@
 ﻿<script type="text/html" id="RadioButtonGroupButtons">
-    <div class="row QuestionBlock" data-bind="foreach: RowedItems">
-        <div class="row" data-bind="foreach: $data">
-            <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
-            <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
-                 data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
+    <div class="row QuestionBlock correctable-question">
+        <!-- ko if: ShowCorrectness -->
+        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
+            <!-- ko if: GetAnswer().Correct === true -->
+            ✓
             <!-- /ko -->
-            <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
-                <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"
-                       type="radio"/>
-                <span data-bind="html: Label"></span>
-            </label>
+            <!-- ko if: GetAnswer().Correct === false -->
+            ✗
+            <!-- /ko -->
         </div>
+        <!-- /ko -->
+
+        <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
+            <div class="row" data-bind="foreach: $data">
+                <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
+                <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
+                     data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
+                <!-- /ko -->
+                <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
+                    <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"
+                           type="radio"/>
+                    <span data-bind="html: Label"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ko if: ShowFeedback && FeedbackText -->
+        <div data-bind="css: `row feedback`">
+            <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
+                ⮕
+            </div>
+            <div data-bind="{html: FeedbackText, css: `col-xs-12`}">
+            </div>
+        </div>
+        <!-- /ko -->
     </div>
 </script>
 
