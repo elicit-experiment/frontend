@@ -1,13 +1,7 @@
 ﻿<script type="text/html" id="RadioButtonGroupButtons">
     <div class="row QuestionBlock correctable-question">
         <!-- ko if: ShowCorrectness -->
-        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
-            <!-- ko if: GetAnswer().Correct === true -->
-            ✓
-            <!-- /ko -->
-            <!-- ko if: GetAnswer().Correct === false -->
-            ✗
-            <!-- /ko -->
+        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`, html: CorrectnessLabel">
         </div>
         <!-- /ko -->
 
@@ -17,8 +11,8 @@
                 <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
-                    <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"
+                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
+                    <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].IsAnswerable"
                            type="radio"/>
                     <span data-bind="html: Label"></span>
                 </label>

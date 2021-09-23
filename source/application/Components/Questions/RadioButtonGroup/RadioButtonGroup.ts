@@ -16,10 +16,13 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
   public AddOneFillerItem: KnockoutComputed<boolean>;
   public AddHalfFillerItem: KnockoutComputed<boolean>;
   public CorrectnessClass: KnockoutComputed<string>;
+  public CorrectnessLabel: KnockoutComputed<string>;
   public ShowFeedback: boolean;
+  public AnswerOnce: boolean;
   public MustAnswerCorrectly: boolean;
   public ShowCorrectness: boolean;
   public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
+  public IsAnswerable: KnockoutObservable<boolean>;
 
   protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
 
@@ -29,6 +32,7 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
     this.MustAnswerCorrectly = !!this.GetInstrument('MustAnswerCorrectly');
     this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
     this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
+    this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
     const randomizeOrder = this.GetInstrument('RandomizeOrder');
     this._isOptional = parseInt(this.GetInstrument('IsOptional')) == 1;
 
@@ -48,6 +52,21 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
       const isCorrect = this.GetAnswer()?.Correct;
       if (!this.ShowCorrectness || !hasAnswer) return '';
       return isCorrect ? 'correct' : 'incorrect';
+    });
+
+    this.CorrectnessLabel = knockout.computed(() => {
+      switch (this.CorrectnessClass()) {
+        case 'correct':
+          return '✓';
+        case 'incorrect':
+          return '✗';
+      }
+    });
+
+    this.IsAnswerable = knockout.computed(() => {
+      const canAnswer = this.CanAnswer();
+      const hasAnswer = this.HasAnswer();
+      return canAnswer && (!this.AnswerOnce || !hasAnswer);
     });
 
     if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
