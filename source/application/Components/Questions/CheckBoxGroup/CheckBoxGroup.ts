@@ -3,10 +3,10 @@ import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStim
 import QuestionModel = require('Models/Question');
 import { shuffleInPlace } from 'Utility/ShuffleInPlace';
 
-type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean> };
-type Item = { Label: string; Id: string; Selected: string };
+type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean>; Correct: boolean; Feedback: string };
+type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
 
-class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[] }> {
+class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[]; Correct: boolean }> {
   private _minNoOfSelections: number;
   private _maxNoOfSelections: number;
 
@@ -17,12 +17,23 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[] }> {
   public AddFillerItem: KnockoutComputed<boolean>;
   public AddOneFillerItem: KnockoutComputed<boolean>;
   public AddHalfFillerItem: KnockoutComputed<boolean>;
+  public ShowFeedback: boolean;
+  public AnswerOnce: boolean;
+  public MustAnswerCorrectly: boolean;
+  public ShowCorrectness: boolean;
+  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
+  public CorrectnessClass: KnockoutComputed<string>;
+  public CorrectnessLabel: KnockoutComputed<string>;
 
   protected readonly InstrumentTemplateName = 'CheckboxGroupButtons';
 
   constructor(question: QuestionModel) {
     super(question);
 
+    this.MustAnswerCorrectly = !!this.GetInstrument('MustAnswerCorrectly');
+    this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
+    this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
+    this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
     this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
     this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
     const randomizeOrder = this.GetInstrument('RandomizeOrder');
@@ -40,13 +51,33 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[] }> {
     this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
     this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
 
+    this.CorrectnessClass = knockout.computed(() => {
+      const hasAnswer = this.HasAnswer();
+      const isCorrect = this.GetAnswer()?.Correct;
+      if (!this.ShowCorrectness || !hasAnswer) return '';
+      return isCorrect ? 'correct' : 'incorrect';
+    });
+
+    this.CorrectnessLabel = knockout.computed(() => {
+      switch (this.CorrectnessClass()) {
+        case 'correct':
+          return '✓';
+        case 'incorrect':
+          return '✗';
+      }
+    });
+
     if (this.HasAnswer()) {
       if (this.GetAnswer()['Selections']) this.Answer.push.apply(this.Answer, this.GetAnswer().Selections);
-    } else this.SetAnswer({ Selections: [] });
+    } else this.SetAnswer({ Selections: [], Correct: false });
 
-    this.Answer.subscribe((v) => {
-      this.AddEvent('Change', 'Mouse/Left/Down', v.join(','));
-      this.SetAnswer({ Selections: v });
+    this.Answer.subscribe((selectedIds) => {
+      this.AddEvent('Change', 'Mouse/Left/Down', selectedIds.join(','));
+      const itemCorrectness = this.Items.map((item) =>
+        selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
+      );
+      this.SetAnswer({ Selections: selectedIds, Correct: itemCorrectness.reduce((a, b) => a && b, true) });
+      this.FeedbackText(item.Feedback);
     });
   }
 
@@ -57,15 +88,17 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[] }> {
     return answer.Selections.length >= this._minNoOfSelections;
   }
 
-  private CreateItemInfo(data: Item): ItemInfo {
-    if (data.Selected === '1') this.Answer.push(data.Id);
+  private CreateItemInfo(item: Item): ItemInfo {
+    if (item.Selected === '1') this.Answer.push(item.Id);
 
-    const info = {
-      Id: data.Id,
-      Label: this.GetFormatted(data.Label),
+    const info: ItemInfo = {
+      Id: item.Id,
+      Label: this.GetFormatted(item.Label),
       IsEnabled: knockout.computed(
-        () => this.CanAnswer() && (this.Answer.indexOf(data.Id) !== -1 || this.CanSelectMore()),
+        () => this.CanAnswer() && (this.Answer.indexOf(item.Id) !== -1 || this.CanSelectMore()),
       ),
+      Correct: item.Correct,
+      Feedback: item.Feedback,
     };
 
     return info;
