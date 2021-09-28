@@ -98,6 +98,12 @@ class WebGazerCalibrate extends QuestionBase<any> {
     );
   }
 
+  public ShowWebGazerVideo() {
+    ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) =>
+      $('#' + s).show(),
+    );
+  }
+
   public SlideCompleted(): boolean {
     console.log('WebGazerCalibration: Completed');
     ExperimentManager.SlideTitle('');
@@ -223,6 +229,8 @@ class WebGazerCalibrate extends QuestionBase<any> {
     wgCalibrate.$data.CanAnswer = knockout.computed(() => true);
 
     wgCalibrate.$data.Answer(wgCalibrate.$data.currentAccuracy);
+
+    this.ShowWebGazerVideo();
 
     WebGazerManager.StartTracking();
 
