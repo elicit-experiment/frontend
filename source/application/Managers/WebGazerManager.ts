@@ -185,12 +185,25 @@ class WebGazerManager extends DisposableComponent {
     this.SetState(WebGazerState.Calibrating);
   }
 
+  public RestartCalibration() {
+    this.End();
+
+    this.ClearCalibration();
+
+    this.Start().then(() => {});
+  }
+
   public ClearCalibration() {
-    //this.End();
-
-    delete localStorage.webgazerGlobalData;
-
-    //this.Start().then(() => {});
+    // compare with:
+    // webgazer.clearData();
+    window.localStorage.setItem('webgazerGlobalData', undefined);
+    const regs = webgazer.getRegression();
+    for (const reg in regs) {
+      regs[reg].setData([]); // This is in the webgazer code but actually wont work
+    }
+    if (regs && regs[0]) {
+      regs[0] = new webgazer.reg.RidgeWeightedReg();
+    }
   }
 
   public StartTracking() {

@@ -36,16 +36,16 @@ class WebGazerCalibrate extends QuestionBase<any> {
     const me = this;
     WebGazerManager.Init()
       .then(() => {
-        console.log('WebGazerCalibration: webgazer initted');
+        console.log('WebGazerCalibration: webgazer initialized');
         me.ClearCanvas();
 
         me.ShowHelpModal();
 
         $('.Calibration').on('click', (event) => me.HandleCalibrationClick(event));
       })
-      .catch((x) => {
+      .catch((exception) => {
         console.error('WebGazerCalibration: failed to upload test packet');
-        console.error(x);
+        console.error(exception);
         swal2({
           title: 'Calibration',
           html: 'Failed to initialize calibration.  Experiment cannot be taken',
@@ -79,7 +79,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   /**
-   * Restart the calibration process by clearing the local storage and reseting the calibration point
+   * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
   public Restart(showInstructions: boolean) {
     const accuracy = document.getElementById('Accuracy');
@@ -198,7 +198,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * This function clears the calibration buttons memory
    */
   private ClearCalibration() {
-    WebGazerManager.ClearCalibration();
+    WebGazerManager.RestartCalibration();
 
     $('.Calibration').css('background-color', 'red');
     $('.Calibration').css('opacity', 0.2);
@@ -214,6 +214,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private CalibrationCompleted() {
+    console.log('calibration complete');
     const wgCalibrate = knockout.contextFor(document.getElementById('webgazer-calibration'));
 
     const slideShell = knockout.contextFor($('.panel').get(0)).$data;
