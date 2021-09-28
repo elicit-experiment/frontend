@@ -183,7 +183,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
       cancelButtonClass: 'btn btn-lg',
       showCancelButton: true,
     }).then(() => {
-      console.log('Starting calibration.');
+      console.log('WebGazerCalibration: Starting calibration.');
       WebGazerManager.StartCalibration();
       this.ShowCalibrationPoint();
     });
@@ -200,9 +200,10 @@ class WebGazerCalibrate extends QuestionBase<any> {
   private ClearCalibration() {
     WebGazerManager.RestartCalibration();
 
-    $('.Calibration').css('background-color', 'red');
-    $('.Calibration').css('opacity', 0.2);
-    $('.Calibration').prop('disabled', false);
+    const $Calibration = $('.Calibration');
+    $Calibration.css('background-color', 'red');
+    $Calibration.css('opacity', 0.2);
+    $Calibration.prop('disabled', false);
 
     this.CalibrationPoints = {};
     this.PointCalibrate = 0;
@@ -214,7 +215,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private CalibrationCompleted() {
-    console.log('calibration complete');
+    console.log('WebGazerCalibration: calibration complete');
     const wgCalibrate = knockout.contextFor(document.getElementById('webgazer-calibration'));
 
     const slideShell = knockout.contextFor($('.panel').get(0)).$data;
@@ -230,7 +231,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   /**
-   * Restart the calibration process by clearing the local storage and reseting the calibration point
+   * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
   private RestartCalibration() {
     this.Restart(true);
@@ -315,7 +316,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
               if (!!me.MaxNoOfAttempts) {
                 const remainingAttempts = me.MaxNoOfAttempts - me.NoOfAttempts;
-                console.log(`remaining attempts ${remainingAttempts}`);
+                console.log(`WebGazerCalibration: remaining attempts ${remainingAttempts}`);
                 if (remainingAttempts > 0) {
                   html += `  You have ${remainingAttempts} attempts remaining`;
                 } else {

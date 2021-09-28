@@ -232,6 +232,7 @@ class Experiment extends DisposableComponent {
         if (!this.IsTestExperiment) {
           CockpitPortal.Slide.DataPoint(id, datapoint).WithCallback((response) => {
             if (response.Error != null) {
+              console.dir(response.Error);
               if (response.Error.Fullname !== 'Chaos.Cockpit.Core.Core.Exceptions.ValidationException') {
                 c(false, false);
                 Notification.Error(`Failed to save datapoint: ${response.Error.Message}`);

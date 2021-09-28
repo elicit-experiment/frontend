@@ -207,6 +207,7 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public StartTracking() {
+    console.log('WebGazerManager: Start Tracking');
     this.clearAutoSendTimer();
 
     setInterval(this.SendAllPoints.bind(this), WebGazerManager.AUTO_SEND_INTERVAL);
@@ -283,7 +284,7 @@ class WebGazerManager extends DisposableComponent {
     this.pointIndex = 0;
     this.points = new Array<any>(WebGazerManager.POINT_BUFFER_SIZE);
     this.SendPoints(pointsToSend).then((callCount) => {
-      console.log(`Point upload success after ${callCount}`);
+      console.log(`WebGazerManager: Point upload success after ${callCount}`);
     });
   }
 
@@ -300,7 +301,7 @@ class WebGazerManager extends DisposableComponent {
     const postWebgazerTsv = () =>
       new Promise((resolve, reject) => {
         const url = new URL('/v6/time_series/webgazer/file', Configuration.PortalPath);
-        console.log(`Sending calibration points by file to ${url.href}`);
+        console.log(`WebGazerManager: Sending calibration points by file to ${url.href}`);
         const formData = new FormData();
         let tsv = WebGazerManager.WEBGAZER_HEADERS.join('\t') + '\n';
 
@@ -340,7 +341,7 @@ class WebGazerManager extends DisposableComponent {
     const postWebgazerJSON = () =>
       new Promise((resolve, reject) => {
         const url = new URL('/v6/time_series/webgazer', Configuration.PortalPath);
-        console.log(`Sending calibration points to ${url.href}`);
+        console.log(`WebGazerManager: Sending calibration points to ${url.href}`);
         fetch(url.href, {
           method: 'POST',
           //credentials: 'include', // include the sessionGUID cookie
