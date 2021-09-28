@@ -186,6 +186,7 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public RestartCalibration() {
+    console.log('WebGazerManager: Restart Calibration');
     this.End();
 
     this.ClearCalibration();
@@ -194,6 +195,7 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public ClearCalibration() {
+    console.log('WebGazerManager: Clear Calibration');
     // compare with:
     // webgazer.clearData();
     window.localStorage.setItem('webgazerGlobalData', undefined);
