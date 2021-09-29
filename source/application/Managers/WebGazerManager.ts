@@ -415,9 +415,7 @@ class WebGazerManager extends DisposableComponent {
           .then(() => {
             console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
             dataPoint.value = JSON.stringify(dataPointValue);
-            ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {
-              console.log('dp success');
-            });
+            ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {});
             resolve();
           })
           .catch((err) => {

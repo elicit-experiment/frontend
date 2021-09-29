@@ -1,8 +1,4 @@
 import knockout = require('knockout');
-// TODO: fix this grossness
-import swal = require('sweetalert');
-//import swal2 = require("sweetalert2");
-//import { swal as swal2 } from 'sweetalert2';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 const swal2 = Swal;
 
@@ -99,9 +95,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   public ShowWebGazerVideo() {
-    ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) =>
-      $('#' + s).show(),
-    );
+    ['webgazerVideoFeed', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#' + s).show());
   }
 
   public SlideCompleted(): boolean {
@@ -281,15 +275,16 @@ class WebGazerCalibrate extends QuestionBase<any> {
       // clears the canvas
       const canvas = <HTMLCanvasElement>document.getElementById('plotting_canvas');
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
       // notification for the measurement process
-      swal({
+      swal2({
         title: 'Calculating measurement',
-        text:
+        html:
           "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
-        closeOnEsc: false,
+        allowEscapeKey: false,
         allowOutsideClick: false,
-        closeModal: true,
+        showCancelButton: false,
+        // customClass: { container: 'calibration-confirmation' },
+        customClass: 'calibration-confirmation',
       }).then(() => {
         // makes the variables true for 5 seconds & plots the points
         $(document).ready(function () {
