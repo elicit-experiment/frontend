@@ -154,6 +154,10 @@ class WebGazerManager extends DisposableComponent {
 
     try {
       console.log('WebGazerManager: Webgazer finit');
+      ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) =>
+        $('#' + s).remove(),
+      );
+
       this.clearAutoSendTimer();
       if (this.state === WebGazerState.Running) {
         console.log(`Sending final ${this.pointIndex} points`);

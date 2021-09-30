@@ -224,7 +224,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
     wgCalibrate.$data.Answer(wgCalibrate.$data.currentAccuracy);
 
-    this.ShowWebGazerVideo();
+    this.HideWebGazerVideo();
 
     WebGazerManager.StartTracking();
 
