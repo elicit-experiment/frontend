@@ -6,7 +6,7 @@
         "target": "es5",
         "moduleResolution": "classic",
         "types": [ "youtube" ],
-        "lib": ["es2017", "dom"]
+        "lib": ["es2017", "dom", "es6"]
     },
     "include": [
         "source/**/*"

@@ -1,81 +1,94 @@
-"use strict";
+'use strict';
 
-var gulp = require("gulp");
-var del = require("del");
-var replace = require("gulp-replace");
-var rename = require("gulp-rename");
-var filter = require("gulp-filter");
-var merge = require("merge-stream");
+var gulp = require('gulp');
+var del = require('del');
+var replace = require('gulp-replace');
+var rename = require('gulp-rename');
+var filter = require('gulp-filter');
+var merge = require('merge-stream');
 var plumber = require('gulp-plumber');
-var runSequence = require("run-sequence");
+var runSequence = require('run-sequence');
 
-var uglify = require("gulp-uglify");
+var uglify = require('gulp-uglify');
 
-var typescript = require("gulp-typescript");
+var typescript = require('gulp-typescript');
 var babel = require('gulp-babel');
 
-var stylus = require("gulp-stylus");
+var stylus = require('gulp-stylus');
 
-var express = require("express");
+var express = require('express');
 
-var minimist = require("minimist");
+var minimist = require('minimist');
 
 var config = {
-	npmModulePath: "./node_modules/",
-	projectPath: "./source/",
-	appDirBase: "application",
-	mainFile: "Main.ts",
-	componentsPath: "/Components",
-	distPath: "./dist/",
-	dependenciesPath: "lib/",
-	externalDependenciesPath: "./dependencies/",
-	servePort: 5504,
-	typeScript: {
-		noImplicitAny: true,
-		module: "amd",
-		outDir: "app",
-		target: "ES5",
-		types: ["youtube"],
-		lib: ["dom", "es2015.promise", "es5"]
-	},
-	parameters: {
-		string: ["portalPath", "elicitLandingPath"],
-		default: {
-			portalPath: "http://localhost:3000/",
-			elicitLandingPath: "http://localhost:3000",
-		}
-	}
+  npmModulePath: './node_modules/',
+  projectPath: './source/',
+  appDirBase: 'application',
+  mainFile: 'Main.ts',
+  componentsPath: '/Components',
+  distPath: './dist/',
+  dependenciesPath: 'lib/',
+  externalDependenciesPath: './dependencies/',
+  servePort: 5504,
+  typeScript: {
+    noImplicitAny: true,
+    module: 'amd',
+    outDir: 'app',
+    target: 'ES5',
+    types: ['youtube'],
+    lib: ['dom', 'es2015.promise', 'es6'],
+  },
+  parameters: {
+    string: ['portalPath', 'elicitLandingPath'],
+    default: {
+      portalPath: 'http://localhost:3000/',
+      elicitLandingPath: 'http://localhost:3000',
+    },
+  },
 };
 
-gulp.task("compileTypeScript", gulp.series(function(){
-	return gulp.src(config.projectPath + config.appDirBase + "/**/*.ts")
-		.pipe(typescript(config.typeScript))
-		.pipe(gulp.dest(config.distPath + config.appDirBase));
-}));
+gulp.task(
+  'compileTypeScript',
+  gulp.series(function () {
+    return gulp
+      .src(config.projectPath + config.appDirBase + '/**/*.ts')
+      .pipe(typescript(config.typeScript))
+      .pipe(gulp.dest(config.distPath + config.appDirBase));
+  }),
+);
 
-gulp.task('compileES6JS', function() {
-	return gulp.src(config.projectPath + config.appDirBase + "/**/*.js")
-      .pipe(babel({presets: ['env']}))
-	  .pipe(gulp.dest(config.distPath + config.appDirBase));
+gulp.task('compileES6JS', function () {
+  return gulp
+    .src(config.projectPath + config.appDirBase + '/**/*.js')
+    .pipe(babel({ presets: ['env'] }))
+    .pipe(gulp.dest(config.distPath + config.appDirBase));
 });
 
-gulp.task("compileStylus", gulp.series(function() {
-	return gulp.src(config.projectPath + "**/default.styl")
-		.pipe(plumber())
-		.pipe(stylus({
-			compress: true
-		}))
-		.pipe(gulp.dest(config.distPath));
-}));
+gulp.task(
+  'compileStylus',
+  gulp.series(function () {
+    return gulp
+      .src(config.projectPath + '**/default.styl')
+      .pipe(plumber())
+      .pipe(
+        stylus({
+          compress: true,
+        }),
+      )
+      .pipe(gulp.dest(config.distPath));
+  }),
+);
 
-gulp.task("copyDependencies", gulp.series(function()
-{
-	var external = gulp.src(config.externalDependenciesPath + "**/*.*")
-		.pipe(gulp.dest(config.distPath + config.dependenciesPath));
+gulp.task(
+  'copyDependencies',
+  gulp.series(function () {
+    var external = gulp
+      .src(config.externalDependenciesPath + '**/*.*')
+      .pipe(gulp.dest(config.distPath + config.dependenciesPath));
 
-	return external;
+    return external;
 
-	/*var requirejs = gulp.src(config.npmModulePath + "requirejs/require.js")
+    /*var requirejs = gulp.src(config.npmModulePath + "requirejs/require.js")
 		.pipe(uglify())
 		.pipe(gulp.dest(config.distPath + config.dependenciesPath + "requirejs"));
 
@@ -102,65 +115,94 @@ gulp.task("copyDependencies", gulp.series(function()
 
 
 	return merge(external, requirejs, requirejsText, jquery, autosize, crossroads, signals, knockout);*/
-}));
+  }),
+);
 
-gulp.task("copyConfig", gulp.series(function () {
-	var parameters = minimist(process.argv.slice(3),config.parameters);
+gulp.task(
+  'copyConfig',
+  gulp.series(function () {
+    var parameters = minimist(process.argv.slice(3), config.parameters);
 
-	return gulp.src(config.projectPath + "configuration.json")
-		.pipe(replace("{PortalPath}", parameters.portalPath))
-		.pipe(replace("{ElicitLandingPath}", parameters.elicitLandingPath))
-		.pipe(gulp.dest(config.distPath));
-}));
+    return gulp
+      .src(config.projectPath + 'configuration.json')
+      .pipe(replace('{PortalPath}', parameters.portalPath))
+      .pipe(replace('{ElicitLandingPath}', parameters.elicitLandingPath))
+      .pipe(gulp.dest(config.distPath));
+  }),
+);
 
-gulp.task("copyHTML", gulp.series(function()
-{
-	var defaultFilter = filter(["**/default.html"], {restore: true});
+gulp.task(
+  'copyHTML',
+  gulp.series(function () {
+    var defaultFilter = filter(['**/default.html'], { restore: true });
 
-	return gulp.src(config.projectPath + "**/*.html")
-		.pipe(defaultFilter)
-		.pipe(replace(/var CacheBuster = (\d+);/g, "var CacheBuster = " + new Date().getTime() + ";"))
-		.pipe(defaultFilter.restore)
-		.pipe(gulp.dest(config.distPath));
-}));
+    return gulp
+      .src(config.projectPath + '**/*.html')
+      .pipe(defaultFilter)
+      .pipe(replace(/var CacheBuster = (\d+);/g, 'var CacheBuster = ' + new Date().getTime() + ';'))
+      .pipe(defaultFilter.restore)
+      .pipe(gulp.dest(config.distPath));
+  }),
+);
 
-gulp.task("copyImages", gulp.series(function()
-{
-	return gulp.src(config.projectPath + config.appDirBase + "/Images/**")
-		.pipe(gulp.dest(config.distPath + config.appDirBase + "/Images"));
-}));
+gulp.task(
+  'copyImages',
+  gulp.series(function () {
+    return gulp
+      .src(config.projectPath + config.appDirBase + '/Images/**')
+      .pipe(gulp.dest(config.distPath + config.appDirBase + '/Images'));
+  }),
+);
 
-gulp.task("clean", gulp.series(function (callback)
-{
-	del([config.distPath + "**"], callback);
-}));
+gulp.task(
+  'clean',
+  gulp.series(function (callback) {
+    del([config.distPath + '**'], callback);
+  }),
+);
 
-gulp.task("watch", gulp.series(function()
-{
-	gulp.watch(config.projectPath + "**/*.ts", gulp.parallel("compileTypeScript"));
-	gulp.watch(config.projectPath + "**/*.js", gulp.parallel("compileES6JS"));
-	gulp.watch(config.projectPath + "**/*.styl", gulp.parallel("compileStylus"));
-	gulp.watch(config.projectPath + "**/*.html", gulp.parallel("copyHTML"));
-	gulp.watch(config.projectPath + config.appDirBase + "/Images/**", gulp.parallel("copyImages"));
-}));
+gulp.task(
+  'watch',
+  gulp.series(function () {
+    gulp.watch(config.projectPath + '**/*.ts', gulp.parallel('compileTypeScript'));
+    gulp.watch(config.projectPath + '**/*.js', gulp.parallel('compileES6JS'));
+    gulp.watch(config.projectPath + '**/*.styl', gulp.parallel('compileStylus'));
+    gulp.watch(config.projectPath + '**/*.html', gulp.parallel('copyHTML'));
+    gulp.watch(config.projectPath + config.appDirBase + '/Images/**', gulp.parallel('copyImages'));
+  }),
+);
 
-gulp.task("serve", gulp.series(function () {
-	var server = CreateServer();
+gulp.task(
+  'serve',
+  gulp.series(function () {
+    var server = CreateServer();
 
-	server.listen(config.servePort);
-}));
+    server.listen(config.servePort);
+  }),
+);
 
-gulp.task("build", gulp.series(["clean", "compileTypeScript", "compileES6JS", "compileStylus", "copyDependencies", "copyHTML", "copyImages", "copyConfig"]));
+gulp.task(
+  'build',
+  gulp.series([
+    'clean',
+    'compileTypeScript',
+    'compileES6JS',
+    'compileStylus',
+    'copyDependencies',
+    'copyHTML',
+    'copyImages',
+    'copyConfig',
+  ]),
+);
 
-gulp.task("default", gulp.series(["build"]));
+gulp.task('default', gulp.series(['build']));
 
-function CreateServer()
-{
-	var server = express();
-	server.use(express.static(config.distPath));
-	server.get(/\/((?!\.).)*$/, function(req, res){
-		res.sendFile("default.html", { root: config.distPath } );
-	});
+function CreateServer() {
+  var server = express();
+  server.use('/', express.static(config.distPath));
+  server.get(/\/((?!\.).)*$/, function (req, res) {
+    res.sendFile('default.html', { root: config.distPath });
+  });
 
-	return server;
+  return server;
 }

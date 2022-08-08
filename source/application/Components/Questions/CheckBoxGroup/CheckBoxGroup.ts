@@ -77,7 +77,10 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[]; Cor
         selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
       );
       this.SetAnswer({ Selections: selectedIds, Correct: itemCorrectness.reduce((a, b) => a && b, true) });
-      this.FeedbackText(item.Feedback);
+      const firstIncorrectItem = this.Items.find((item) => !item.Correct);
+      if (firstIncorrectItem) {
+        this.FeedbackText(firstIncorrectItem.Feedback);
+      }
     });
   }
 

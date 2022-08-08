@@ -45,10 +45,12 @@ class KacPS extends QuestionBase<{ Id: string }> {
     this.HasNoStimulus = this.Items.every((i) => !i.HasStimulus);
     this._hasActives = this.Items.some((i) => i.IsActive);
 
-    this.CanAnswer = this.WhenAllAudioHavePlayed(
+    /*
+    this.CanAnswer = this.WhenAllHavePlayed(
       this.Items.map((i) => i.AudioInfo),
       true,
     );
+*/
 
     if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
     this.Answer.subscribe((v) => {
@@ -68,9 +70,9 @@ class KacPS extends QuestionBase<{ Id: string }> {
     if (data.ChoiceButton.Selected === '1') this.Answer(data.Id);
 
     const audioInfo = AudioInfo.Create(data.Stimulus);
-
+    /*
     if (audioInfo !== null) this.TrackAudioInfo(`/Instrument/Items/Item(Id=${data.Id})/Stimulus`, audioInfo);
-
+*/
     const info = {
       Id: data.Id,
       UniqueId: this.Id + '_' + data.Id,

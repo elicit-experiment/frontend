@@ -1,8 +1,9 @@
-﻿import knockout = require('knockout');
-import QuestionBase = require('Components/Questions/QuestionBase');
+﻿import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 
 class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; TimeZone: { Offset: number } }> {
+  public KeyDownHandler: { (event: KeyboardEvent): void } | null = null;
+
   constructor(question: QuestionModel) {
     super(question, false);
   }
@@ -11,6 +12,11 @@ class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; Ti
     this.AddEvent('Start', 'Monitor');
 
     this.UpdateAnswer();
+
+    this.KeyDownHandler = (event: KeyboardEvent) => {
+      this.AddEvent('KeyDown', 'None', event.code.toString());
+    };
+    document.addEventListener('keydown', this.KeyDownHandler);
   }
 
   public SlideCompleted(): boolean {

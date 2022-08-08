@@ -1,7 +1,7 @@
 ﻿import knockout = require('knockout');
 import jquery = require('jquery');
 import Highcharts = require('Highcharts'); //Highcharts;
-import QuestionBase = require('Components/Questions/QuestionBase');
+import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
 
@@ -15,7 +15,7 @@ namespace XHighcharts {
 type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptions };
 type AnswerItem = { Id: string; Position: string };
 
-class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[] }> {
+class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   public Title: string;
   public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
   public Items: Item[];
@@ -25,7 +25,6 @@ class TwoDScaleK extends QuestionBase<{ Scalings: AnswerItem[] }> {
   constructor(question: QuestionModel) {
     super(question);
 
-    this.Title = this.GetInstrumentFormatted('HeaderLabel');
     this.InitializeItems();
 
     this.Subscribe(this.ChartElement, (element) => this.InitializeChart());
