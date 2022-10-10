@@ -8,15 +8,18 @@ interface IMouseTrackingRow {
   y: number;
   timeStamp: number;
 }
+
 type MouseTrackingRow = Required<IMouseTrackingRow>;
 
-function postTimeSeriesAsFile(tsv: string, seriesType: string) {
+function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: string) {
+  if (sessionGuid === '') console.error('no session GUID');
+
   return new Promise((resolve, reject) => {
     const url = new URL(`/v6/time_series/${seriesType}/file`, Configuration.PortalPath);
     const formData = new FormData();
     formData.append('series_type', seriesType);
     formData.append('file', new Blob([tsv]), 'file');
-    formData.append('sessionGUID', this.sessionGuid);
+    formData.append('sessionGUID', sessionGuid);
 
     fetch(url.href, {
       method: 'POST',
@@ -88,6 +91,7 @@ class MouseTrackingManager extends DisposableComponent {
     // Chrome requires returnValue to be set.
     return event.returnValue;
   };
+
   public getUnloadListener(): (event: any) => void {
     return MouseTrackingManager.unloadListener;
   }
@@ -175,7 +179,7 @@ class MouseTrackingManager extends DisposableComponent {
             Object.prototype.toString.call(point[header]) === '[object Date]' ? point[header].toJSON() : point[header];
           tsv += MouseTrackingManager.MOUSEMOVEMENT_HEADERS.map(pointToRow).join('\t') + '\n';
         }
-        postTimeSeriesAsFile(tsv, seriesType)
+        postTimeSeriesAsFile(tsv, seriesType, this.sessionGuid)
           .then((json) => resolve(json))
           .catch((err) => reject(err));
       });
@@ -237,15 +241,21 @@ class MouseTrackingManager extends DisposableComponent {
           .then(() => {
             console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
             dataPoint.value = JSON.stringify(dataPointValue);
-            ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {});
+            ExperimentManager.SendSlideDataPoint(seriesType, dataPoint, (err) => {
+              if (!err) {
+                console.error('datapoint error');
+              }
+            });
             resolve();
           })
           .catch((err) => {
-            console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`);
+            console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed due to ${err}`);
             dataPointValue.status = err.toString();
             dataPoint.value = JSON.stringify(dataPointValue);
-            ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {
-              console.log('dp fail');
+            ExperimentManager.SendSlideDataPoint(seriesType, dataPoint, (err) => {
+              if (!err) {
+                console.error('datapoint error');
+              }
             });
             reject(/* fatal: */ false);
           });
