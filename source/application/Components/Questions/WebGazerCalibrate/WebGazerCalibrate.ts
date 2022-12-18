@@ -292,7 +292,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
           me.sleep(5000).then(() => {
             me.stop_storing_points_variable(); // stop storing the prediction points
-            const past50 = me.get_points(); // retrieve the stored points
+            const past50 = webgazer.getStoredPoints(); // retrieve the stored points
             const precision_measurement = me.calculatePrecision(past50);
             const accuracyLabel = '<a>Accuracy | ' + precision_measurement + '%</a>';
             document.getElementById('Accuracy').innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
@@ -366,7 +366,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private store_points_variable() {
-    store_points_var = true;
+    webgazer.params.storingPoints = true;
   }
 
   /*
@@ -374,17 +374,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * stored any more
    */
   private stop_storing_points_variable() {
-    store_points_var = false;
-  }
-
-  /*
-   * Returns the stored tracker prediction points
-   */
-  private get_points() {
-    const past50 = new Array(2);
-    past50[0] = xPast50;
-    past50[1] = yPast50;
-    return past50;
+    webgazer.params.storingPoints = false;
   }
 
   private calculatePrecision(past50Array: number[][]) {

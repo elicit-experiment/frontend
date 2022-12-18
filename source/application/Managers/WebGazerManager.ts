@@ -5,6 +5,9 @@ import ExperimentManager = require('Managers/Portal/Experiment');
 import knockout = require('knockout');
 import EndOfExperiment = require('../Components/Questions/EndOfExperiment/EndOfExperiment');
 import PortalClient = require('PortalClient');
+import methods = require('../Utility/TimeSeries');
+
+const { postTimeSeriesAsJson, postTimeSeriesAsFile } = methods;
 
 enum WebGazerState {
   NotStarted,
@@ -312,9 +315,6 @@ class WebGazerManager extends DisposableComponent {
 
     const postWebgazerTsv = () =>
       new Promise((resolve, reject) => {
-        const url = new URL('/v6/time_series/webgazer/file', Configuration.PortalPath);
-        console.log(`WebGazerManager: Sending calibration points by file to ${url.href}`);
-        const formData = new FormData();
         let tsv = WebGazerManager.WEBGAZER_HEADERS.join('\t') + '\n';
 
         // TODO: ideally we would generate a separate stream of points to send, already in the CSV format.
@@ -325,54 +325,15 @@ class WebGazerManager extends DisposableComponent {
             Object.prototype.toString.call(point[header]) === '[object Date]' ? point[header].toJSON() : point[header];
           tsv += WebGazerManager.WEBGAZER_HEADERS.map(pointToRow).join('\t') + '\n';
         }
-        formData.append('series_type', 'webgazer');
-        formData.append('file', new Blob([tsv]), 'file');
-        formData.append('sessionGUID', this.sessionGuid);
 
-        fetch(url.href, {
-          method: 'POST',
-          mode: 'cors', // no-cors, cors, *same-origin
-          headers: {
-            Accept: 'application/json',
-          },
-          credentials: 'include',
-          body: formData,
-        })
-          .then((rawResponse) => {
-            if (rawResponse.ok) {
-              return rawResponse;
-            } else {
-              throw Error(`Request rejected with status ${rawResponse.status}`);
-            }
-          })
-          .then((rawResponse) => rawResponse.json())
+        postTimeSeriesAsFile(tsv, 'webgazer', this.sessionGuid)
           .then((json) => resolve(json))
           .catch((err) => reject(err));
       });
 
     const postWebgazerJSON = () =>
       new Promise((resolve, reject) => {
-        const url = new URL('/v6/time_series/webgazer', Configuration.PortalPath);
-        console.log(`WebGazerManager: Sending calibration points to ${url.href}`);
-        fetch(url.href, {
-          method: 'POST',
-          //credentials: 'include', // include the sessionGUID cookie
-          mode: 'cors', // no-cors, cors, *same-origin
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ sessionGUID: this.sessionGuid, points: pointsToSend }),
-        })
-          .then((rawResponse) => {
-            if (rawResponse.ok) {
-              return rawResponse;
-            } else {
-              throw Error(`Request rejected with status ${rawResponse.status}`);
-            }
-          })
-          .then((rawResponse) => rawResponse.json())
+        postTimeSeriesAsJson(JSON.stringify({ sessionGUID: this.sessionGuid, points: pointsToSend }), 'webgazer')
           .then((json) => resolve(json))
           .catch((err) => reject(err));
       });

@@ -1,7 +1,9 @@
-import Configuration = require('Managers/Configuration');
 import DisposableComponent = require('Components/DisposableComponent');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import PortalClient = require('PortalClient');
+import methods = require('../Utility/TimeSeries');
+
+const { postTimeSeriesAsJson, postTimeSeriesAsFile } = methods;
 
 interface IMouseTrackingRow {
   x: number;
@@ -10,66 +12,6 @@ interface IMouseTrackingRow {
 }
 
 type MouseTrackingRow = Required<IMouseTrackingRow>;
-
-function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: string) {
-  if (sessionGuid === '') console.error('no session GUID');
-
-  return new Promise((resolve, reject) => {
-    const url = new URL(`/v6/time_series/${seriesType}/file`, Configuration.PortalPath);
-    const formData = new FormData();
-    formData.append('series_type', seriesType);
-    formData.append('file', new Blob([tsv]), 'file');
-    formData.append('sessionGUID', sessionGuid);
-
-    fetch(url.href, {
-      method: 'POST',
-      mode: 'cors', // no-cors, cors, *same-origin
-      headers: {
-        Accept: 'application/json',
-      },
-      credentials: 'include',
-      body: formData,
-    })
-      .then((rawResponse) => {
-        if (rawResponse.ok) {
-          return rawResponse;
-        } else {
-          throw Error(`Request rejected with status ${rawResponse.status}`);
-        }
-      })
-      .then((rawResponse) => rawResponse.json())
-      .then((json) => resolve(json))
-      .catch((err) => reject(err));
-  });
-}
-
-function postTimeSeriesAsJson(body: any, seriesType: string) {
-  return new Promise((resolve, reject) => {
-    const url = new URL(`/v6/time_series/${seriesType}`, Configuration.PortalPath);
-    console.log(`MouseTrackingManager: Sending calibration points to ${url.href}`);
-    fetch(url.href, {
-      method: 'POST',
-      //credentials: 'include', // include the sessionGUID cookie
-      mode: 'cors', // no-cors, cors, *same-origin
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(body),
-    })
-      .then((rawResponse) => {
-        if (rawResponse.ok) {
-          return rawResponse;
-        } else {
-          throw Error(`Request rejected with status ${rawResponse.status}`);
-        }
-      })
-      .then((rawResponse) => rawResponse.json())
-      .then((json) => resolve(json))
-      .catch((err) => reject(err));
-  });
-}
 
 class MouseTrackingManager extends DisposableComponent {
   constructor() {

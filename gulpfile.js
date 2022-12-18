@@ -86,6 +86,11 @@ gulp.task(
       .src(config.externalDependenciesPath + '**/*.*')
       .pipe(gulp.dest(config.distPath + config.dependenciesPath));
 
+    var webgazer = gulp
+      .src(config.npmModulePath + 'requirejs/require.js')
+      .pipe(uglify())
+      .pipe(gulp.dest(config.distPath + config.dependenciesPath + 'requirejs'));
+
     return external;
 
     /*var requirejs = gulp.src(config.npmModulePath + "requirejs/require.js")
