@@ -1,9 +1,11 @@
 ﻿import knockout = require('knockout');
 import jquery = require('jquery');
 import MediaInfo = require('Components/Players/MediaInfo');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Source = { Type: string; Source: string };
 
+@KoComponent({ template: require('./Audio.html'), name: 'Players/Audio/Audio' })
 class Audio {
   public PlayerElement: KnockoutObservable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
   public Sources: Source[];

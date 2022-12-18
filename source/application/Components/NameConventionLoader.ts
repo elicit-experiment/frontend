@@ -1,4 +1,6 @@
-﻿class NameConventionLoader implements KnockoutComponentTypes.Loader {
+﻿import Shell from 'Components/Shell/Shell';
+
+class NameConventionLoader implements KnockoutComponentTypes.Loader {
   public getConfig(componentName: string, callback: (result: KnockoutComponentTypes.ComponentConfig) => void): void {
     const filePath = NameConventionLoader.GetFilePath(componentName);
 
@@ -9,8 +11,10 @@
   }
 
   public static GetFilePath(name: string): string {
+    console.log(name);
     const filePath = name + (name.lastIndexOf('/') === -1 ? `/${name}` : name.substring(name.lastIndexOf('/')));
 
+    console.log(filePath);
     return 'Components/' + filePath;
   }
 }

@@ -6,7 +6,17 @@
         "target": "es5",
         "moduleResolution": "classic",
         "types": [ "youtube" ],
-        "lib": ["es2017", "dom", "es6"]
+        "lib": ["es2017", "dom", "es6"],
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "baseUrl": "./source/",
+        "paths": {
+            "Components/*": ["application/Components"],
+            "Managers/*": ["application/Managers"],
+            "Models/*": ["application/Models"],
+            "Images/*": ["application/Images"],
+            "Utility/*": ["application/Utility"]
+        }
     },
     "include": [
         "source/**/*"

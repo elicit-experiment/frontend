@@ -2,7 +2,9 @@
 import ExperimentManager = require('Managers/Portal/Experiment');
 import SlideModel = require('Models/Slide');
 import CockpitPortal = require('Managers/Portal/Cockpit');
+import { KoComponent } from 'Utility/KoDecorators';
 
+@KoComponent()
 class SlideShell {
   public Title: KnockoutObservable<string>;
   public HasTitle: KnockoutComputed<boolean>;

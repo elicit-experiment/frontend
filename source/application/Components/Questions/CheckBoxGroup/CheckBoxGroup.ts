@@ -2,10 +2,15 @@
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 import { shuffleInPlace } from 'Utility/ShuffleInPlace';
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean>; Correct: boolean; Feedback: string };
 type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
 
+@KoComponent({
+  template: require('./CheckBoxGroup.html'),
+  name: 'Questions/CheckBoxGroup',
+})
 class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[]; Correct: boolean }> {
   private _minNoOfSelections: number;
   private _maxNoOfSelections: number;

@@ -1,5 +1,6 @@
 import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Answer = { Text: string };
 
@@ -14,6 +15,10 @@ function makeCompletionCode() {
   return text;
 }
 
+@KoComponent({
+  template: require('./CompletionCode.html'),
+  name: 'Questions/CompletionCode',
+})
 class CompletionCode extends FreetextBase<Answer> {
   public completionCode: string;
   constructor(question: QuestionModel) {

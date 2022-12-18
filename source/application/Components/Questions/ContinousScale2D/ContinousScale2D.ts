@@ -1,9 +1,14 @@
 ﻿import knockout = require('knockout');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type ContinousScale2DAnswer = { X: number; Y: number; T: number } | null;
 
+@KoComponent({
+  template: require('./ContinousScale2D.html'),
+  name: 'Questions/ContinousScale2D',
+})
 class ContinousScale2D extends QuestionWithStimulusBase<ContinousScale2DAnswer> {
   private static BackgroundStrokeColor = '#eee';
   private static BackgroundLineSpacing = 10;

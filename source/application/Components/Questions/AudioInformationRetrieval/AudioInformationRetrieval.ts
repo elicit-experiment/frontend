@@ -9,9 +9,14 @@ import Search from 'Components/Questions/AudioInformationRetrieval/Search';
 import TimeLine from 'Components/Questions/AudioInformationRetrieval/TimeLine';
 import Rating from 'Components/Questions/AudioInformationRetrieval/Rating';
 import Audio from 'Utility/Audio';
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Selection = { Identifier: string };
 
+@KoComponent({
+  template: require('./AudioInformationRetrieval.html'),
+  name: 'Questions/AudioInformationRetrieval',
+})
 class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }> {
   public SearchViewHeader: string;
 

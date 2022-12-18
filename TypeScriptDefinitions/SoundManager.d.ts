@@ -41,6 +41,7 @@ interface ISoundOptions
 interface ISoundManagerModule
 {
 	getInstance():ISoundManager;
+	soundManager: ISoundManager;
 }
 
 declare var soundManager: ISoundManagerModule;

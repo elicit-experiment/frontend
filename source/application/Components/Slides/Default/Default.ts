@@ -4,7 +4,10 @@ import QuestionModel = require('Models/Question');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import NameConventionLoader = require('Components/NameConventionLoader');
+import { KoComponent } from '../../../Utility/KoDecorators';
+import QuestionRadioButtonGroup = require('Components/Questions/RadioButtonGroup/RadioButtonGroup');
 
+@KoComponent({ template: require('./Default.html'), name: 'Slides/Default' })
 class Default {
   private _slide: SlideModel;
   private _uiLessQuestions: IQuestionViewModel[] = [];
@@ -42,10 +45,12 @@ class Default {
       questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
       this.Questions.push(questionModel);
 
-      if (!questionModel.HasUIElement)
-        ((m: QuestionModel) =>
-          require([NameConventionLoader.GetFilePath(questionModel.Type)], (vm: any) =>
-            this._uiLessQuestions.push(new vm(m))))(questionModel);
+      if (!questionModel.HasUIElement) {
+      }
+      //import(NameConventionLoader.GetFilePath(questionModel.Type)).then((x) => console.dir(x));
+      // ((m: QuestionModel) =>
+      //   require([NameConventionLoader.GetFilePath(questionModel.Type)], (vm: any) =>
+      //     this._uiLessQuestions.push(new vm(m))))(questionModel);
     }
 
     if (questions.length === 0) {

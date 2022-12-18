@@ -1,7 +1,12 @@
 ﻿import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
+@KoComponent({
+  template: null,
+  name: 'Questions/EndOfExperiment',
+})
 class EndOfExperiment extends QuestionBase<any> {
   constructor(question: QuestionModel) {
     super(question, false);

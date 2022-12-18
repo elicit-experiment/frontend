@@ -1,6 +1,6 @@
 {
-  "PortalPath": "{PortalPath}",
-  "ElicitLandingPath": "{ElicitLandingPath}",
+  "PortalPath": "http://localhost:3000/",
+  "ElicitLandingPath": "http://localhost:3000/",
   "LarmPortalPath": "http://api.prod.larm.fm",
   "WayfPath": "https://wayf.larm.fm"
 }

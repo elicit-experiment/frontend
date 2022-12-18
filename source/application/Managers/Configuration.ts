@@ -1,4 +1,4 @@
-﻿import ConfigurationFile = require('text!../../configuration.json');
+﻿import ConfigurationFile from '../../configuration.json';
 
 const configurationData = JSON.parse(ConfigurationFile);
 

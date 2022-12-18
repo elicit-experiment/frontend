@@ -3,7 +3,9 @@ import CockpitPortal = require('Managers/Portal/Cockpit');
 import Portal = require('Managers/Portal/Portal');
 import PortalClient = require('PortalClient');
 import DisposableComponent = require('Components/DisposableComponent');
+import { KoComponent } from '../../Utility/KoDecorators';
 
+@KoComponent()
 class CreateExperiment extends DisposableComponent {
   public IsAuthenticated: KnockoutObservable<boolean>;
   public Email = knockout.observable('');

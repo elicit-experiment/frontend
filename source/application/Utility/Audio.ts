@@ -1,5 +1,5 @@
 ﻿import knockout = require('knockout');
-import SoundManager = require('soundmanager2');
+import SoundManager from 'soundmanager2';
 import Notification = require('Managers/Notification');
 
 export default class Audio {
@@ -31,7 +31,7 @@ export default class Audio {
   public static Initialize(): void {
     if (Audio.SoundManager != null) return;
 
-    Audio.SoundManager = SoundManager.getInstance();
+    Audio.SoundManager = SoundManager.soundManager;
 
     Notification.Debug('Initialize Sound');
 
