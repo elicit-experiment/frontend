@@ -1,9 +1,14 @@
 ﻿import QuestionModel = require('Models/Question');
 import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import CryptoJS = require('crypto-js');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Answer = { Value: string; Length: number };
 
+@KoComponent({
+  template: null,
+  name: 'Questions/FreetextHash',
+})
 class FreetextHash extends FreetextBase<Answer> {
   private _forceLowerCase: boolean;
 

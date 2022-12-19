@@ -1,8 +1,13 @@
 ﻿import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Answer = { Text: string };
 
+@KoComponent({
+  template: null,
+  name: 'Questions/Freetext',
+})
 class Freetext extends FreetextBase<Answer> {
   constructor(question: QuestionModel) {
     super(question);

@@ -28,16 +28,28 @@ import CheckBoxGroup = require('Components/Questions/CheckBoxGroup/CheckBoxGroup
 import CompletionCode = require('Components/Questions/CompletionCode/CompletionCode');
 import ContinousScale2D = require('Components/Questions/ContinousScale2D/ContinousScale2D');
 import EndOfExperiment = require('Components/Questions/EndOfExperiment/EndOfExperiment');
+import Freetext = require('Components/Questions/Freetext/Freetext');
+import FreetextHash = require('Components/Questions/FreetextHash/FreetextHash');
+import KAcPS = require('Components/Questions/KAcPS/KAcPS');
+import Monitor = require('Components/Questions/Monitor/Monitor');
+import OneDScale = require('Components/Questions/OneDScale/OneDScale');
+import LikertScale = require('Components/Questions/LikertScale/LikertScale');
+import OneDScaleT = require('Components/Questions/OneDScaleT/OneDScaleT');
+import SoloStimulus = require('Components/Questions/OneDScaleT/OneDScaleT');
+import TaggingA = require('Components/Questions/TaggingA/TaggingA');
+import TaggingB = require('Components/Questions/TaggingB/TaggingB');
+import TextBlock = require('Components/Questions/TextBlock/TextBlock');
+import TwoDScaleK = require('Components/Questions/TwoDScaleK/TwoDScaleK');
+import Unsupported = require('Components/Questions/Unsupported/Unsupported');
+import WebGazerCalibrate = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate');
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';
 
-//knockout.components.loaders.push(new NameConventionLoader());
 knockout.applyBindings({
   declarations: [
     Shell,
     SlideShell,
     Default,
-    QuestionRadioButtonGroup,
     CreateExperiment,
     ExperimentNotFound,
     NoMoreExperiments,
@@ -57,5 +69,20 @@ knockout.applyBindings({
     CompletionCode,
     ContinousScale2D,
     EndOfExperiment,
+    QuestionRadioButtonGroup,
+    Freetext,
+    FreetextHash,
+    KAcPS,
+    OneDScale,
+    OneDScaleT,
+    LikertScale,
+    Monitor,
+    SoloStimulus,
+    TaggingA,
+    TaggingB,
+    TextBlock,
+    TwoDScaleK,
+    Unsupported,
+    WebGazerCalibrate,
   ],
 });

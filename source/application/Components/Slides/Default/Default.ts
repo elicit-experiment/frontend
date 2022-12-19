@@ -3,7 +3,6 @@ import SlideModel = require('Models/Slide');
 import QuestionModel = require('Models/Question');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import CockpitPortal = require('Managers/Portal/Cockpit');
-import NameConventionLoader = require('Components/NameConventionLoader');
 import { KoComponent } from '../../../Utility/KoDecorators';
 import QuestionRadioButtonGroup = require('Components/Questions/RadioButtonGroup/RadioButtonGroup');
 

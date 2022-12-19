@@ -1,12 +1,15 @@
 import knockout = require('knockout');
 import Swal, { SweetAlertResult } from 'sweetalert2';
-const swal2 = Swal;
-
 import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import WebGazerManager = require('Managers/WebGazerManager');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
+@KoComponent({
+  template: null,
+  name: 'Questions/WebGazerCalibrate',
+})
 class WebGazerCalibrate extends QuestionBase<any> {
   public AnswerIsRequired = true;
   public HasMedia = false;
@@ -42,14 +45,16 @@ class WebGazerCalibrate extends QuestionBase<any> {
       .catch((exception) => {
         console.error('WebGazerCalibration: failed to upload test packet');
         console.error(exception);
-        swal2({
+        Swal.fire({
           title: 'Calibration',
           html: 'Failed to initialize calibration.  Experiment cannot be taken',
           showLoaderOnConfirm: true,
           buttonsStyling: false,
-          confirmButtonClass: 'btn btn-primary btn-lg',
-          cancelButtonClass: 'btn btn-lg',
           showCancelButton: true,
+          customClass: {
+            confirmButton: 'btn btn-primary btn-lg',
+            cancelButton: 'btn btn-lg',
+          },
         }).then(() => {
           ExperimentManager.ExperimentCompleted();
         });
@@ -174,13 +179,15 @@ class WebGazerCalibrate extends QuestionBase<any> {
       '</div>';
 
     this.ClearCanvas();
-    swal2({
+    Swal.fire({
       title: 'Calibration',
       html: instructions,
       showLoaderOnConfirm: true,
       buttonsStyling: false,
-      confirmButtonClass: 'btn btn-primary btn-lg',
-      cancelButtonClass: 'btn btn-lg',
+      customClass: {
+        confirmButton: 'btn btn-primary btn-lg',
+        cancelButton: 'btn btn-lg',
+      },
       showCancelButton: true,
     }).then(() => {
       console.log('WebGazerCalibration: Starting calibration.');
@@ -276,7 +283,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
       const canvas = <HTMLCanvasElement>document.getElementById('plotting_canvas');
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
       // notification for the measurement process
-      swal2({
+      Swal.fire({
         title: 'Calculating measurement',
         html:
           "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
@@ -331,7 +338,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
             me.NoOfAttempts += 1;
 
-            swal2({
+            Swal.fire({
               title,
               html,
               allowOutsideClick: false,

@@ -1,6 +1,11 @@
 ﻿import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
+@KoComponent({
+  template: null,
+  name: 'Questions/TextBlock',
+})
 class TextBlock extends QuestionBase<any> {
   public Text: string;
   public HeaderLabel: string;

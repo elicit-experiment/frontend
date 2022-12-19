@@ -2,6 +2,7 @@
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type ItemInfo = {
   Id: string;
@@ -15,6 +16,10 @@ type ItemInfo = {
 };
 type Item = { Id: string; ChoiceButton: { Label: string; Selected: string; Active?: string }; Stimulus: IStimulus };
 
+@KoComponent({
+  template: null,
+  name: 'Questions/KacPS',
+})
 class KacPS extends QuestionBase<{ Id: string }> {
   public Id: string;
   public HeaderLabel: string;

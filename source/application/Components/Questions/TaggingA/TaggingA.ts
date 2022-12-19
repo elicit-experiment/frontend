@@ -1,11 +1,16 @@
 ﻿import knockout = require('knockout');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
 
+@KoComponent({
+  template: null,
+  name: 'Questions/TaggingA',
+})
 class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
   public UserTagsLabel: string;

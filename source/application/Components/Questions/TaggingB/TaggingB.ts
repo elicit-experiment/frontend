@@ -2,11 +2,16 @@
 import TaggingA = require('Components/Questions/TaggingA/TaggingA');
 import Taggle = require('Taggle');
 import QuestionModel = require('Models/Question');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
 
+@KoComponent({
+  template: null,
+  name: 'Questions/TaggingB',
+})
 class TaggingB extends TaggingA {
   public TagBoxElement = knockout.observable<HTMLElement>();
   protected readonly InstrumentTemplateName = TaggingB.name;

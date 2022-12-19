@@ -14,6 +14,7 @@ module.exports = function (env) {
 
     // [Browser-single-js-file]: Packing a library Javascript file.
     {
+      stats: { errorDetails: true },
       plugins: [
         // new webpack.ProvidePlugin({
         //   PortalClient: path.resolve(path.join(__dirname, 'dependencies/PortalClient/PortalClient.min.js')),
@@ -21,8 +22,8 @@ module.exports = function (env) {
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output
           // both options are optional
-          filename: '[name]-[hash].css',
-          chunkFilename: '[name]-[hash].css',
+          filename: '[name]-[contenthash].css',
+          chunkFilename: '[name]-[contenthash].css',
         }),
         new HtmlWebpackPlugin({
           filename: 'index.html',
@@ -40,7 +41,7 @@ module.exports = function (env) {
       output: {
         library: 'ElicitExperiment',
         libraryTarget: 'var',
-        filename: process.env.NODE_ENV === 'production' ? '[name]-[hash].js' : '[name].js',
+        filename: process.env.NODE_ENV === 'production' ? '[name]-[contenthash].js' : '[name].js',
         path: path.resolve(__dirname, 'dist'),
         devtoolModuleFilenameTemplate: process.env.NODE_ENV === 'production' ? '[resource-path]' : void 0,
       },
@@ -115,6 +116,7 @@ module.exports = function (env) {
           Utility: path.resolve(__dirname, 'source/application/Utility'),
           Images: path.resolve(__dirname, 'source/application/Images'),
           PortalClient: path.resolve(path.join(__dirname, 'dependencies/PortalClient/PortalClient.min.js')),
+          WebGazer: path.resolve(path.join(__dirname, 'dependencies/webgazer/webgazer.commonjs2.js')),
         },
       },
       devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',

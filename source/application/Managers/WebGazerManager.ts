@@ -1,9 +1,8 @@
-import webgazer = require('webgazer');
+import webgazer = require('WebGazer');
 import Configuration = require('Managers/Configuration');
 import DisposableComponent = require('Components/DisposableComponent');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import knockout = require('knockout');
-import EndOfExperiment = require('../Components/Questions/EndOfExperiment/EndOfExperiment');
 import PortalClient = require('PortalClient');
 import methods = require('../Utility/TimeSeries');
 
