@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:16-alpine
 
 ARG API_URL
 ARG ELICIT_LANDING_URL
@@ -6,34 +6,36 @@ ARG API_SCHEME
 
 RUN apk add git
 
-RUN npm uninstall gulp -g
-
 RUN mkdir /experiment-frontend
 
 WORKDIR /experiment-frontend
 
+ENV API_SCHEME=$API_SCHEME
+ENV API_URL=$API_URL
+ENV ELICIT_LANDING_URL=$ELICIT_LANDING_URL
+COPY make_config.sh .
+RUN chmod +x make_config.sh
+RUN mkdir -p ./source
+RUN ./make_config.sh
+RUN cat ./source/configuration-production.json
+
 COPY ./package.json /experiment-frontend/
-# COPY ./package-lock.json /experiment-frontend/
+COPY ./package-lock.json /experiment-frontend/
 
 RUN ls -als
 
 RUN npm install
 
-RUN npm install -g gulp
-
 COPY . /experiment-frontend
-
-RUN sed -i'' -E "s/(\s+portalPath\: ).*/\1\"$API_SCHEME:\/\/$API_URL\",/g" gulpfile.js
-RUN sed -i'' -E "s/(\s+elicitLandingPath\: ).*/\1\"$API_SCHEME:\/\/$ELICIT_LANDING_URL\",/g" gulpfile.js
-
-RUN cat gulpfile.js | grep portalPath
+RUN mv ./source/configuration-production.json ./source/configuration.json
+RUN cat ./source/configuration.json
 
 RUN npm --version
 
 RUN node --version
 
-RUN gulp  --version
+RUN mkdir dist
 
-RUN gulp build
+RUN npm run build
 
 CMD ["/bin/sh", "./run.sh"]

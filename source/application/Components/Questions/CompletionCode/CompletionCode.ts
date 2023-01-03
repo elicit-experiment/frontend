@@ -1,6 +1,6 @@
 import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import * as knockout from 'knockout';
 
 type Answer = { Text: string };
 
@@ -15,10 +15,6 @@ function makeCompletionCode() {
   return text;
 }
 
-@KoComponent({
-  template: require('./CompletionCode.html'),
-  name: 'Questions/CompletionCode',
-})
 class CompletionCode extends FreetextBase<Answer> {
   public completionCode: string;
   constructor(question: QuestionModel) {
@@ -53,5 +49,11 @@ class CompletionCode extends FreetextBase<Answer> {
     super.AddRawEvent(eventType, 'CompletionCode', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/CompletionCode/CompletionCode.html');
+knockout.components.register('Questions/CompletionCode', {
+  viewModel: CompletionCode,
+  template: template.default,
+});
 
 export = CompletionCode;

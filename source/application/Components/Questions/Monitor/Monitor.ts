@@ -1,6 +1,6 @@
 ﻿import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
-import mouseTrackingManager = require('Managers/MouseTrackingManager');
+import MouseTrackingManager = require('Managers/MouseTrackingManager');
 
 class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; TimeZone: { Offset: number } }> {
   public KeyDownHandler: { (event: KeyboardEvent): void } | null = null;
@@ -20,9 +20,9 @@ class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; Ti
     };
     document.addEventListener('keydown', this.KeyDownHandler);
 
-    mouseTrackingManager.StartTracking();
+    MouseTrackingManager.Instance.StartTracking();
     this.MouseMoveHandler = (event: MouseEvent) => {
-      mouseTrackingManager.ProcessPoint(
+      MouseTrackingManager.Instance.ProcessPoint(
         { x: event.x, y: event.y, timeStamp: new Date().getTime() },
         new Date().getTime(),
       );
@@ -35,7 +35,7 @@ class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; Ti
 
     this.UpdateAnswer();
 
-    mouseTrackingManager.StopTracking();
+    MouseTrackingManager.Instance.StopTracking();
 
     return true;
   }

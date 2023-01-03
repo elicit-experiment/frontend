@@ -1,10 +1,9 @@
 ﻿import knockout = require('knockout');
 import jquery = require('jquery');
-import Highcharts = require('Highcharts'); //Highcharts;
+import Highcharts = require('highcharts'); //Highcharts;
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 namespace XHighcharts {
   interface SeriesOptions {
@@ -16,10 +15,6 @@ namespace XHighcharts {
 type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptions };
 type AnswerItem = { Id: string; Position: string };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/TwoDScaleK',
-})
 class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   public Title: string;
   public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
@@ -171,5 +166,11 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     super.AddRawEvent(eventType, 'TwoDScaleK', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/TwoDScaleK/TwoDScaleK.html');
+knockout.components.register('Questions/TwoDScaleK', {
+  viewModel: TwoDScaleK,
+  template: template.default,
+});
 
 export = TwoDScaleK;

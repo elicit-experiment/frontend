@@ -1,6 +1,11 @@
 ﻿// Import our custom CSS
 import './Main.scss';
-import * as bootstrap from 'bootstrap';
+
+import jQuery from 'jquery';
+window.jQuery = jQuery;
+window.$ = jQuery;
+
+//import * as bootstrap from 'bootstrap';
 
 import 'promise-polyfill';
 import 'whatwg-fetch';
@@ -35,7 +40,7 @@ import Monitor = require('Components/Questions/Monitor/Monitor');
 import OneDScale = require('Components/Questions/OneDScale/OneDScale');
 import LikertScale = require('Components/Questions/LikertScale/LikertScale');
 import OneDScaleT = require('Components/Questions/OneDScaleT/OneDScaleT');
-import SoloStimulus = require('Components/Questions/OneDScaleT/OneDScaleT');
+import SoloStimulus = require('Components/Questions/SoloStimulus/SoloStimulus');
 import TaggingA = require('Components/Questions/TaggingA/TaggingA');
 import TaggingB = require('Components/Questions/TaggingB/TaggingB');
 import TextBlock = require('Components/Questions/TextBlock/TextBlock');
@@ -44,6 +49,9 @@ import Unsupported = require('Components/Questions/Unsupported/Unsupported');
 import WebGazerCalibrate = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate');
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';
+// TODO: make this work
+//KnockoutBindings.forEach((binding: {string:KnockoutBindingHandler}) => (ko.bindingHandlers[binding.class.name] = binding));
+knockout.bindingHandlers['Element'] = KnockoutBindings.Element;
 
 knockout.applyBindings({
   declarations: [

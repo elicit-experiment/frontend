@@ -1,6 +1,5 @@
-﻿import { KoComponent } from '../../Utility/KoDecorators';
+﻿import knockout from 'knockout';
 
-@KoComponent()
 class ExperimentNotFound {
   public Id: string;
 
@@ -8,5 +7,11 @@ class ExperimentNotFound {
     this.Id = data;
   }
 }
+
+import template = require('Components/ExperimentNotFound/ExperimentNotFound.html');
+knockout.components.register('Questions/ExperimentNotFound', {
+  viewModel: ExperimentNotFound,
+  template: template.default,
+});
 
 export = ExperimentNotFound;

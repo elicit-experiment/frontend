@@ -1,6 +1,11 @@
-﻿import { KoComponent } from '../../Utility/KoDecorators';
+﻿import knockout from 'knockout';
 
-@KoComponent()
 class NoMoreExperiments {}
+
+import template = require('Components/NoMoreExperiments/NoMoreExperiments.html');
+knockout.components.register('Questions/NoMoreExperiments', {
+  viewModel: NoMoreExperiments,
+  template: template.default,
+});
 
 export = NoMoreExperiments;

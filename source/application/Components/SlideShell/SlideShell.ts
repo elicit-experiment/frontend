@@ -2,9 +2,7 @@
 import ExperimentManager = require('Managers/Portal/Experiment');
 import SlideModel = require('Models/Slide');
 import CockpitPortal = require('Managers/Portal/Cockpit');
-import { KoComponent } from 'Utility/KoDecorators';
 
-@KoComponent()
 class SlideShell {
   public Title: KnockoutObservable<string>;
   public HasTitle: KnockoutComputed<boolean>;
@@ -156,5 +154,11 @@ class SlideShell {
     this._subscriptions.forEach((s) => s.dispose());
   }
 }
+
+import template = require('Components/SlideShell/SlideShell.html');
+knockout.components.register('SlideShell', {
+  viewModel: SlideShell,
+  template: template.default,
+});
 
 export = SlideShell;

@@ -24,11 +24,23 @@ export function KoComponent(options: IKoComponentOptions | undefined = undefined
         template: require(`Components/${clazz.name}/${clazz.name}.html`),
       };
     }
+    console.log(`options.name ${options.name} clazz.name ${clazz.name}`);
     knockout.components.register(options.name || clazz.name, { viewModel: clazz, ...options });
     return clazz;
   };
 }
 
+export function KoComponent2(template: any, options: IKoComponentOptions | undefined = undefined) {
+  return (clazz: IKoComponentStatic): any => {
+    if (!options) {
+      options = {
+        template: template,
+      };
+    }
+    knockout.components.register(options.name || clazz.name, { viewModel: clazz, ...options });
+    return clazz;
+  };
+}
 export interface IKoModuleOptions {
   /** Array of Components and/or Directives */
   declarations?: any[];

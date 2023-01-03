@@ -1,7 +1,6 @@
 import knockout = require('knockout');
 import jquery = require('jquery');
 import MediaInfo = require('Components/Players/MediaInfo');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Source = { Type: string; Source: string; Width: string; Height: string };
 
@@ -12,7 +11,6 @@ declare global {
 }
 
 // TODO: probably should be refactored into a container for HTMLVideo or YouTubeVideo children
-@KoComponent({ template: require('./Video.html'), name: 'Players/Video/Video' })
 class Video {
   public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
   public PlayerControlsElement: KnockoutObservable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
@@ -54,8 +52,11 @@ class Video {
       sub.dispose();
       this.InitializeHTML5VideoPlayer(e);
     });
+    console.log('hello');
+
     const sub2 = this.YouTubePlayerElement.subscribe((e) => {
       sub2.dispose();
+      console.log('hello');
       const callback = this.CreateYouTubePlayer.bind(this);
       Video.OnYouTubeInit(callback);
     });
@@ -79,6 +80,7 @@ class Video {
   private static _youTubeInitList: Array<CallableFunction> = [];
 
   private static OnYouTubeInit(cb: CallableFunction): void {
+    console.log('OnYouTubeInit');
     if (Video._isYouTubeLoaded) {
       cb();
       return;
@@ -270,5 +272,11 @@ class Video {
     $(this.PlayButtonElement()).prop('disabled', true);
   }
 }
+
+import template = require('Components/Players/Video/Video.html');
+knockout.components.register('Players/Video', {
+  viewModel: Video,
+  template: template.default,
+});
 
 export = Video;

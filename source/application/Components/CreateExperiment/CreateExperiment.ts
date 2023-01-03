@@ -3,9 +3,7 @@ import CockpitPortal = require('Managers/Portal/Cockpit');
 import Portal = require('Managers/Portal/Portal');
 import PortalClient = require('PortalClient');
 import DisposableComponent = require('Components/DisposableComponent');
-import { KoComponent } from '../../Utility/KoDecorators';
 
-@KoComponent()
 class CreateExperiment extends DisposableComponent {
   public IsAuthenticated: KnockoutObservable<boolean>;
   public Email = knockout.observable('');
@@ -65,5 +63,11 @@ class CreateExperiment extends DisposableComponent {
     }
   }
 }
+
+import template = require('Components/CreateExperiment/CreateExperiment.html');
+knockout.components.register('CreateExperiment', {
+  viewModel: CreateExperiment,
+  template: template.default,
+});
 
 export = CreateExperiment;

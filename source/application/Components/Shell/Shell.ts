@@ -3,9 +3,7 @@ import Navigation = require('Managers/Navigation/Navigation');
 import NavigationPage = require('Managers/Navigation/NavigationPage');
 import TextFormatter = require('Managers/TextFormatter');
 import ExperimentManager = require('Managers/Portal/Experiment');
-import { KoComponent } from 'Utility/KoDecorators';
 
-@KoComponent({ template: require('./Shell.html') })
 class Shell {
   public Page: KnockoutObservable<NavigationPage>;
   public FooterLabel: KnockoutComputed<string>;
@@ -17,5 +15,11 @@ class Shell {
     this.IsFooterVisible = knockout.computed(() => this.FooterLabel() != null && this.FooterLabel() !== '');
   }
 }
+
+import template = require('Components/Shell/Shell.html');
+knockout.components.register('Shell', {
+  viewModel: Shell,
+  template: template.default,
+});
 
 export = Shell;

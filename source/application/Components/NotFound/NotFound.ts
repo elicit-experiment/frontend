@@ -1,6 +1,11 @@
-﻿import { KoComponent } from '../../Utility/KoDecorators';
+﻿import knockout from 'knockout';
 
-@KoComponent()
 class NotFound {}
+
+import template = require('Components/NotFound/NotFound.html');
+knockout.components.register('Questions/NotFound', {
+  viewModel: NotFound,
+  template: template.default,
+});
 
 export = NotFound;

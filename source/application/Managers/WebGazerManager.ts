@@ -1,5 +1,4 @@
 import webgazer = require('WebGazer');
-import Configuration = require('Managers/Configuration');
 import DisposableComponent = require('Components/DisposableComponent');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import knockout = require('knockout');
@@ -17,12 +16,19 @@ enum WebGazerState {
 }
 
 class WebGazerManager extends DisposableComponent {
-  constructor() {
+  private constructor() {
     super();
 
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+  }
+
+  private static _instance: WebGazerManager;
+
+  static get Instance() {
+    // Do you need arguments? Make it a regular static method instead.
+    return this._instance || (this._instance = new this());
   }
 
   static POINT_BUFFER_SIZE = 1000;
@@ -403,6 +409,4 @@ class WebGazerManager extends DisposableComponent {
   }
 }
 
-const instance = new WebGazerManager();
-
-export = instance;
+export = WebGazerManager;

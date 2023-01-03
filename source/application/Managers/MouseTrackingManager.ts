@@ -14,14 +14,19 @@ interface IMouseTrackingRow {
 type MouseTrackingRow = Required<IMouseTrackingRow>;
 
 class MouseTrackingManager extends DisposableComponent {
-  constructor() {
+  private constructor() {
     super();
 
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
   }
+  private static _instance: MouseTrackingManager;
 
+  static get Instance() {
+    // Do you need arguments? Make it a regular static method instead.
+    return this._instance || (this._instance = new this());
+  }
   static POINT_BUFFER_SIZE = 1000;
   static AUTO_SEND_INTERVAL = 3000;
   public static unloadListener = (event: any) => {
@@ -207,6 +212,4 @@ class MouseTrackingManager extends DisposableComponent {
   }
 }
 
-const instance = new MouseTrackingManager();
-
-export = instance;
+export = MouseTrackingManager;

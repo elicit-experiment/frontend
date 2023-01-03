@@ -5,12 +5,7 @@ import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import MediaInfo = require('Components/Players/MediaInfo');
 import WebGazerManager = require('Managers/WebGazerManager');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
-@KoComponent({
-  template: null,
-  name: 'Questions/SoloStimulus',
-})
 class SoloStimulus extends QuestionBase<any> {
   public MediaLabel = '';
   public MediaInfo: MediaInfo = null;
@@ -35,8 +30,8 @@ class SoloStimulus extends QuestionBase<any> {
 
     this.UsesWebGazer = stimulus.Type.indexOf('+webgazer') !== -1;
 
-    if (this.UsesWebGazer && !WebGazerManager.Ready()) {
-      WebGazerManager.Init().then(() => {
+    if (this.UsesWebGazer && !WebGazerManager.Instance.Ready()) {
+      WebGazerManager.Instance.Init().then(() => {
         //WebGazer.Restart(false);
         document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video');
 
@@ -48,7 +43,7 @@ class SoloStimulus extends QuestionBase<any> {
         }).then(() => {
           console.log('Starting calibration.');
 
-          WebGazerManager.StartCalibration();
+          WebGazerManager.Instance.StartCalibration();
 
           const player = document.getElementById('player');
           const playerBBox = player.getBoundingClientRect();
@@ -60,7 +55,7 @@ class SoloStimulus extends QuestionBase<any> {
           const tx = Math.round(10.0 * (playerBBox.left + playerBBox.width / 2 - videoBBox.width / 2)) / 10.0;
           const ty = Math.round(10.0 * (playerBBox.top + playerBBox.height / 2 - videoBBox.height / 2)) / 10.0;
           const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
-          WebGazerManager.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
+          WebGazerManager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
             (el: HTMLElement) => (el.style.transform = transform),
           );
         });
@@ -77,7 +72,7 @@ class SoloStimulus extends QuestionBase<any> {
 
     let pointIndex = 0;
     const points: Array<any> = [];
-    this._pointsSubscription = WebGazerManager.currentPoint.subscribe((v: any) => {
+    this._pointsSubscription = WebGazerManager.Instance.currentPoint.subscribe((v: any) => {
       pointIndex = pointIndex++ % 1000;
 
       let dataPoint;
@@ -212,11 +207,11 @@ class SoloStimulus extends QuestionBase<any> {
           // TODO: refactor with calibration check in ctor
           (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
 
-          WebGazerManager.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
+          WebGazerManager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
             (el: HTMLElement) => (el.style.display = 'none'),
           );
 
-          WebGazerManager.StartTracking();
+          WebGazerManager.Instance.StartTracking();
 
           this.CanStartPlaying(true);
         }
@@ -250,5 +245,11 @@ class SoloStimulus extends QuestionBase<any> {
     super.AddRawEvent(eventType, this.MediaInfo.EventType(), 'Stimulus', method, data);
   }
 }
+
+import template = require('Components/Questions/SoloStimulus/SoloStimulus.html');
+knockout.components.register('Questions/SoloStimulus', {
+  viewModel: SoloStimulus,
+  template: template.default,
+});
 
 export = SoloStimulus;

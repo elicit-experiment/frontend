@@ -1,17 +1,12 @@
 ﻿import knockout = require('knockout');
 import TaggingA = require('Components/Questions/TaggingA/TaggingA');
-import Taggle = require('Taggle');
+import Taggle = require('taggle');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/TaggingB',
-})
 class TaggingB extends TaggingA {
   public TagBoxElement = knockout.observable<HTMLElement>();
   protected readonly InstrumentTemplateName = TaggingB.name;
@@ -63,5 +58,11 @@ class TaggingB extends TaggingA {
     super.AddRawEvent(eventType, 'TaggingB', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/TaggingB/TaggingB.html');
+knockout.components.register('Questions/TaggingB', {
+  viewModel: TaggingA,
+  template: template.default,
+});
 
 export = TaggingB;

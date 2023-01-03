@@ -1,6 +1,11 @@
-﻿import { KoComponent } from '../../Utility/KoDecorators';
+﻿import knockout from 'knockout';
 
-@KoComponent({ template: require('./Welcome.html') })
 class Welcome {}
+
+import template = require('Components/Welcome/Welcome.html');
+knockout.components.register('Questions/Welcome', {
+  viewModel: Welcome,
+  template: template.default,
+});
 
 export = Welcome;

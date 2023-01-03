@@ -1,7 +1,6 @@
 ﻿import knockout = require('knockout');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Tick = {
   Label: string;
@@ -12,10 +11,6 @@ type Tick = {
 };
 type TickData = { Label: string; Position: string };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/OneDScaleT',
-})
 class OneDScaleT extends QuestionWithStimulusBase<{ Position: number; Time: number }> {
   private static _positionMinValue = -1;
   private static _positionMaxValue = 1;
@@ -110,5 +105,11 @@ class OneDScaleT extends QuestionWithStimulusBase<{ Position: number; Time: numb
     this.AddEvent('Change', 'Mouse/Left/Down', JSON.stringify({ Position: value, Times: times }));
   }
 }
+
+import template = require('Components/Questions/OneDScaleT/OneDScaleT.html');
+knockout.components.register('Questions/OneDScaleT', {
+  viewModel: OneDScaleT,
+  template: template.default,
+});
 
 export = OneDScaleT;

@@ -1,11 +1,7 @@
 ﻿import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import * as knockout from 'knockout';
 
-@KoComponent({
-  template: null,
-  name: 'Questions/TextBlock',
-})
 class TextBlock extends QuestionBase<any> {
   public Text: string;
   public HeaderLabel: string;
@@ -24,5 +20,11 @@ class TextBlock extends QuestionBase<any> {
     super.AddRawEvent(eventType, 'TextBlock', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/TextBlock/TextBlock.html');
+knockout.components.register('Questions/TextBlock', {
+  viewModel: TextBlock,
+  template: template.default,
+});
 
 export = TextBlock;

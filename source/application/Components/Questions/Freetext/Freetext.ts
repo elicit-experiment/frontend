@@ -1,13 +1,9 @@
 ﻿import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import knockout from 'knockout';
 
 type Answer = { Text: string };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/Freetext',
-})
 class Freetext extends FreetextBase<Answer> {
   constructor(question: QuestionModel) {
     super(question);
@@ -32,5 +28,11 @@ class Freetext extends FreetextBase<Answer> {
     super.AddRawEvent(eventType, 'Freetext', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/Freetext/Freetext.html');
+knockout.components.register('Questions/Freetext', {
+  viewModel: Freetext,
+  template: template.default,
+});
 
 export = Freetext;

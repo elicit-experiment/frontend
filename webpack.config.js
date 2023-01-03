@@ -2,10 +2,13 @@ var path = require('path');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+//const UglifyJSPlugin = require('uglify-js');
 const webpack = require('webpack');
+const glob = require('glob');
 
 const stylRoot = 'source/application/Style';
-console.log(path.resolve(__dirname, `${stylRoot}/default.styl`));
+templates = glob.sync('source/application/Components/**/*.html');
 
 module.exports = function (env) {
   return [
@@ -16,9 +19,10 @@ module.exports = function (env) {
     {
       stats: { errorDetails: true },
       plugins: [
-        // new webpack.ProvidePlugin({
-        //   PortalClient: path.resolve(path.join(__dirname, 'dependencies/PortalClient/PortalClient.min.js')),
-        // }),
+        new webpack.ProvidePlugin({
+          $: 'jquery',
+          jQuery: 'jquery',
+        }),
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output
           // both options are optional
@@ -37,11 +41,12 @@ module.exports = function (env) {
       entry: {
         elicit_experiment: path.resolve(__dirname, 'source/application/Main.ts'),
         style_module: path.resolve(__dirname, `${stylRoot}/default.styl`),
+        templates: templates.map((template) => path.resolve(__dirname, template)),
       },
       output: {
         library: 'ElicitExperiment',
         libraryTarget: 'var',
-        filename: process.env.NODE_ENV === 'production' ? '[name]-[contenthash].js' : '[name].js',
+        filename: '[name]-[contenthash].js',
         path: path.resolve(__dirname, 'dist'),
         devtoolModuleFilenameTemplate: process.env.NODE_ENV === 'production' ? '[resource-path]' : void 0,
       },
@@ -115,9 +120,31 @@ module.exports = function (env) {
           Models: path.resolve(__dirname, 'source/application/Models'),
           Utility: path.resolve(__dirname, 'source/application/Utility'),
           Images: path.resolve(__dirname, 'source/application/Images'),
+          KnockoutBindings: path.resolve(__dirname, 'source/application/KnockoutBindings'),
           PortalClient: path.resolve(path.join(__dirname, 'dependencies/PortalClient/PortalClient.min.js')),
           WebGazer: path.resolve(path.join(__dirname, 'dependencies/webgazer/webgazer.commonjs2.js')),
         },
+      },
+      optimization: {
+        minimize: false,
+        // minimizer: [
+        //   // new TerserPlugin({
+        //   //   terserOptions: {
+        //   //     keep_classnames: true,
+        //   //   },
+        //   // }),
+        //   new UglifyJSPlugin({
+        //     cache: true,
+        //     parallel: true,
+        //     uglifyOptions: {
+        //       compress: true,
+        //       ecma: 6,
+        //       mangle: true,
+        //       keep_classnames: true,
+        //     },
+        //     sourceMap: true,
+        //   }),
+        // ],
       },
       devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
       devServer: {

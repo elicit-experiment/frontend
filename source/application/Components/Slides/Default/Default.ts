@@ -4,9 +4,7 @@ import QuestionModel = require('Models/Question');
 import ExperimentManager = require('Managers/Portal/Experiment');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import { KoComponent } from '../../../Utility/KoDecorators';
-import QuestionRadioButtonGroup = require('Components/Questions/RadioButtonGroup/RadioButtonGroup');
 
-@KoComponent({ template: require('./Default.html'), name: 'Slides/Default' })
 class Default {
   private _slide: SlideModel;
   private _uiLessQuestions: IQuestionViewModel[] = [];
@@ -138,5 +136,11 @@ class Default {
     this._slide.CanGoToNextSlide(allAnswered);
   }
 }
+
+import template = require('Components/Slides/Default/Default.html');
+knockout.components.register('Slides/Default', {
+  viewModel: Default,
+  template: template.default,
+});
 
 export = Default;

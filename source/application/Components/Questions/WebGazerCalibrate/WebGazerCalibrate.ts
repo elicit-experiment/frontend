@@ -4,12 +4,8 @@ import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import WebGazerManager = require('Managers/WebGazerManager');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import webgazer = require('WebGazer');
 
-@KoComponent({
-  template: null,
-  name: 'Questions/WebGazerCalibrate',
-})
 class WebGazerCalibrate extends QuestionBase<any> {
   public AnswerIsRequired = true;
   public HasMedia = false;
@@ -24,6 +20,8 @@ class WebGazerCalibrate extends QuestionBase<any> {
   public MinCalibrationAccuracyPct: number;
   public CalibrationFailed: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
+  private _helpModal: any = null;
+
   constructor(question: QuestionModel) {
     super(question, true);
 
@@ -33,7 +31,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
     const me = this;
-    WebGazerManager.Init()
+    WebGazerManager.Instance.Init()
       .then(() => {
         console.log('WebGazerCalibration: webgazer initialized');
         me.ClearCanvas();
@@ -48,7 +46,6 @@ class WebGazerCalibrate extends QuestionBase<any> {
         Swal.fire({
           title: 'Calibration',
           html: 'Failed to initialize calibration.  Experiment cannot be taken',
-          showLoaderOnConfirm: true,
           buttonsStyling: false,
           showCancelButton: true,
           customClass: {
@@ -114,11 +111,11 @@ class WebGazerCalibrate extends QuestionBase<any> {
     console.log('WebGazerCalibration: Failed');
     ExperimentManager.SlideTitle('Calibration failed');
 
-    WebGazerManager.HideCalibrationElements();
+    WebGazerManager.Instance.HideCalibrationElements();
     this.ClearCanvas();
     this.CalibrationFailed(true);
 
-    WebGazerManager.End();
+    WebGazerManager.Instance.End();
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -143,12 +140,15 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private ShowHelpModal() {
-    $('#helpModal').modal('show');
+    import('bootstrap').then((bootstrap) => {
+      this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
+      this._helpModal.show();
+    });
   }
 
   private PopUpInstruction() {
     /*
-        let instructions = "<div>"+
+        let instructions = "<div>"+we
         "<ul class='calibrate-instructions'><li>Click on each of the 9 points on the screen.</li>" +
         "<li>You must click on each point 5 times till it goes yellow.</li>"+
         "<li>Please ensure that your face is visible within the rectangle within the webcam video.</li>"+
@@ -179,6 +179,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
       '</div>';
 
     this.ClearCanvas();
+
     Swal.fire({
       title: 'Calibration',
       html: instructions,
@@ -191,7 +192,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
       showCancelButton: true,
     }).then(() => {
       console.log('WebGazerCalibration: Starting calibration.');
-      WebGazerManager.StartCalibration();
+      WebGazerManager.Instance.StartCalibration();
       this.ShowCalibrationPoint();
     });
   }
@@ -205,7 +206,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * This function clears the calibration buttons memory
    */
   private ClearCalibration() {
-    WebGazerManager.RestartCalibration();
+    WebGazerManager.Instance.RestartCalibration();
 
     const $Calibration = $('.Calibration');
     $Calibration.css('background-color', 'red');
@@ -233,7 +234,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
     this.HideWebGazerVideo();
 
-    WebGazerManager.StartTracking();
+    WebGazerManager.Instance.StartTracking();
 
     // TODO: maybe investigate parent of wgCalibrate from context?
     slideShell.GoToNextSlide();
@@ -243,6 +244,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
   private RestartCalibration() {
+    this._helpModal.hide();
     this.Restart(true);
   }
 
@@ -464,5 +466,11 @@ class WebGazerCalibrate extends QuestionBase<any> {
     super.AddRawEvent(eventType, 'WebGazerCalibrate', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html');
+knockout.components.register('Questions/WebGazerCalibrate', {
+  viewModel: WebGazerCalibrate,
+  template: template.default,
+});
 
 export = WebGazerCalibrate;

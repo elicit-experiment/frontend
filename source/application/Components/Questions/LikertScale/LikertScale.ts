@@ -1,15 +1,10 @@
 ﻿import knockout = require('knockout');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type ItemInfo = { Id: string; Label: string };
 type Item = { Label: string; Id: string; Selected: string };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/LikertScale',
-})
 class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
   public Items: ItemInfo[];
   public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
@@ -52,5 +47,11 @@ class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
     super.AddRawEvent(eventType, 'LikertScale', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/LikertScale/LikertScale.html');
+knockout.components.register('Questions/LikertScale', {
+  viewModel: LikertScale,
+  template: template.default,
+});
 
 export = LikertScale;

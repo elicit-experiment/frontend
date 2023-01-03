@@ -1,12 +1,8 @@
 ﻿import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import knockout from 'knockout';
 
-@KoComponent({
-  template: null,
-  name: 'Questions/Header',
-})
 class Header extends QuestionBase<any> {
   public HeaderLabel: string;
 
@@ -30,5 +26,11 @@ class Header extends QuestionBase<any> {
     super.AddRawEvent(eventType, 'Header', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/Header/Header.html');
+knockout.components.register('Questions/Header', {
+  viewModel: Header,
+  template: template.default,
+});
 
 export = Header;

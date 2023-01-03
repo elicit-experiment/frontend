@@ -1,16 +1,11 @@
 ﻿import knockout = require('knockout');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/TaggingA',
-})
 class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
   public UserTagsLabel: string;
@@ -180,5 +175,11 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
     super.AddRawEvent(eventType, 'TaggingA', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/TaggingA/TaggingA.html');
+knockout.components.register('Questions/TaggingA', {
+  viewModel: TaggingA,
+  template: template.default,
+});
 
 export = TaggingA;

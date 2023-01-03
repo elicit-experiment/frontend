@@ -9,14 +9,9 @@ import Search from 'Components/Questions/AudioInformationRetrieval/Search';
 import TimeLine from 'Components/Questions/AudioInformationRetrieval/TimeLine';
 import Rating from 'Components/Questions/AudioInformationRetrieval/Rating';
 import Audio from 'Utility/Audio';
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type Selection = { Identifier: string };
 
-@KoComponent({
-  template: require('./AudioInformationRetrieval.html'),
-  name: 'Questions/AudioInformationRetrieval',
-})
 class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }> {
   public SearchViewHeader: string;
 
@@ -82,5 +77,11 @@ class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }
     super.AddRawEvent(eventType, 'AudioInformationRetrieval', 'Instrument', method, data);
   }
 }
+
+import template = require('Components/Questions/AudioInformationRetrieval/AudioInformationRetrieval.html');
+knockout.components.register('Questions/AudioInformationRetrieval', {
+  viewModel: AudioInformationRetrieval,
+  template: template.default,
+});
 
 export = AudioInformationRetrieval;

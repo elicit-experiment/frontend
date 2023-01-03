@@ -1,12 +1,8 @@
 ﻿import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import * as knockout from 'knockout';
 
-@KoComponent({
-  template: null,
-  name: 'Questions/EndOfExperiment',
-})
 class EndOfExperiment extends QuestionBase<any> {
   constructor(question: QuestionModel) {
     super(question, false);
@@ -18,5 +14,10 @@ class EndOfExperiment extends QuestionBase<any> {
     super.AddRawEvent(eventType, 'EndOfExperiment', 'Instrument', method, data);
   }
 }
+
+knockout.components.register('Questions/EndOfExperiment', {
+  viewModel: EndOfExperiment,
+  template: '',
+});
 
 export = EndOfExperiment;

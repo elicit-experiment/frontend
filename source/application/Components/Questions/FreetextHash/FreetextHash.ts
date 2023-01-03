@@ -1,14 +1,10 @@
 ﻿import QuestionModel = require('Models/Question');
 import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
 import CryptoJS = require('crypto-js');
-import { KoComponent } from '../../../Utility/KoDecorators';
+import knockout from 'knockout';
 
 type Answer = { Value: string; Length: number };
 
-@KoComponent({
-  template: null,
-  name: 'Questions/FreetextHash',
-})
 class FreetextHash extends FreetextBase<Answer> {
   private _forceLowerCase: boolean;
 
@@ -33,5 +29,11 @@ class FreetextHash extends FreetextBase<Answer> {
     };
   }
 }
+
+import template = require('Components/Questions/FreetextHash/FreetextHash.html');
+knockout.components.register('Questions/FreetextHash', {
+  viewModel: FreetextHash,
+  template: template.default,
+});
 
 export = FreetextHash;

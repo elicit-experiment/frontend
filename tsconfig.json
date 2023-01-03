@@ -15,11 +15,12 @@
             "Managers/*": ["application/Managers"],
             "Models/*": ["application/Models"],
             "Images/*": ["application/Images"],
-            "Utility/*": ["application/Utility"]
+            "Utility/*": ["application/Utility"],
+            "KnockoutBindings/*": ["application/KnockoutBindings"]
         }
     },
     "include": [
-        "source/**/*"
+        "source/**/*.ts", "source/**/*.html", "source/**/*.json", "global.d.ts"
     ],
     "exclude": [
         "node_modules",

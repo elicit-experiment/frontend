@@ -2,15 +2,10 @@
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 import { shuffleInPlace } from 'Utility/ShuffleInPlace';
-import { KoComponent } from '../../../Utility/KoDecorators';
 
 type ItemInfo = { Id: string; Label: string; Correct: boolean; Feedback: string };
 type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
 
-@KoComponent({
-  template: require('./RadioButtonGroup.html'),
-  name: 'Questions/RadioButtonGroup',
-})
 class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: boolean }> {
   private _isOptional: boolean;
 
@@ -107,5 +102,11 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
     return info;
   }
 }
+
+import template = require('Components/Questions/RadioButtonGroup/RadioButtonGroup.html');
+knockout.components.register('Questions/RadioButtonGroup', {
+  viewModel: RadioButtonGroup,
+  template: template.default,
+});
 
 export = RadioButtonGroup;
