@@ -1,7 +1,4 @@
-﻿import jquery = require('jquery');
-import knockout = require('knockout');
-
-knockout.bindingHandlers['ScrollTo'] = {
+﻿export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
     const value: KnockoutObservable<(duration: number) => void> = valueAccessor();
@@ -13,4 +10,4 @@ knockout.bindingHandlers['ScrollTo'] = {
       $document.animate({ scrollTop: $element.offset().top }, duration);
     });
   },
-};
+} as KnockoutBindingHandler;

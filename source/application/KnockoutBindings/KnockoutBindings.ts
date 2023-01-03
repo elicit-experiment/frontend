@@ -5,4 +5,11 @@ import ScrollTo = require('KnockoutBindings/ScrollTo');
 import Height = require('KnockoutBindings/Height');
 import Width = require('KnockoutBindings/Width');
 
-export default { CanvasContext, Element: Element.default, ClickPosition, ScrollTo, Height, Width };
+export default {
+  CanvasContext: CanvasContext.default,
+  Element: Element.default,
+  ClickPosition: ClickPosition.default,
+  ScrollTo: ScrollTo.default,
+  Height: Height.default,
+  Width: Width.default,
+};

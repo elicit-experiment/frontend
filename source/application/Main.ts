@@ -1,5 +1,6 @@
 ﻿// Import our custom CSS
 import './Main.scss';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import jQuery from 'jquery';
 window.jQuery = jQuery;
@@ -49,9 +50,10 @@ import Unsupported = require('Components/Questions/Unsupported/Unsupported');
 import WebGazerCalibrate = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate');
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';
-// TODO: make this work
-//KnockoutBindings.forEach((binding: {string:KnockoutBindingHandler}) => (ko.bindingHandlers[binding.class.name] = binding));
-knockout.bindingHandlers['Element'] = KnockoutBindings.Element;
+
+for (const [bindingName, binding] of Object.entries(KnockoutBindings)) {
+  knockout.bindingHandlers[bindingName] = binding;
+}
 
 knockout.applyBindings({
   declarations: [

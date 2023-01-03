@@ -52,11 +52,9 @@ class Video {
       sub.dispose();
       this.InitializeHTML5VideoPlayer(e);
     });
-    console.log('hello');
 
     const sub2 = this.YouTubePlayerElement.subscribe((e) => {
       sub2.dispose();
-      console.log('hello');
       const callback = this.CreateYouTubePlayer.bind(this);
       Video.OnYouTubeInit(callback);
     });
@@ -80,7 +78,6 @@ class Video {
   private static _youTubeInitList: Array<CallableFunction> = [];
 
   private static OnYouTubeInit(cb: CallableFunction): void {
-    console.log('OnYouTubeInit');
     if (Video._isYouTubeLoaded) {
       cb();
       return;

@@ -35,7 +35,18 @@ module.exports = function (env) {
           title: 'Cockpit Experiments',
           lang: 'en',
           meta: { charset: 'utf-8', viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
-          templateContent: '<div data-bind="component: \'Shell\'">Loading...</div>',
+          templateContent: ({ htmlWebpackPlugin }) => `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        ${htmlWebpackPlugin.tags.headTags}
+      </head>
+      <body>
+        <div data-bind="component: \'Shell\'">Loading...</div>
+        ${htmlWebpackPlugin.tags.bodyTags}
+      </body>
+    </html>
+  `,
         }),
       ],
       entry: {
@@ -84,10 +95,9 @@ module.exports = function (env) {
               },
             ],
           },
-
           // for bootstrap
           {
-            test: /\.(scss)$/,
+            test: /\.(s?css)$/,
             use: [
               {
                 loader: 'style-loader',
@@ -107,6 +117,23 @@ module.exports = function (env) {
                 loader: 'sass-loader',
               },
             ],
+          },
+          {
+            test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            include: path.resolve(__dirname, './node_modules/bootstrap-icons/font/fonts'),
+            type: 'asset/resource',
+            generator: {
+              //filename: 'fonts/[name]-[hash][ext][query]'
+              filename: 'fonts/[name][ext][query]',
+            },
+            // xuse: {
+            //   loader: 'file-loader',
+            //   options: {
+            //     name: '[name].[ext]',
+            //     outputPath: 'fonts',
+            //     publicPath: '../fonts',
+            //   },
+            // },
           },
         ],
       },

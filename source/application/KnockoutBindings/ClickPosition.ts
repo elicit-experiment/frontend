@@ -1,7 +1,5 @@
-﻿import knockout = require('knockout');
-import jquery = require('jquery');
-
-knockout.bindingHandlers['ClickPosition'] = {
+﻿import jquery = require('jquery');
+export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
     const value: (x: number, y: number) => void = valueAccessor();
     const $element = jquery(element);
@@ -10,4 +8,4 @@ knockout.bindingHandlers['ClickPosition'] = {
     );
   },
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
-};
+} as KnockoutBindingHandler;
