@@ -38,16 +38,19 @@ class Default {
     };
 
     for (let i = 0; i < questions.length; i++) {
-      var questionModel = new QuestionModel(questions[i], (question) => this.AnswerChanged(question), loaded);
+      const questionModel = new QuestionModel(questions[i], (question) => this.AnswerChanged(question), loaded);
       questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
       this.Questions.push(questionModel);
 
+      // The UI-less elements won't get created by knockout, so we have to create them ourselves
       if (!questionModel.HasUIElement) {
+        knockout.components.get(questionModel.Type, (definition: KnockoutComponentTypes.Definition) => {
+          const question = definition.createViewModel(questionModel, {
+            element: document.getElementsByTagName('body')[0],
+          });
+          this._uiLessQuestions.push(question);
+        });
       }
-      //import(NameConventionLoader.GetFilePath(questionModel.Type)).then((x) => console.dir(x));
-      // ((m: QuestionModel) =>
-      //   require([NameConventionLoader.GetFilePath(questionModel.Type)], (vm: any) =>
-      //     this._uiLessQuestions.push(new vm(m))))(questionModel);
     }
 
     if (questions.length === 0) {
@@ -138,6 +141,7 @@ class Default {
 }
 
 import template = require('Components/Slides/Default/Default.html');
+import QuestionsBase from '../../Questions/QuestionBase';
 knockout.components.register('Slides/Default', {
   viewModel: Default,
   template: template.default,

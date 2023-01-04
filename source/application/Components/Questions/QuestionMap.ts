@@ -10,7 +10,7 @@ export function Get(key: string) {
 function Initialize() {
   _map = {
     Monitor: new QuestionMap('Questions/Monitor', false),
-    Header: new QuestionMap('Questions/Header', false),
+    Header: new QuestionMap('Questions/Header', true),
     EndOfExperiment: new QuestionMap('Questions/EndOfExperiment', false),
     introductions_r001: new QuestionMap('Questions/Introduction'),
     'BooleanQuestion, 1.0': new QuestionMap('Questions/Boolean'),

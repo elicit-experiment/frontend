@@ -1,4 +1,5 @@
-﻿import QuestionBase = require('Components/Questions/QuestionBase');
+﻿import knockout = require('knockout');
+import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import MouseTrackingManager = require('Managers/MouseTrackingManager');
 
@@ -51,5 +52,10 @@ class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; Ti
     super.AddRawEvent(eventType, 'Monitor', 'Instrument', method, data);
   }
 }
+
+knockout.components.register('Questions/Monitor', {
+  viewModel: Monitor,
+  template: '<div></div>',
+});
 
 export = Monitor;

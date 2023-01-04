@@ -22,7 +22,9 @@ class Slide {
     this.Name = name;
     this.CanGoToNextSlide = canGoToNextSlide;
     this.Questions = questions;
-    this.IsWorking = knockout.computed(() => (this._isWorking() != null ? this._isWorking()() : false));
+    this.IsWorking = knockout.computed(() => {
+      return this._isWorking() != null ? this._isWorking()() : false;
+    });
   }
 
   public Complete(callback: () => void): void {

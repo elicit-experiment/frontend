@@ -6,8 +6,6 @@ import jQuery from 'jquery';
 window.jQuery = jQuery;
 window.$ = jQuery;
 
-//import * as bootstrap from 'bootstrap';
-
 import 'promise-polyfill';
 import 'whatwg-fetch';
 import * as knockout from 'knockout';
@@ -38,6 +36,7 @@ import Freetext = require('Components/Questions/Freetext/Freetext');
 import FreetextHash = require('Components/Questions/FreetextHash/FreetextHash');
 import KAcPS = require('Components/Questions/KAcPS/KAcPS');
 import Monitor = require('Components/Questions/Monitor/Monitor');
+import Header = require('Components/Questions/Header/Header');
 import OneDScale = require('Components/Questions/OneDScale/OneDScale');
 import LikertScale = require('Components/Questions/LikertScale/LikertScale');
 import OneDScaleT = require('Components/Questions/OneDScaleT/OneDScaleT');
@@ -80,6 +79,7 @@ knockout.applyBindings({
     ContinousScale2D,
     EndOfExperiment,
     QuestionRadioButtonGroup,
+    Header,
     Freetext,
     FreetextHash,
     KAcPS,

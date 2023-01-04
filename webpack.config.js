@@ -38,9 +38,6 @@ module.exports = function (env) {
           templateContent: ({ htmlWebpackPlugin }) => `
     <!DOCTYPE html>
     <html>
-      <head>
-        ${htmlWebpackPlugin.tags.headTags}
-      </head>
       <body>
         <div data-bind="component: \'Shell\'">Loading...</div>
         ${htmlWebpackPlugin.tags.bodyTags}
@@ -52,7 +49,7 @@ module.exports = function (env) {
       entry: {
         elicit_experiment: path.resolve(__dirname, 'source/application/Main.ts'),
         style_module: path.resolve(__dirname, `${stylRoot}/default.styl`),
-        templates: templates.map((template) => path.resolve(__dirname, template)),
+        //templates: templates.map((template) => path.resolve(__dirname, template)),
       },
       output: {
         library: 'ElicitExperiment',
@@ -70,7 +67,17 @@ module.exports = function (env) {
           },
           {
             test: /\.html?(\?.+)?$/,
-            use: ['html-loader'],
+            use: [
+              {
+                loader: 'html-loader',
+                options: {
+                  minimize: {
+                    removeComments: false,
+                    collapseWhitespace: false,
+                  },
+                },
+              },
+            ],
           },
           {
             test: /\.json/,

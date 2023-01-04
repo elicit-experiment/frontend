@@ -27,10 +27,9 @@ class Header extends QuestionBase<any> {
   }
 }
 
-import template = require('Components/Questions/Header/Header.html');
 knockout.components.register('Questions/Header', {
   viewModel: Header,
-  template: template.default,
+  template: '<div></div>',
 });
 
 export = Header;

@@ -9,6 +9,8 @@ class SlideShell {
 
   public SlideData: KnockoutObservable<SlideModel> = knockout.observable<SlideModel>();
 
+  public SlideComponent: KnockoutComputed<{ name: string; params: any }>;
+
   public AreAllQuestionsAnswered: KnockoutObservable<boolean> = knockout.observable(false);
   public SlideIndex: KnockoutObservable<number>;
   public SlideNumber: KnockoutComputed<number>;
@@ -30,12 +32,18 @@ class SlideShell {
 
   constructor() {
     this.IsLoadingSlide = knockout.computed(() => {
-      //console.log(`SlideShell.ts: IsLoadingSlide: ${this.SlideData()} `);
       return !this.SlideData();
     });
+
     this.SlideIndex = ExperimentManager.CurrentSlideIndex;
     this.SlideNumber = knockout.computed(() => this.SlideIndex() + 1);
     this.NumberOfSlides = ExperimentManager.NumberOfSlides;
+
+    this.SlideComponent = knockout.computed(() => {
+      if (this.SlideData()) {
+        return { name: this.SlideData().Name, params: this.SlideData() };
+      }
+    });
 
     this.IsWaiting = knockout.computed(() => this.IsWaitingForNext());
 
@@ -50,7 +58,6 @@ class SlideShell {
     });
     this.IsNextSlideEnabled = knockout.computed(() => {
       const enabled = this.IsNextSlideVisible() && !this.IsLoadingSlide() && !this.IsWaiting();
-      //console.log(`SlideShell.ts: IsNextSlideEnabled: visible: ${this.IsNextSlideVisible()} not-loading: ${!this.IsLoadingSlide()} not waiting: ${!this.IsWaiting()} => ${enabled}`);
       return enabled;
     });
     this.IsCloseExperimentVisible = knockout.computed(
@@ -82,9 +89,10 @@ class SlideShell {
     this.IsWaitingForNext(true);
 
     this.DoWhenDone(
-      () => !this.IsLoadingSlide() && !this.SlideData().IsWorking(),
       () => {
-        //console.log('SlideShell.ts: GoToNextSlide Going to next slide?');
+        return !this.IsLoadingSlide() && !this.SlideData().IsWorking();
+      },
+      () => {
         this.IsWaitingForNext(false);
 
         if (this.AreAllQuestionsAnswered()) {
