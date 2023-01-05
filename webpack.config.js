@@ -1,9 +1,8 @@
-var path = require('path');
-var MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-//const UglifyJSPlugin = require('uglify-js');
 const webpack = require('webpack');
 const glob = require('glob');
 
@@ -34,6 +33,7 @@ module.exports = function (env) {
           favicon: './dependencies/favicon.png',
           title: 'Cockpit Experiments',
           lang: 'en',
+          minify: false,
           meta: { charset: 'utf-8', viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
           templateContent: ({ htmlWebpackPlugin }) => `
     <!DOCTYPE html>
