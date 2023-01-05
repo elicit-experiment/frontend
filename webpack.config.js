@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
@@ -5,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const glob = require('glob');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const stylRoot = 'source/application/Style';
 templates = glob.sync('source/application/Components/**/*.html');
@@ -44,6 +46,9 @@ module.exports = function (env) {
       </body>
     </html>
   `,
+        }),
+        new CompressionPlugin({
+          algorithm: 'gzip',
         }),
       ],
       entry: {
@@ -160,25 +165,14 @@ module.exports = function (env) {
         },
       },
       optimization: {
-        minimize: false,
-        // minimizer: [
-        //   // new TerserPlugin({
-        //   //   terserOptions: {
-        //   //     keep_classnames: true,
-        //   //   },
-        //   // }),
-        //   new UglifyJSPlugin({
-        //     cache: true,
-        //     parallel: true,
-        //     uglifyOptions: {
-        //       compress: true,
-        //       ecma: 6,
-        //       mangle: true,
-        //       keep_classnames: true,
-        //     },
-        //     sourceMap: true,
-        //   }),
-        // ],
+        //        minimize: false,
+        minimizer: [
+          new TerserPlugin({
+            terserOptions: {
+              keep_classnames: true,
+            },
+          }),
+        ],
       },
       devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'inline-source-map',
       devServer: {
