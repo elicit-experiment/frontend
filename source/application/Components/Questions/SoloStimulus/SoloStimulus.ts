@@ -4,7 +4,6 @@ import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import MediaInfo = require('Components/Players/MediaInfo');
-import WebGazerManager = require('Managers/WebGazerManager');
 
 class SoloStimulus extends QuestionBase<any> {
   public MediaLabel = '';
@@ -20,6 +19,7 @@ class SoloStimulus extends QuestionBase<any> {
   public EventId = 'SoloStimulus';
   public CanStartPlaying: KnockoutObservable<boolean> = knockout.observable(true);
   public UsesWebGazer = false;
+  private webgazerManager: typeof WebGazerManager = null;
 
   protected _pointsSubscription: KnockoutSubscription;
 
@@ -30,49 +30,82 @@ class SoloStimulus extends QuestionBase<any> {
 
     this.UsesWebGazer = stimulus.Type.indexOf('+webgazer') !== -1;
 
-    if (this.UsesWebGazer && !WebGazerManager.Instance.Ready()) {
-      WebGazerManager.Instance.Init().then(() => {
-        //WebGazer.Restart(false);
-        document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video');
+    if (this.UsesWebGazer) {
+      import('Managers/WebGazerManager').then((x) => {
+        this.webgazerManager = x.default;
 
-        Swal.fire({
-          title: 'Calibration',
-          text:
-            "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
-          showCancelButton: false,
-        }).then(() => {
-          console.log('Starting calibration.');
+        if (!this.webgazerManager.Instance.Ready()) {
+          this.InitWebgazer(this.webgazerManager);
+        }
 
-          WebGazerManager.Instance.StartCalibration();
-
-          const player = document.getElementById('player');
-          const playerBBox = player.getBoundingClientRect();
-          const videoFeed = document.getElementById('webgazerVideoFeed');
-          const videoBBox = videoFeed.getBoundingClientRect();
-          const scale =
-            Math.round(10.0 * Math.min(playerBBox.width / videoBBox.width, playerBBox.height / videoBBox.height)) /
-            10.0;
-          const tx = Math.round(10.0 * (playerBBox.left + playerBBox.width / 2 - videoBBox.width / 2)) / 10.0;
-          const ty = Math.round(10.0 * (playerBBox.top + playerBBox.height / 2 - videoBBox.height / 2)) / 10.0;
-          const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
-          WebGazerManager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
-            (el: HTMLElement) => (el.style.transform = transform),
-          );
-        });
+        this.InitWebgazerPoints(this.webgazerManager);
       });
     } else {
-      for (const pt of <HTMLElement[]>(<any>document.querySelectorAll('.video-calibration-point'))) {
-        pt.style.display = 'none';
-      }
-      for (const instructions of <HTMLElement[]>(<any>document.querySelectorAll('.calibration-instructions'))) {
-        instructions.style.display = 'none';
-      }
-      this.CanStartPlaying(true);
+      this.InitNonWebgazer();
     }
 
+    this.MediaComponentName = MediaInfo.MimeTypeToPlayerType[stimulus.Type];
+
+    if (this.MediaComponentName == undefined) {
+      console.error(`MediaComponentName unknown for ${stimulus.Type}`);
+    }
+
+    this.MediaLabel = this.GetFormatted(stimulus.Label);
+
+    this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
+    this.TrackMediaInfo(this.EventId, this.MediaInfo);
+
+    this.MediaInfo.AddScreenElementLocationCallback((bbox) => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
+
+    this.HasMedia = true;
+
+    this.CanAnswer.subscribe((v) => {
+      if (!!v) {
+        this.SetAnswer({ completed: v });
+      }
+    });
+
+    const played = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
+    if (played()) this.CanAnswer(true);
+    else played.subscribe(() => this.CanAnswer(true));
+  }
+
+  private InitWebgazer(manager: typeof WebGazerManager) {
+    manager.Instance.Init().then(() => {
+      //WebGazer.Restart(false);
+      document.getElementsByTagName('body')[0].classList.remove('hide-webgazer-video');
+
+      Swal.fire({
+        title: 'Calibration',
+        text:
+          "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
+        showCancelButton: false,
+      }).then(() => {
+        console.log('Starting calibration.');
+
+        manager.Instance.StartCalibration();
+
+        const player = document.getElementById('player');
+        const playerBBox = player.getBoundingClientRect();
+        const videoFeed = document.getElementById('webgazerVideoFeed');
+        const videoBBox = videoFeed.getBoundingClientRect();
+        const scale =
+          Math.round(10.0 * Math.min(playerBBox.width / videoBBox.width, playerBBox.height / videoBBox.height)) / 10.0;
+        const tx = Math.round(10.0 * (playerBBox.left + playerBBox.width / 2 - videoBBox.width / 2)) / 10.0;
+        const ty = Math.round(10.0 * (playerBBox.top + playerBBox.height / 2 - videoBBox.height / 2)) / 10.0;
+        const transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+        manager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
+          (el: HTMLElement) => (el.style.transform = transform),
+        );
+      });
+      this.InitWebgazerPoints(manager);
+    });
+  }
+
+  private InitWebgazerPoints(manager: typeof WebGazerManager) {
     let pointIndex = 0;
     const points: Array<any> = [];
-    this._pointsSubscription = WebGazerManager.Instance.currentPoint.subscribe((v: any) => {
+    this._pointsSubscription = manager.Instance.currentPoint.subscribe((v: any) => {
       pointIndex = pointIndex++ % 1000;
 
       let dataPoint;
@@ -108,31 +141,16 @@ class SoloStimulus extends QuestionBase<any> {
 
       points.push(dataPoint);
     });
+  }
 
-    this.MediaComponentName = MediaInfo.MimeTypeToPlayerType[stimulus.Type];
-
-    if (this.MediaComponentName == undefined) {
-      console.error(`MediaComponentName unknown for ${stimulus.Type}`);
+  private InitNonWebgazer() {
+    for (const pt of <HTMLElement[]>(<any>document.querySelectorAll('.video-calibration-point'))) {
+      pt.style.display = 'none';
     }
-
-    this.MediaLabel = this.GetFormatted(stimulus.Label);
-
-    this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
-    this.TrackMediaInfo(this.EventId, this.MediaInfo);
-
-    this.MediaInfo.AddScreenElementLocationCallback((bbox) => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
-
-    this.HasMedia = true;
-
-    this.CanAnswer.subscribe((v) => {
-      if (!!v) {
-        this.SetAnswer({ completed: v });
-      }
-    });
-
-    const played = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
-    if (played()) this.CanAnswer(true);
-    else played.subscribe(() => this.CanAnswer(true));
+    for (const instructions of <HTMLElement[]>(<any>document.querySelectorAll('.calibration-instructions'))) {
+      instructions.style.display = 'none';
+    }
+    this.CanStartPlaying(true);
   }
 
   public SlideCompleted(): boolean {
@@ -207,11 +225,11 @@ class SoloStimulus extends QuestionBase<any> {
           // TODO: refactor with calibration check in ctor
           (<HTMLElement>document.querySelector('.calibration-instructions')).style.display = 'none';
 
-          WebGazerManager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
+          this.webgazerManager.Instance.VIDEO_ELEMENTS.map((id: string) => document.getElementById(id)).forEach(
             (el: HTMLElement) => (el.style.display = 'none'),
           );
 
-          WebGazerManager.Instance.StartTracking();
+          this.webgazerManager.Instance.StartTracking();
 
           this.CanStartPlaying(true);
         }
@@ -247,6 +265,8 @@ class SoloStimulus extends QuestionBase<any> {
 }
 
 import template = require('Components/Questions/SoloStimulus/SoloStimulus.html');
+import WebGazerManager from '../../../Managers/WebGazerManager';
+
 knockout.components.register('Questions/SoloStimulus', {
   viewModel: SoloStimulus,
   template: template.default,

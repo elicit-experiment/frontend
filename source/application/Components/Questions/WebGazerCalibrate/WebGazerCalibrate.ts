@@ -3,8 +3,6 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
-import WebGazerManager = require('Managers/WebGazerManager');
-import webgazer = require('WebGazer');
 
 class WebGazerCalibrate extends QuestionBase<any> {
   public AnswerIsRequired = true;
@@ -22,6 +20,8 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
   private _helpModal: any = null;
 
+  private webgazerManager: typeof WebGazerManager = null;
+
   constructor(question: QuestionModel) {
     super(question, true);
 
@@ -31,7 +31,11 @@ class WebGazerCalibrate extends QuestionBase<any> {
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
     const me = this;
-    WebGazerManager.Instance.Init()
+    import('Managers/WebGazerManager')
+      .then((webgazerManagerImport) => {
+        this.webgazerManager = webgazerManagerImport.default;
+      })
+      .then(() => this.webgazerManager.Instance.Init())
       .then(() => {
         console.log('WebGazerCalibration: webgazer initialized');
         me.ClearCanvas();
@@ -111,11 +115,11 @@ class WebGazerCalibrate extends QuestionBase<any> {
     console.log('WebGazerCalibration: Failed');
     ExperimentManager.SlideTitle('Calibration failed');
 
-    WebGazerManager.Instance.HideCalibrationElements();
+    this.webgazerManager.Instance.HideCalibrationElements();
     this.ClearCanvas();
     this.CalibrationFailed(true);
 
-    WebGazerManager.Instance.End();
+    this.webgazerManager.Instance.End();
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -192,7 +196,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
       showCancelButton: true,
     }).then(() => {
       console.log('WebGazerCalibration: Starting calibration.');
-      WebGazerManager.Instance.StartCalibration();
+      this.webgazerManager.Instance.StartCalibration();
       this.ShowCalibrationPoint();
     });
   }
@@ -206,7 +210,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * This function clears the calibration buttons memory
    */
   private ClearCalibration() {
-    WebGazerManager.Instance.RestartCalibration();
+    this.webgazerManager.Instance.RestartCalibration();
 
     const $Calibration = $('.Calibration');
     $Calibration.css('background-color', 'red');
@@ -234,7 +238,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
     this.HideWebGazerVideo();
 
-    WebGazerManager.Instance.StartTracking();
+    this.webgazerManager.Instance.StartTracking();
 
     // TODO: maybe investigate parent of wgCalibrate from context?
     slideShell.GoToNextSlide();
@@ -301,7 +305,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
 
           me.sleep(5000).then(() => {
             me.stop_storing_points_variable(); // stop storing the prediction points
-            const past50 = webgazer.getStoredPoints(); // retrieve the stored points
+            const past50 = me.webgazerManager.Instance.webgazer.getStoredPoints(); // retrieve the stored points
             const precision_measurement = me.calculatePrecision(past50);
             const accuracyLabel = '<a>Accuracy | ' + precision_measurement + '%</a>';
             document.getElementById('Accuracy').innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
@@ -375,7 +379,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private store_points_variable() {
-    webgazer.params.storingPoints = true;
+    this.webgazerManager.Instance.webgazer.params.storingPoints = true;
   }
 
   /*
@@ -383,7 +387,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
    * stored any more
    */
   private stop_storing_points_variable() {
-    webgazer.params.storingPoints = false;
+    this.webgazerManager.Instance.webgazer.params.storingPoints = false;
   }
 
   private calculatePrecision(past50Array: number[][]) {
@@ -468,9 +472,10 @@ class WebGazerCalibrate extends QuestionBase<any> {
 }
 
 import template = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html');
+import WebGazerManager from '../../../Managers/WebGazerManager';
 knockout.components.register('Questions/WebGazerCalibrate', {
   viewModel: WebGazerCalibrate,
   template: template.default,
 });
-
+console.log('WebGazerCalibrate');
 export = WebGazerCalibrate;

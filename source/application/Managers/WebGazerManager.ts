@@ -54,6 +54,8 @@ class WebGazerManager extends DisposableComponent {
 
   public _autoSendTimer: number = null;
 
+  public webgazer: typeof webgazer;
+
   public VIDEO_ELEMENTS = [
     'webgazerVideoFeed',
     'webgazerVideoCanvas',
@@ -85,6 +87,7 @@ class WebGazerManager extends DisposableComponent {
 
   public Init(): Promise<void> {
     const self = this;
+    this.webgazer = webgazer;
 
     // Set up the webgazer video feedback.
     const setupVideoCanvas = function () {
@@ -409,4 +412,4 @@ class WebGazerManager extends DisposableComponent {
   }
 }
 
-export = WebGazerManager;
+export default WebGazerManager;
