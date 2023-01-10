@@ -5,11 +5,13 @@
 			<label class="Freetext">
 				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
 				<!-- ko if: IsResizeable -->
-					<textarea type="textarea" class="form-control" data-bind="textInput: Answer, attr: GetResizableDimensions()"/>
+					<textarea type="textarea" class="form-control" data-bind="textInput: Answer, attr: GetResizableDimensions()"></textarea>
 				<!-- /ko -->
+
 				<!-- ko if: !IsResizeable -->
 					<input type="text" class="form-control" data-bind="textInput: Answer"/>
 				<!-- /ko -->
+
 				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
 			</label>
 		</div>
@@ -18,4 +20,3 @@
 </script>
 
 <div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
-
