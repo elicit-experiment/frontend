@@ -3,22 +3,28 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 import ExperimentManager = require('Managers/Portal/Experiment');
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
+import bootstrap = require('bootstrap');
 
-class WebGazerCalibrate extends QuestionBase<any> {
+interface CalibrationPoint {
+  [key: string]: number;
+}
+
+class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   public AnswerIsRequired = true;
   public HasMedia = false;
   public CanAnswer: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
   public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
 
   public PointCalibrate = 0;
-  public CalibrationPoints = <any>[];
+  public CalibrationPoints: CalibrationPoint = {};
   public currentAccuracy: number;
   public MaxNoOfAttempts: number;
   public NoOfAttempts = 1;
   public MinCalibrationAccuracyPct: number;
   public CalibrationFailed: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
 
-  private _helpModal: any = null;
+  private _helpModal: bootstrap.Modal = null;
+  private _loadingModal: bootstrap.Modal = null;
 
   private webgazerManager: typeof WebGazerManager = null;
 
@@ -30,7 +36,9 @@ class WebGazerCalibrate extends QuestionBase<any> {
     this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
-    const me = this;
+    this._loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    this._loadingModal.show();
+
     import('Managers/WebGazerManager')
       .then((webgazerManagerImport) => {
         this.webgazerManager = webgazerManagerImport.default;
@@ -38,11 +46,12 @@ class WebGazerCalibrate extends QuestionBase<any> {
       .then(() => this.webgazerManager.Instance.Init())
       .then(() => {
         console.log('WebGazerCalibration: webgazer initialized');
-        me.ClearCanvas();
+        this._loadingModal.hide();
+        this.ClearCanvas();
 
-        me.ShowHelpModal();
+        this.ShowHelpModal();
 
-        $('.Calibration').on('click', (event) => me.HandleCalibrationClick(event));
+        $('.Calibration').on('click', (event) => this.HandleCalibrationClick(event));
       })
       .catch((exception) => {
         console.error('WebGazerCalibration: failed to upload test packet');
@@ -83,7 +92,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
   /**
    * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
-  public Restart(showInstructions: boolean) {
+  public Restart(showInstructions: boolean): void {
     const accuracy = document.getElementById('Accuracy');
     if (accuracy) {
       accuracy.innerHTML = '<a>Not yet Calibrated</a>';
@@ -94,13 +103,13 @@ class WebGazerCalibrate extends QuestionBase<any> {
     }
   }
 
-  public HideWebGazerVideo() {
+  public HideWebGazerVideo(): void {
     ['webgazerVideoFeed', 'webgazerVideoCanvas', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) =>
       $('#' + s).hide(),
     );
   }
 
-  public ShowWebGazerVideo() {
+  public ShowWebGazerVideo(): void {
     ['webgazerVideoFeed', 'webgazerFaceOverlay', 'webgazerFaceFeedbackBox'].forEach((s) => $('#' + s).show());
   }
 
@@ -111,7 +120,7 @@ class WebGazerCalibrate extends QuestionBase<any> {
     return false;
   }
 
-  public FailedToCalibrate() {
+  public FailedToCalibrate(): void {
     console.log('WebGazerCalibration: Failed');
     ExperimentManager.SlideTitle('Calibration failed');
 
@@ -125,13 +134,6 @@ class WebGazerCalibrate extends QuestionBase<any> {
   protected HasValidAnswer(answer: any): boolean {
     answer = answer || this.GetAnswer();
 
-    /*
-        console.log(`WGCalibrate CanAnswer: ${this.CanAnswer()}`);
-        console.log(`WGCalibrate answer: ${answer}`);
-        console.log(`WGCalibrate answer: ${this.GetAnswer()}`);
-        console.dir(answer);
-*/
-
     return 'CalibrationAccuracy' in answer && answer.CalibrationAccuracy > this.GetMinCalibrationAccuracyPct();
   }
 
@@ -144,31 +146,11 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private ShowHelpModal() {
-    import('bootstrap').then((bootstrap) => {
-      this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
-      this._helpModal.show();
-    });
+    this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
+    this._helpModal.show();
   }
 
   private PopUpInstruction() {
-    /*
-        let instructions = "<div>"+we
-        "<ul class='calibrate-instructions'><li>Click on each of the 9 points on the screen.</li>" +
-        "<li>You must click on each point 5 times till it goes yellow.</li>"+
-        "<li>Please ensure that your face is visible within the rectangle within the webcam video.</li>"+
-        "<li>When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.</li>" +
-        "<li>Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow.</li>"+ 
-        "<li>Please try to hold your head steady during the process.  This will calibrate your eye movements.</li>" + 
-        "</ul></div>";
-
-        if (!!this.GetMinCalibrationAccuracyPct()) {
-            instructions += `<b>You must score ${this.GetMinCalibrationAccuracyPct()}% accuracy to continue</b><br/>`;
-        }
-        if (!!this.MaxNoOfAttempts) {
-            instructions += `  You have <b>${this.MaxNoOfAttempts}</b> attempts.`
-        }
-*/
-
     const accuracyRequirement =
       !!this.GetMinCalibrationAccuracyPct() && !!this.MaxNoOfAttempts
         ? `You have ${this.MaxNoOfAttempts} attempts to achieve ${this.GetMinCalibrationAccuracyPct()}% accuracy.<br/>`
@@ -253,7 +235,6 @@ class WebGazerCalibrate extends QuestionBase<any> {
   }
 
   private HandleCalibrationClick(event: Event) {
-    const me = this;
     const id = $(event.currentTarget).attr('id');
     const $cal = $(event.currentTarget);
 
@@ -300,25 +281,25 @@ class WebGazerCalibrate extends QuestionBase<any> {
         customClass: 'calibration-confirmation',
       }).then(() => {
         // makes the variables true for 5 seconds & plots the points
-        $(document).ready(function () {
-          me.store_points_variable(); // start storing the prediction points
+        $(document).ready(() => {
+          this.store_points_variable(); // start storing the prediction points
 
-          me.sleep(5000).then(() => {
-            me.stop_storing_points_variable(); // stop storing the prediction points
-            const past50 = me.webgazerManager.Instance.webgazer.getStoredPoints(); // retrieve the stored points
-            const precision_measurement = me.calculatePrecision(past50);
-            const accuracyLabel = '<a>Accuracy | ' + precision_measurement + '%</a>';
+          this.sleep(5000).then(() => {
+            this.stop_storing_points_variable(); // stop storing the prediction points
+            const past50 = this.webgazerManager.Instance.webgazer.getStoredPoints(); // retrieve the stored points
+            const precisionMeasurement = this.calculatePrecision(past50);
+            const accuracyLabel = '<a>Accuracy | ' + precisionMeasurement + '%</a>';
             document.getElementById('Accuracy').innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
-            me.currentAccuracy = precision_measurement;
+            this.currentAccuracy = precisionMeasurement;
             let title = '';
-            let html = `Your accuracy measure is ${precision_measurement}%<br/>`;
+            let html = `Your accuracy measure is ${precisionMeasurement}%<br/>`;
             let showCancelButton = false;
-            const minimumCalibrationAccuracy = me.GetMinCalibrationAccuracyPct();
+            const minimumCalibrationAccuracy = this.GetMinCalibrationAccuracyPct();
             let confirmButtonText = '';
             let cancelButtonText = '';
             let confirmIsRecalibrate = false;
 
-            if (me.currentAccuracy >= minimumCalibrationAccuracy) {
+            if (this.currentAccuracy >= minimumCalibrationAccuracy) {
               confirmButtonText = 'Go on to the survey';
               cancelButtonText = 'Recalibrate';
               showCancelButton = true;
@@ -330,19 +311,19 @@ class WebGazerCalibrate extends QuestionBase<any> {
               html += `The experiment requires a minimum of ${minimumCalibrationAccuracy}.<br/>`;
               html += 'Please try again.<br/>';
 
-              if (!!me.MaxNoOfAttempts) {
-                const remainingAttempts = me.MaxNoOfAttempts - me.NoOfAttempts;
+              if (!!this.MaxNoOfAttempts) {
+                const remainingAttempts = this.MaxNoOfAttempts - this.NoOfAttempts;
                 console.log(`WebGazerCalibration: remaining attempts ${remainingAttempts}`);
                 if (remainingAttempts > 0) {
                   html += `  You have ${remainingAttempts} attempts remaining`;
                 } else {
-                  me.FailedToCalibrate();
+                  this.FailedToCalibrate();
                   return;
                 }
               }
             }
 
-            me.NoOfAttempts += 1;
+            this.NoOfAttempts += 1;
 
             Swal.fire({
               title,
@@ -354,8 +335,8 @@ class WebGazerCalibrate extends QuestionBase<any> {
             }).then((result: SweetAlertResult) => {
               if (result.value && !confirmIsRecalibrate) {
                 //clear the calibration & hide the last middle button
-                me.ClearCanvas();
-                me.CalibrationCompleted();
+                this.ClearCanvas();
+                this.CalibrationCompleted();
               } else {
                 // TODO: I cannot figure out how to clear the webgazer calibration and restart it.
                 // It fails to begin() after end() is called.  See WebgazerManager#ClearCalibration.
@@ -365,11 +346,6 @@ class WebGazerCalibrate extends QuestionBase<any> {
                 document.cookie = 'session_guid=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 
                 window.location.reload();
-                /*
-                                me.ClearCalibration();
-                                me.ClearCanvas();
-                                me.ShowCalibrationPoint();
-                                */
               }
             });
           });
