@@ -1,3 +1,9 @@
+<div class="VideoControls loading" data-bind="Element: PlayerControlsElement">
+	<button type="button" class="btn btn-default" aria-label="Left Align" data-bind="click: TogglePlay, Element: PlayButtonElement">
+		<i class="bi bi-play-circle" aria-hidden="true" data-bind="visible: !IsPlaying()"></i>
+		<i class="bi bi-stop-circle" aria-hidden="true" data-bind="visible: IsPlaying()"></i>
+	</button>
+</div>
 <div class="video-wrapper">
 	<!-- ko if: SourceType === 'youtube' -->
 	<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
@@ -6,10 +12,4 @@
 	<video class="VideoPlayer" crossOrigin="anonymous" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">
 	</video>
 	<!-- /ko -->
-</div>
-<div class="VideoControls loading" data-bind="Element: PlayerControlsElement">
-	<button type="button" class="btn btn-default" aria-label="Left Align" data-bind="click: TogglePlay, Element: PlayButtonElement">
-		<i class="bi bi-play-circle" aria-hidden="true" data-bind="visible: !IsPlaying()"></i>
-		<i class="bi bi-stop-circle" aria-hidden="true" data-bind="visible: IsPlaying()"></i>
-	</button>	
 </div>
