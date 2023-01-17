@@ -38,6 +38,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     this._loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     this._loadingModal.show();
+    this.ClearCanvas();
 
     import('Managers/WebGazerManager')
       .then((webgazerManagerImport) => {
@@ -46,10 +47,16 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       .then(() => this.webgazerManager.Instance.Init())
       .then(() => {
         console.log('WebGazerCalibration: webgazer initialized');
-        this._loadingModal.hide();
-        this.ClearCanvas();
-
-        this.ShowHelpModal();
+        console.timeStamp('WebGazerCalibration: webgazer initialized');
+        //window.requestIdleCallback(
+        window.setTimeout(
+          () => {
+            this._loadingModal.hide();
+            this.ShowHelpModal();
+          },
+          10000,
+          //,{ timeout: 10000 },
+        );
 
         $('.Calibration').on('click', (event) => this.HandleCalibrationClick(event));
       })
@@ -114,14 +121,14 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 
   public SlideCompleted(): boolean {
-    console.log('WebGazerCalibration: Completed');
+    console.timeStamp('WebGazerCalibration: Completed');
     ExperimentManager.SlideTitle('');
 
     return false;
   }
 
   public FailedToCalibrate(): void {
-    console.log('WebGazerCalibration: Failed');
+    console.timeStamp('WebGazerCalibration: Failed');
     ExperimentManager.SlideTitle('Calibration failed');
 
     this.webgazerManager.Instance.HideCalibrationElements();
@@ -148,6 +155,8 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   private ShowHelpModal() {
     this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
     this._helpModal.show();
+    console.log('Show helpmodal');
+    console.timeStamp('Show helpmodal');
   }
 
   private PopUpInstruction() {
@@ -169,7 +178,6 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
     Swal.fire({
       title: 'Calibration',
       html: instructions,
-      showLoaderOnConfirm: true,
       buttonsStyling: false,
       customClass: {
         confirmButton: 'btn btn-primary btn-lg',
@@ -192,7 +200,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
    * This function clears the calibration buttons memory
    */
   private ClearCalibration() {
-    this.webgazerManager.Instance.RestartCalibration();
+    this.webgazerManager.Instance.RestartCalibration().then(() => console.timeStamp('ClearCalibration complete'));
 
     const $Calibration = $('.Calibration');
     $Calibration.css('background-color', 'red');
@@ -229,6 +237,14 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   /**
    * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
+  private BeginCalibration() {
+    console.log('BeginCalibratioon');
+    this._helpModal.hide();
+    return new Promise(() => {
+      this.Restart(true);
+    });
+  }
+
   private RestartCalibration() {
     this._helpModal.hide();
     this.Restart(true);

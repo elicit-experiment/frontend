@@ -298,7 +298,7 @@ define(['webgazer', 'swal', 'knockout'], (webgazer, swal, ko) => {
     //start the webgazer tracker
     webgazer
       .setRegression('ridge') /* currently must set regression and tracker */
-      .setTracker('clmtrackr')
+      .setTracker('TFFacemesh')
       .setGazeListener(function (data, clock) {
         currentPoint({
           data: data /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */,

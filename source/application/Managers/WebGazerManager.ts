@@ -86,7 +86,6 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public Init(): Promise<void> {
-    const self = this;
     this.webgazer = webgazer;
 
     // Set up the webgazer video feedback.
@@ -98,6 +97,7 @@ class WebGazerManager extends DisposableComponent {
         canvas.height = window.innerHeight;
         canvas.style.position = 'fixed';
       }
+      console.log('Canvas setup');
     };
 
     const testPointsUpload = () =>
@@ -119,15 +119,14 @@ class WebGazerManager extends DisposableComponent {
 
         this.SendPoints([testPoint])
           .then((callCount) => {
-            console.log(`resolve after ${callCount}`);
+            console.log(`SendPoints: resolve after ${callCount}`);
             resolve();
           })
           .catch((x) => reject(x));
       });
 
     return new Promise<void>((resolve, reject) => {
-      self
-        .Start()
+      this.Start()
         .then(setupVideoCanvas)
         .then(testPointsUpload)
         .then(() => resolve())
@@ -136,25 +135,27 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public Start() {
-    const self = this;
     delete localStorage.webgazerGlobalData;
 
     return new Promise<void>((resolve) => {
       //start the webgazer tracker
+      console.time('Start Webgazer');
+
       webgazer
         .setRegression('ridge') /* currently must set regression and tracker */
-        .setTracker('clmtrackr')
-        .setGazeListener((data: any, clock: number) => self.ProcessPoint(data, clock))
+        .setTracker('TFFacemesh')
+        .setGazeListener((data: any, clock: number) => this.ProcessPoint(data, clock))
         .begin();
 
-      function checkIfReady() {
+      const checkIfReady = () => {
         if (webgazer.isReady()) {
-          self.state = WebGazerState.Started;
+          this.state = WebGazerState.Started;
+          console.timeEnd('Start Webgazer');
           resolve();
         } else {
           setTimeout(checkIfReady, 100);
         }
-      }
+      };
 
       setTimeout(checkIfReady, 100);
     });
@@ -164,7 +165,7 @@ class WebGazerManager extends DisposableComponent {
     //        window.removeEventListener('beforeunload', WebGazerManager.unloadListener);
 
     try {
-      console.log('WebGazerManager: Webgazer finit');
+      console.timeStamp('WebGazerManager: Webgazer finit');
       webgazer.showPredictionPoints(false);
 
       [
@@ -207,16 +208,16 @@ class WebGazerManager extends DisposableComponent {
   }
 
   public RestartCalibration() {
-    console.log('WebGazerManager: Restart Calibration');
+    console.timeStamp('WebGazerManager: Restart Calibration');
     this.End();
 
     this.ClearCalibration();
 
-    this.Start().then(() => {});
+    return this.Start();
   }
 
   public ClearCalibration() {
-    console.log('WebGazerManager: Clear Calibration');
+    console.timeStamp('WebGazerManager: Clear Calibration');
     // compare with:
     // webgazer.clearData();
     window.localStorage.setItem('webgazerGlobalData', undefined);
