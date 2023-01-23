@@ -33,6 +33,11 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     this.hidePanelElements();
 
+    const parser = new URL(window.location.href);
+    if (parser.searchParams.get('attempt')) {
+      this.NoOfAttempts = parseInt(parser.searchParams.get('attempt'), 10);
+    }
+
     this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
@@ -160,9 +165,14 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 
   private PopUpInstruction() {
+    const attemptsRemaining = this.MaxNoOfAttempts - this.NoOfAttempts;
     const accuracyRequirement =
       !!this.GetMinCalibrationAccuracyPct() && !!this.MaxNoOfAttempts
-        ? `You have ${this.MaxNoOfAttempts} attempts to achieve ${this.GetMinCalibrationAccuracyPct()}% accuracy.<br/>`
+        ? `You have ${
+            this.MaxNoOfAttempts
+          } attempts to achieve ${this.GetMinCalibrationAccuracyPct()}% accuracy.<br/>This is attempt number ${
+            this.NoOfAttempts
+          }.<br/>`
         : '';
 
     const instructions =
@@ -170,7 +180,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       'Ready to calibrate<br/>' +
       accuracyRequirement +
       'Remember to keep still during the entire experiment.<br/>' +
-      "<span class='soto-voce'>(press help in the upper right corner to see instructions again)</span>" +
+      "<span class='soto-voce'>(press help in the at the top of the screen to see instructions again)</span>" +
       '</div>';
 
     this.ClearCanvas();
@@ -361,7 +371,9 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
                 // delete the session GUID so we don't kill the experiment because of USER reload
                 document.cookie = 'session_guid=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 
-                window.location.reload();
+                const parser = new URL(window.location.href);
+                parser.searchParams.set('attempt', this.NoOfAttempts.toString(10));
+                window.location.href = parser.href;
               }
             });
           });
