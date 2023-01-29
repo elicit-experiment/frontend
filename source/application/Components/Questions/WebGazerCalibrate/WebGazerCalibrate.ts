@@ -57,7 +57,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
         window.setTimeout(
           () => {
             this._loadingModal.hide();
-            this.ShowHelpModal();
+            this.ShowHelpModalWithCalibration();
           },
           10000,
           //,{ timeout: 10000 },
@@ -158,6 +158,23 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 
   private ShowHelpModal() {
+    this._ShowHelpModal(false);
+  }
+  private ShowHelpModalWithCalibration() {
+    this._ShowHelpModal(true);
+  }
+  private _ShowHelpModal(showCalibration: boolean | undefined) {
+    const helpModal = document.getElementById('helpModal');
+    helpModal.querySelectorAll('.d-none').forEach((button) => {
+      button.classList.remove('d-none');
+    });
+    console.log(`ShowCalibration: ${showCalibration}`);
+    if (showCalibration) {
+      helpModal.querySelector('.close-button').classList.add('d-none');
+    } else {
+      helpModal.querySelector('.calibrate-button').classList.add('d-none');
+    }
+
     this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
     this._helpModal.show();
     console.log('Show helpmodal');
@@ -244,12 +261,20 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
     slideShell.GoToNextSlide();
   }
 
+  private HideHelpModal(_x: any, event: Event) {
+    this._helpModal.hide();
+
+    console.log('wut');
+    console.log(event.target);
+    if ((event.target as Element).classList.contains('calibrate-button')) {
+      this.BeginCalibration();
+    }
+  }
   /**
    * Restart the calibration process by clearing the local storage and resetting the calibration point
    */
   private BeginCalibration() {
-    console.log('BeginCalibratioon');
-    this._helpModal.hide();
+    (document.querySelector('p.text-muted') as any).style['display'] = 'none';
     return new Promise(() => {
       this.Restart(true);
     });
