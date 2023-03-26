@@ -13,7 +13,7 @@
 	<!-- /ko -->
 	<div class="panel-footer clearfix">
 		<!-- ko ifnot: IsLoadingSlide -->
-		<div class="pull-left">
+		<div class="float-start">
 			<button type="button"
 				data-bind="enable: IsPreviousSlideEnabled, click: GoToPreviousSlide, visible: IsPreviousSlideVisible"
 				class="btn btn-primary">
@@ -21,7 +21,7 @@
 				Previous
 			</button>
 		</div>
-		<div class="pull-right">
+		<div class="float-end">
 			<span data-bind="text: SlideNumber"></span> of <span data-bind="text: NumberOfSlides"></span>
 			<button type="button"
 				data-bind="enable: IsNextSlideEnabled, click: GoToNextSlide, visible: IsNextSlideVisible"
