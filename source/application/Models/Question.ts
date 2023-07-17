@@ -1,7 +1,7 @@
 ﻿import knockout = require('knockout');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import QuestionMap = require('Components/Questions/QuestionMap');
-import SlideStep from "./SlideStep";
+import SlideStep from './SlideStep';
 
 class Question {
   public Id: string;
@@ -12,11 +12,11 @@ class Question {
   public Component: any[];
   public Answer: KnockoutObservable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
   public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
-  public SlideStep: KnockoutObservable<SlideStep>
+  public SlideStep: KnockoutObservable<SlideStep>;
   public RequiresInput: boolean;
   public ScrollToCallback: KnockoutObservable<(duration: number) => void> = knockout.observable(null);
   public AllRequiredMediaHavePlayed = knockout.observable(false);
-  public HasFeedbackToShow= knockout.observable(false);
+  public HasFeedbackToShow = knockout.observable(false);
   private _loadedCallback: () => void;
 
   constructor(
@@ -25,7 +25,6 @@ class Question {
     answerChangedCallback: (question: Question) => void,
     questionLoadedCallback: () => void,
   ) {
-
     this.SlideStep = slideStep;
 
     let questionMap: any;
@@ -75,7 +74,14 @@ class Question {
     this.Type = questionMap.Type;
     this.HasUIElement = questionMap.HasUIElement;
     this.APIType = question.Type;
-    const instrumentsHaveFeedback = input.isArray?.call(input) ? input.reduce((showFeedback: boolean, instrument:any) => showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness, false) : false;
+    const instrumentsHaveFeedback = Array.isArray(input)
+      ? input.reduce(
+          (showFeedback: boolean, instrument: any) =>
+            showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness,
+          false,
+        )
+      : false;
+    console.dir(instrumentsHaveFeedback);
     this.HasFeedbackToShow(this.HasFeedbackToShow?.call(this) || instrumentsHaveFeedback);
     this._loadedCallback = questionLoadedCallback;
 
