@@ -24,9 +24,8 @@
 		<div class="float-end">
 			<span data-bind="text: SlideNumber"></span> of <span data-bind="text: NumberOfSlides"></span>
 			<button type="button"
-				data-bind="enable: IsNextSlideEnabled, click: GoToNextSlide, visible: IsNextSlideVisible"
+				data-bind="text: NextText, enable: IsNextSlideEnabled, click: NextAction, visible: IsNextSlideVisible"
 				class="btn btn-primary">
-				Next
 				<span class="bi bi-arrow-right-circle" aria-hidden="true"
 					data-bind="css: {Rotating: IsWaitingForNext}"></span>
 			</button>

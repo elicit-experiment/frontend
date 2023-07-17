@@ -38,8 +38,18 @@ class Default {
     };
 
     for (let i = 0; i < questions.length; i++) {
-      const questionModel = new QuestionModel(questions[i], (question) => this.AnswerChanged(question), loaded);
+      const questionModel = new QuestionModel(questions[i], this._slide.SlideCurrentStep, (question) => this.AnswerChanged(question), loaded);
       questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
+      this._slide.SlideHasFeedbackToShow(this._slide.SlideHasFeedbackToShow() || questionModel.HasFeedbackToShow());
+
+      if (questionModel.HasFeedbackToShow()) {
+        this._slide.SlideHasFeedbackToShow.subscribe(
+          (feedbackToShow) => {
+            return !feedbackToShow && questionModel.HasFeedbackToShow(feedbackToShow);
+          },
+        );
+      }
+
       this.Questions.push(questionModel);
 
       // The UI-less elements won't get created by knockout, so we have to create them ourselves
@@ -142,6 +152,7 @@ class Default {
 
 import template = require('Components/Slides/Default/Default.html');
 import QuestionsBase from '../../Questions/QuestionBase';
+import slideStep from "../../../Models/SlideStep";
 knockout.components.register('Slides/Default', {
   viewModel: Default,
   template: template.default,

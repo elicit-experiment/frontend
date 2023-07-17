@@ -11,7 +11,7 @@
                 <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group': true}">
+                <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group rowF': true}">
                     <input type="checkbox"
                            data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"/>
                     <span data-bind="html: Label"></span>

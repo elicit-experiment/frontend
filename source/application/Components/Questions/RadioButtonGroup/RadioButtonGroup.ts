@@ -1,26 +1,15 @@
 ﻿import knockout = require('knockout');
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
+import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
-import { shuffleInPlace } from 'Utility/ShuffleInPlace';
 
-type ItemInfo = { Id: string; Label: string; Correct: boolean; Feedback: string };
-type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
-
-class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: boolean }> {
+class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: boolean }> {
   private _isOptional: boolean;
 
-  public Items: ItemInfo[];
-  public RowedItems: ItemInfo[][];
   public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-  public AddFillerItem: KnockoutComputed<boolean>;
-  public AddOneFillerItem: KnockoutComputed<boolean>;
-  public AddHalfFillerItem: KnockoutComputed<boolean>;
+
   public CorrectnessClass: KnockoutComputed<string>;
   public CorrectnessLabel: KnockoutComputed<string>;
-  public ShowFeedback: boolean;
-  public AnswerOnce: boolean;
-  public MustAnswerCorrectly: boolean;
-  public ShowCorrectness: boolean;
+
   public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
   public IsAnswerable: KnockoutObservable<boolean>;
 
@@ -29,38 +18,16 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
   constructor(question: QuestionModel) {
     super(question);
 
-    this.MustAnswerCorrectly = !!this.GetInstrument('MustAnswerCorrectly');
-    this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
-    this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
-    this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
-    const randomizeOrder = this.GetInstrument('RandomizeOrder');
     this._isOptional = parseInt(this.GetInstrument('IsOptional')) == 1;
 
-    this.Items = this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item));
-    if (randomizeOrder) {
-      this.Items = shuffleInPlace(this.Items);
-    }
-    this.AddEvent('Render', '', JSON.stringify(this.Items));
-    this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
+    this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
 
-    this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
-    this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
-    this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
+    this.RevealAnswers.subscribe((reveal: boolean) => {
+      if (!reveal) return;
 
-    this.CorrectnessClass = knockout.computed(() => {
-      const hasAnswer = this.HasAnswer();
-      const isCorrect = this.GetAnswer()?.Correct;
-      if (!this.ShowCorrectness || !hasAnswer) return '';
-      return isCorrect ? 'correct' : 'incorrect';
-    });
+      const item = this.Items.find((item) => item.Id === this.GetAnswer().Id);
 
-    this.CorrectnessLabel = knockout.computed(() => {
-      switch (this.CorrectnessClass()) {
-        case 'correct':
-          return '✓';
-        case 'incorrect':
-          return '✗';
-      }
+      this.FeedbackText(item.Feedback);
     });
 
     this.IsAnswerable = knockout.computed(() => {
@@ -74,15 +41,15 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
       const item = this.Items.find((item) => item.Id === id);
       this.AddEvent('Change', 'Mouse/Left/Down', id);
       this.SetAnswer({ Id: id, Correct: item.Correct });
-      this.FeedbackText(item.Feedback);
     });
+
   }
 
   protected HasValidAnswer(answer: any): boolean {
     const item = this.Items.find((item) => item.Id === answer.Id);
     if (this.MustAnswerCorrectly && !item?.Correct) return false;
     if (this._isOptional) return true;
-    return answer.Id != undefined && answer.Id != null;
+    return answer.Id != undefined;
   }
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
@@ -95,6 +62,7 @@ class RadioButtonGroup extends QuestionWithStimulusBase<{ Id: string; Correct: b
     const info: ItemInfo = {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
+      IsEnabled: knockout.computed(() => true),
       Feedback: item.Feedback,
       Correct: item.Correct,
     };

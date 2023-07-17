@@ -2,6 +2,7 @@
 import ExperimentManager = require('Managers/Portal/Experiment');
 import SlideModel = require('Models/Slide');
 import CockpitPortal = require('Managers/Portal/Cockpit');
+import SlideStep from '../../Models/SlideStep';
 
 class SlideShell {
   public Title: KnockoutObservable<string>;
@@ -12,6 +13,8 @@ class SlideShell {
   public SlideComponent: KnockoutComputed<{ name: string; params: any }>;
 
   public AreAllQuestionsAnswered: KnockoutObservable<boolean> = knockout.observable(false);
+  public ShowFeedback: KnockoutObservable<boolean> = knockout.observable(false);
+  public CurrentSlideStep: KnockoutObservable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
   public SlideIndex: KnockoutObservable<number>;
   public SlideNumber: KnockoutComputed<number>;
   public NumberOfSlides: KnockoutObservable<number>;
@@ -27,6 +30,9 @@ class SlideShell {
   public IsHighlighted: KnockoutObservable<boolean> = knockout.observable(false);
   public IsWaiting: KnockoutComputed<boolean>;
   public IsWaitingForNext: KnockoutObservable<boolean> = knockout.observable(false);
+  public NextText: KnockoutComputed<string> = knockout.computed(() => {
+    return this.ShowFeedback() && (this.CurrentSlideStep() == SlideStep.ANSWERING) ? 'See Answers' : 'Next';
+  });
 
   private _subscriptions: KnockoutSubscription[] = [];
 
@@ -85,6 +91,13 @@ class SlideShell {
     if (ExperimentManager.IsReady()) this.LoadNextSlide();
   }
 
+  public NextAction(): void {
+    if (this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING) {
+      this.CurrentSlideStep(SlideStep.REVEALING);
+    } else {
+      this.GoToNextSlide();
+    }
+  }
   public GoToNextSlide(): void {
     this.IsWaitingForNext(true);
 
@@ -125,7 +138,16 @@ class SlideShell {
 
   public MakeLoadSlideCallback(): (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void {
     return (slideIndex, questions) => {
-      this.SlideData(new SlideModel('Slides/Default', slideIndex, this.AreAllQuestionsAnswered, questions));
+      this.SlideData(
+        new SlideModel(
+          'Slides/Default',
+          slideIndex,
+          this.AreAllQuestionsAnswered,
+          this.ShowFeedback,
+          this.CurrentSlideStep,
+          questions,
+        ),
+      );
     };
   }
 

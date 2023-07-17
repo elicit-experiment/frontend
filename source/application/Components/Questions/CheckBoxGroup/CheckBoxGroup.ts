@@ -1,69 +1,36 @@
 ﻿import knockout = require('knockout');
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
+import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
-import { shuffleInPlace } from 'Utility/ShuffleInPlace';
 
-type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean>; Correct: boolean; Feedback: string };
-type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
-
-class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[]; Correct: boolean }> {
+class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Correct: boolean }> {
   private _minNoOfSelections: number;
   private _maxNoOfSelections: number;
 
-  public Items: ItemInfo[];
-  public RowedItems: ItemInfo[][];
   public Answer: KnockoutObservableArray<string> = knockout.observableArray<string>();
+
   public CanSelectMore: KnockoutComputed<boolean>;
-  public AddFillerItem: KnockoutComputed<boolean>;
-  public AddOneFillerItem: KnockoutComputed<boolean>;
-  public AddHalfFillerItem: KnockoutComputed<boolean>;
-  public ShowFeedback: boolean;
-  public AnswerOnce: boolean;
-  public MustAnswerCorrectly: boolean;
-  public ShowCorrectness: boolean;
-  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
-  public CorrectnessClass: KnockoutComputed<string>;
-  public CorrectnessLabel: KnockoutComputed<string>;
+
+  public ItemCorrectness: boolean[];
 
   protected readonly InstrumentTemplateName = 'CheckboxGroupButtons';
 
   constructor(question: QuestionModel) {
     super(question);
 
-    this.MustAnswerCorrectly = !!this.GetInstrument('MustAnswerCorrectly');
-    this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
-    this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
-    this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
     this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
     this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
-    const randomizeOrder = this.GetInstrument('RandomizeOrder');
-
     this.CanSelectMore = knockout.computed(() => this.Answer().length < this._maxNoOfSelections);
+    this.SetItems(this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)));
 
-    this.Items = this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v));
-    if (randomizeOrder) {
-      this.Items = shuffleInPlace(this.Items);
-    }
-    this.AddEvent('Render', '', JSON.stringify(this.Items));
-    this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
+    this.RevealAnswers.subscribe((reveal: boolean) => {
+      if (!reveal) return;
 
-    this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
-    this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
-    this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
+      const firstIncorrectItemIndex = this.ItemCorrectness.findIndex((x: boolean) => !x);
+      if (!firstIncorrectItemIndex) return;
 
-    this.CorrectnessClass = knockout.computed(() => {
-      const hasAnswer = this.HasAnswer();
-      const isCorrect = this.GetAnswer()?.Correct;
-      if (!this.ShowCorrectness || !hasAnswer) return '';
-      return isCorrect ? 'correct' : 'incorrect';
-    });
-
-    this.CorrectnessLabel = knockout.computed(() => {
-      switch (this.CorrectnessClass()) {
-        case 'correct':
-          return '✓';
-        case 'incorrect':
-          return '✗';
+      const firstIncorrectItem = this.Items[firstIncorrectItemIndex];
+      if (firstIncorrectItem) {
+        this.FeedbackText(firstIncorrectItem.Feedback);
       }
     });
 
@@ -73,14 +40,11 @@ class CheckBoxGroup extends QuestionWithStimulusBase<{ Selections: string[]; Cor
 
     this.Answer.subscribe((selectedIds) => {
       this.AddEvent('Change', 'Mouse/Left/Down', selectedIds.join(','));
-      const itemCorrectness = this.Items.map((item) =>
+      this.ItemCorrectness = this.Items.map((item) =>
         selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
       );
-      this.SetAnswer({ Selections: selectedIds, Correct: itemCorrectness.reduce((a, b) => a && b, true) });
-      const firstIncorrectItem = this.Items.find((item) => !item.Correct);
-      if (firstIncorrectItem) {
-        this.FeedbackText(firstIncorrectItem.Feedback);
-      }
+      this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
+
     });
   }
 

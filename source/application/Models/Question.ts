@@ -1,6 +1,7 @@
 ﻿import knockout = require('knockout');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import QuestionMap = require('Components/Questions/QuestionMap');
+import SlideStep from "./SlideStep";
 
 class Question {
   public Id: string;
@@ -11,17 +12,22 @@ class Question {
   public Component: any[];
   public Answer: KnockoutObservable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
   public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
+  public SlideStep: KnockoutObservable<SlideStep>
   public RequiresInput: boolean;
   public ScrollToCallback: KnockoutObservable<(duration: number) => void> = knockout.observable(null);
   public AllRequiredMediaHavePlayed = knockout.observable(false);
-
+  public HasFeedbackToShow= knockout.observable(false);
   private _loadedCallback: () => void;
 
   constructor(
     question: CockpitPortal.IQuestion,
+    slideStep: KnockoutObservable<SlideStep>,
     answerChangedCallback: (question: Question) => void,
     questionLoadedCallback: () => void,
   ) {
+
+    this.SlideStep = slideStep;
+
     let questionMap: any;
     let input;
 
@@ -69,6 +75,7 @@ class Question {
     this.Type = questionMap.Type;
     this.HasUIElement = questionMap.HasUIElement;
     this.APIType = question.Type;
+    this.HasFeedbackToShow(this.HasFeedbackToShow() || input.reduce((showFeedback: boolean, instrument:any) => showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness, false) )
     this._loadedCallback = questionLoadedCallback;
 
     if (question.Output) this.Answer(question.Output);
