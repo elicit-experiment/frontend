@@ -75,7 +75,8 @@ class Question {
     this.Type = questionMap.Type;
     this.HasUIElement = questionMap.HasUIElement;
     this.APIType = question.Type;
-    this.HasFeedbackToShow(this.HasFeedbackToShow() || input.reduce((showFeedback: boolean, instrument:any) => showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness, false) )
+    const instrumentsHaveFeedback = input.isArray?.call(input) ? input.reduce((showFeedback: boolean, instrument:any) => showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness, false) : false;
+    this.HasFeedbackToShow(this.HasFeedbackToShow?.call(this) || instrumentsHaveFeedback);
     this._loadedCallback = questionLoadedCallback;
 
     if (question.Output) this.Answer(question.Output);
