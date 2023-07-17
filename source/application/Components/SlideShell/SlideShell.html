@@ -3,13 +3,16 @@
 		<h1 data-bind="html: Title"></h1>
 	</div>
 	<!-- ko if: IsLoadingSlide -->
-	<div>
+	<div class="panel-body">
 		<span>Loading slide...</span>
+		<div class="footer-push"></div>
 	</div>
 	<!-- /ko -->
 	<!-- ko ifnot: IsLoadingSlide -->
 	<div class="panel-body"
-		data-bind="component: { name: SlideData().Name, params: SlideData() }, css: {Highlight: IsHighlighted}"></div>
+		data-bind="component: { name: SlideData().Name, params: SlideData() }, css: {Highlight: IsHighlighted}">
+		<div class="footer-push"></div>
+	</div>
 	<!-- /ko -->
 	<div class="panel-footer clearfix">
 		<!-- ko ifnot: IsLoadingSlide -->
@@ -21,8 +24,12 @@
 				Previous
 			</button>
 		</div>
-		<div class="float-end">
-			<span data-bind="text: SlideNumber"></span> of <span data-bind="text: NumberOfSlides"></span>
+		<div class="float-end slide-nav-right">
+			<span class="slide-position-details">
+				<span data-bind="text: SlideNumber"></span>
+				<span>of</span>
+			    <span data-bind="text: NumberOfSlides"></span>
+			</span>
 			<button type="button"
 				data-bind="text: NextText, enable: IsNextSlideEnabled, click: NextAction, visible: IsNextSlideVisible"
 				class="btn btn-primary">

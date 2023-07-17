@@ -21,7 +21,7 @@
 @require "radioButtonGroup"
 
 body {
-	padding-top: 20px;
+	//padding-top: 20px;
 }
 
 .HalfColumn {
@@ -56,4 +56,55 @@ ul.calibrate-instructions > li {
 
 .flex-col {
   flex-direction: column;
+}
+
+// footers
+
+html, body {
+  height: 100%;
+}
+.shell {
+  height: 100%;
+  min-height: 100%;
+}
+.footer-push {
+  height: 40px;
+}
+
+.shell-body {
+  margin-bottom: -40px;
+  min-height: 100%;
+  height: 100%;
+}
+
+.shell-footer {
+  height: 24px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > .panel-body {
+    flex-grow: 1;
+  }
+
+  > .panel-footer {
+    padding: 0 10px 8px 10px;
+
+    .slide-nav-right {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+
+      > .slide-position-details {
+        > span {
+          //margin: 0 4px;
+        }
+        margin-right: 16px;
+        vertical-align: middle;
+      }
+    }
+  }
 }

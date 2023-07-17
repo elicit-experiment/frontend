@@ -41,7 +41,7 @@ module.exports = function (env) {
     <!DOCTYPE html>
     <html>
       <body>
-        <div data-bind="component: \'Shell\'">Loading...</div>
+        <div data-bind="component: \'Shell\'" class="shell">Loading...</div>
         ${htmlWebpackPlugin.tags.bodyTags}
       </body>
     </html>
