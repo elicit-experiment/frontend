@@ -77,7 +77,7 @@ class Question {
     const instrumentsHaveFeedback = Array.isArray(input)
       ? input.reduce(
           (showFeedback: boolean, instrument: any) =>
-            showFeedback || instrument.Instrument.ShowFeedback || instrument.Instrument.ShowCorrectness,
+            showFeedback || instrument?.Instrument?.ShowFeedback || instrument?.Instrument?.ShowCorrectness,
           false,
         )
       : false;
