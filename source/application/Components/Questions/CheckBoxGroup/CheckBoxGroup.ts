@@ -3,8 +3,8 @@ import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionB
 import QuestionModel = require('Models/Question');
 
 class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Correct: boolean }> {
-  private _minNoOfSelections: number;
-  private _maxNoOfSelections: number;
+  private readonly _minNoOfSelections: number;
+  private readonly _maxNoOfSelections: number;
 
   public Answer: KnockoutObservableArray<string> = knockout.observableArray<string>();
 
@@ -12,15 +12,23 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
 
   public ItemCorrectness: boolean[];
 
+  public FeedbackCorrect = knockout.observable<string>('');
+  public FeedbackIncorrect = knockout.observable<string>('');
+
   protected readonly InstrumentTemplateName = 'CheckboxGroupButtons';
 
   constructor(question: QuestionModel) {
     super(question);
 
+    this.FeedbackCorrect(this.GetInstrument('FeedbackCorrect'));
+    this.FeedbackIncorrect(this.GetInstrument('FeedbackIncorrect'));
+
     this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
     this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
     this.CanSelectMore = knockout.computed(() => this.Answer().length < this._maxNoOfSelections);
-    this.SetItems(this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)));
+    this.SetItems(
+      this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)),
+    );
 
     this.RevealAnswers.subscribe((reveal: boolean) => {
       if (!reveal) return;
@@ -30,8 +38,16 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
 
       const firstIncorrectItem = this.Items[firstIncorrectItemIndex];
       if (firstIncorrectItem) {
-        this.FeedbackText(firstIncorrectItem.Feedback);
+        this.FeedbackText(this.FeedbackIncorrect());
+      } else {
+        this.FeedbackText(this.FeedbackCorrect());
       }
+
+      this.ItemCorrectness.forEach((correct, index) =>
+        this.GetAnswer().Selections.indexOf(this.Items[index].Id) !== -1 || !correct
+          ? this.Items[index].AnsweredCorrectly(correct)
+          : '',
+      );
     });
 
     if (this.HasAnswer()) {
@@ -43,8 +59,8 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
       this.ItemCorrectness = this.Items.map((item) =>
         selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
       );
-      this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
 
+      this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
     });
   }
 
@@ -55,10 +71,15 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
     return answer.Selections.length >= this._minNoOfSelections;
   }
 
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'CheckBoxGroup', 'Instrument', method, data);
+  }
+
   private CreateItemInfo(item: Item): ItemInfo {
     if (item.Selected === '1') this.Answer.push(item.Id);
 
-    const info: ItemInfo = {
+    const AnsweredCorrectly = knockout.observable<boolean | null>(null);
+    return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
       IsEnabled: knockout.computed(
@@ -66,13 +87,13 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
       ),
       Correct: item.Correct,
       Feedback: item.Feedback,
+      AnsweredCorrectly,
+      CorrectnessClass: knockout.computed(() => {
+        if (AnsweredCorrectly() === null) return '';
+
+        return AnsweredCorrectly() ? 'correct' : 'incorrect';
+      }),
     };
-
-    return info;
-  }
-
-  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
-    super.AddRawEvent(eventType, 'CheckBoxGroup', 'Instrument', method, data);
   }
 }
 

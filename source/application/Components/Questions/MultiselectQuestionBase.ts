@@ -2,7 +2,7 @@ import knockout = require('knockout');
 import QuestionWithStimulusBase from './QuestionWithStimulusBase';
 import QuestionModel = require('Models/Question');
 import SlideStep from '../../Models/SlideStep';
-import { shuffleInPlace } from "../../Utility/ShuffleInPlace";
+import { shuffleInPlace } from '../../Utility/ShuffleInPlace';
 
 export type ItemInfo = {
   Id: string;
@@ -10,6 +10,8 @@ export type ItemInfo = {
   IsEnabled: KnockoutComputed<boolean>;
   Correct: boolean;
   Feedback: string;
+  AnsweredCorrectly: KnockoutObservable<boolean>;
+  CorrectnessClass: KnockoutComputed<string>;
 };
 export type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
 
@@ -77,8 +79,6 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   protected SetItems(items: ItemInfo[]): void {
     this.Items = items;
 
-    console.dir(items);
-
     const randomizeOrder = this.GetInstrument('RandomizeOrder');
     if (randomizeOrder) {
       this.Items = shuffleInPlace(this.Items);
@@ -91,5 +91,6 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
   }
 }
+
 
 export default MultiselectQuestionBase;

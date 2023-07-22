@@ -13,6 +13,7 @@ label.radio-button-group {
   align-items: center;
   min-width: 200px;
   justify-content: flex-start;
+  position: relative;
 }
 
 label.checkbox-button-group > input[type=checkbox],
@@ -45,7 +46,7 @@ label.checkbox-button-group > span {
 
 .feedback {
   margin-top: 1.5rem;
-  padding: 0.1rem 2.0rem !important;
+  padding: 1rem 2.0rem !important;
 
   .correctness-icon {
     margin-top: -1.25rem;
@@ -66,7 +67,21 @@ label.checkbox-button-group > span {
 .correctness-icon {
   position: absolute;
   left: -3em;
-  margin-top: 0em;
+  margin-top: 0;
   font-size: 36px;
   border: none;
+
+  &.individual {
+    font-size: unset;
+    left: -3.6em;
+    top: 0;
+  }
+
+  &.correct.individual:before {
+    content: '⮕'
+  }
+
+  &.incorrect.individual:before {
+    content: '⮕'
+  }
 }

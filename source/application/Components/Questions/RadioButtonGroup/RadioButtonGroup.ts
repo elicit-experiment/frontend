@@ -42,7 +42,6 @@ class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: bo
       this.AddEvent('Change', 'Mouse/Left/Down', id);
       this.SetAnswer({ Id: id, Correct: item.Correct });
     });
-
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -59,15 +58,22 @@ class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: bo
   private ItemInfo(item: Item): ItemInfo {
     if (item.Selected === '1') this.Answer(item.Id);
 
-    const info: ItemInfo = {
+    const AnsweredCorrectly = knockout.observable<boolean | null>(null);
+    return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
-      IsEnabled: knockout.computed(() => true),
-      Feedback: item.Feedback,
+      IsEnabled: knockout.computed(
+          () => true,
+      ),
       Correct: item.Correct,
-    };
+      Feedback: item.Feedback,
+      AnsweredCorrectly,
+      CorrectnessClass: knockout.computed(() => {
+        if (AnsweredCorrectly() === null) return '';
 
-    return info;
+        return AnsweredCorrectly() ? 'correct' : 'incorrect';
+      }),
+    };
   }
 }
 
