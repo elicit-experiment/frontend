@@ -1,9 +1,6 @@
 ﻿<script type="text/html" id="CheckboxGroupButtons">
     <div class="row QuestionBlock correctable-question">
-        <!-- ko if: ShowCorrectness -->
-        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`, html: CorrectnessLabel">
-        </div>
-        <!-- /ko -->
+
 
         <div class="row" data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
             <div class="row" data-bind="foreach: $data">
@@ -11,24 +8,28 @@
                 <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: {disabled: !$parents[1].CanAnswer(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group rowF': true}">
+                <label data-bind="css: {disabled: !($parents[1].CanAnswer() && IsEnabled()), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group row': true}">
                     <!-- ko if: $parents[1].ShowCorrectness -->
-                    <div data-bind="css: `correctness-icon individual ${CorrectnessClass()}`">
+                    <div data-bind="css: `highlight-result-icon individual ${CorrectnessClass()}`">
                     </div>
                     <!-- /ko -->
                     <input type="checkbox"
-                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"/>
+                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: ($parents[1].CanAnswer() && IsEnabled())"/>
                     <span data-bind="html: Label"></span>
                 </label>
             </div>
         </div>
-
+        <!-- ko if: ShowCorrectness -->
+        <div data-bind="css: `${CorrectnessClass()}`">
+            <span class="group-result correctness-icon" data-bind="html: CorrectnessLabel"> </span>
+        </div>
+        <!-- /ko -->
         <!-- ko if: ShowFeedback && FeedbackText -->
-        <div data-bind="css: `row feedback`">
-            <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
+        <div data-bind="css: `row feedback ${CorrectnessClass()}`">
+            <div data-bind="css: `highlight-result-icon col-xs-2`">
                 ⮕
             </div>
-            <div data-bind="{html: FeedbackText, css: `col-xs-12`}">
+            <div data-bind="{html: FeedbackText, css: `col-xs-10`}">
             </div>
         </div>
         <!-- /ko -->

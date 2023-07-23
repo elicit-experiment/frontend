@@ -2,7 +2,9 @@
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
 
-class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Correct: boolean }> {
+type AnswerType = { Selections: string[]; Correct: boolean };
+
+class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
   private readonly _minNoOfSelections: number;
   private readonly _maxNoOfSelections: number;
 
@@ -25,7 +27,12 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
 
     this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
     this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
-    this.CanSelectMore = knockout.computed(() => this.Answer().length < this._maxNoOfSelections);
+
+    console.log(this._minNoOfSelections);
+    this.CanSelectMore = knockout.computed(() => {
+      console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
+      return this.Answer().length < this._maxNoOfSelections;
+    });
     this.SetItems(
       this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)),
     );
@@ -64,7 +71,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
     });
   }
 
-  protected HasValidAnswer(answer: any): boolean {
+  protected HasValidAnswer(answer: AnswerType): boolean {
     if (this._minNoOfSelections === 0) return true;
     if (!answer.Selections) return false;
 
@@ -82,9 +89,14 @@ class CheckBoxGroup extends MultiselectQuestionBase<{ Selections: string[]; Corr
     return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
-      IsEnabled: knockout.computed(
-        () => this.CanAnswer() && (this.Answer.indexOf(item.Id) !== -1 || this.CanSelectMore()),
-      ),
+      IsEnabled: knockout.computed(() => {
+        console.dir([this.CanAnswer(), this.Answer().indexOf(item.Id) !== -1, this.CanSelectMore()]);
+        const canAnswer = this.CanAnswer();
+        const alreadyAnswered = this.Answer().indexOf(item.Id) !== -1;
+        const canSelectMore = this.CanSelectMore();
+
+        return canAnswer && (canSelectMore || alreadyAnswered);
+      }),
       Correct: item.Correct,
       Feedback: item.Feedback,
       AnsweredCorrectly,

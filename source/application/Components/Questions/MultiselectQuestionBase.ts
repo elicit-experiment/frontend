@@ -47,7 +47,6 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 
-
     this.CorrectnessClass = knockout.computed(() => {
       if (!this.RevealAnswers()) return '';
 
@@ -91,6 +90,5 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
   }
 }
-
 
 export default MultiselectQuestionBase;

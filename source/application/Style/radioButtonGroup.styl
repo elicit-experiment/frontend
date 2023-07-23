@@ -34,14 +34,25 @@ label.radio-button-group > span {
 label.checkbox-button-group > span {
 }
 
-.correct {
-  border: 2px solid green;
-  padding: 0.1rem 2.0rem !important;
-}
-
-.incorrect {
-  border: 2px solid red;
-  padding: 0.1rem 2.0rem !important;
+.QuestionBlock > .row {
+  &.correct {
+    border: 2px solid green;
+    padding: 0.1rem 2.0rem !important;
+  }
+  &.correct.feedback {
+    background: green;
+    font-weight: bold;
+    color: white;
+  }
+  &.incorrect {
+    border: 2px solid red;
+    padding: 0.1rem 2.0rem !important;
+  }
+  &.incorrect.feedback {
+    background: red;
+    font-weight: bold;
+    color: white;
+  }
 }
 
 .feedback {
@@ -57,19 +68,27 @@ label.checkbox-button-group > span {
   position: relative;
 }
 
-.correctness-icon.incorrect {
+.incorrect .correctness-icon, .highlight-result-icon.incorrect {
   color: red;
 }
-.correctness-icon.correct {
+.correct .correctness-icon, .highlight-result-icon.correct {
   color: green;
 }
 
 .correctness-icon {
   position: absolute;
-  left: -3em;
-  margin-top: 0;
-  font-size: 36px;
-  border: none;
+
+  &.group-result {
+    right: -1em;
+    top: calc(50% - 18px);
+    font-size: 36px;
+  }
+
+}
+
+.highlight-result-icon {
+  position: absolute;
+  left: 0;
 
   &.individual {
     font-size: unset;
@@ -77,11 +96,14 @@ label.checkbox-button-group > span {
     top: 0;
   }
 
-  &.correct.individual:before {
+  &.correct.individual:before,
+  &.incorrect.individual:before {
     content: '⮕'
   }
 
-  &.incorrect.individual:before {
-    content: '⮕'
+  &.group-result {
+    right: -1em;
+    top: calc(50% - 18px);
+    font-size: 36px;
   }
 }

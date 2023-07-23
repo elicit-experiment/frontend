@@ -38,15 +38,18 @@ class Default {
     };
 
     for (let i = 0; i < questions.length; i++) {
-      const questionModel = new QuestionModel(questions[i], this._slide.SlideCurrentStep, (question) => this.AnswerChanged(question), loaded);
+      const questionModel = new QuestionModel(
+        questions[i],
+        this._slide.SlideCurrentStep,
+        (question) => this.AnswerChanged(question),
+        loaded,
+      );
       questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
       this._slide.SlideHasFeedbackToShow(this._slide.SlideHasFeedbackToShow() || questionModel.HasFeedbackToShow());
 
       if (questionModel.HasFeedbackToShow()) {
         this._slide.SlideHasFeedbackToShow.subscribe(
-          (feedbackToShow) => {
-            return !feedbackToShow && questionModel.HasFeedbackToShow(feedbackToShow);
-          },
+          (feedbackToShow) => !feedbackToShow && questionModel.HasFeedbackToShow(feedbackToShow),
         );
       }
 
@@ -86,7 +89,7 @@ class Default {
     }
 
     if (waitForAnswerSaved) {
-      var sub = this.HaveActiveAnswersSets.subscribe((v) => {
+      const sub = this.HaveActiveAnswersSets.subscribe((v) => {
         if (!v) {
           sub.dispose();
           completed();
@@ -138,11 +141,11 @@ class Default {
   }
 
   private CheckIfAllQuestionsAreAnswered(): void {
-    const firstQUestionWithInvalidAnswer = this.GetFirstQuestionWithoutValidAnswer();
+    const firstQuestionWithInvalidAnswer = this.GetFirstQuestionWithoutValidAnswer();
 
-    const allAnswered = !firstQUestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
+    const allAnswered = !firstQuestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
 
-    //console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQUestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
+    // console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQuestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
 
     if (this._loadingQuestions()) return this._slide.CanGoToNextSlide(false);
 
@@ -151,8 +154,6 @@ class Default {
 }
 
 import template = require('Components/Slides/Default/Default.html');
-import QuestionsBase from '../../Questions/QuestionBase';
-import slideStep from "../../../Models/SlideStep";
 knockout.components.register('Slides/Default', {
   viewModel: Default,
   template: template.default,

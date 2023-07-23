@@ -31,7 +31,7 @@ class SlideShell {
   public IsWaiting: KnockoutComputed<boolean>;
   public IsWaitingForNext: KnockoutObservable<boolean> = knockout.observable(false);
   public NextText: KnockoutComputed<string> = knockout.computed(() => {
-    return this.ShowFeedback() && (this.CurrentSlideStep() == SlideStep.ANSWERING) ? 'See Answers' : 'Next';
+    return this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING ? 'See Answers' : 'Next';
   });
 
   private _subscriptions: KnockoutSubscription[] = [];
@@ -93,11 +93,22 @@ class SlideShell {
 
   public NextAction(): void {
     if (this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING) {
-      this.CurrentSlideStep(SlideStep.REVEALING);
+      if (this.AreAllQuestionsAnswered()) {
+        this.CurrentSlideStep(SlideStep.REVEALING);
+      } else {
+        //console.log('SlideShell.ts: GoToNextSlide NOT all questions are answered!');
+        this.SlideData().ScrollToFirstInvalidAnswer();
+
+        if (this.IsHighlighted()) {
+          this.IsHighlighted(false);
+          setTimeout(() => this.IsHighlighted(true), 50);
+        } else this.IsHighlighted(true);
+      }
     } else {
       this.GoToNextSlide();
     }
   }
+
   public GoToNextSlide(): void {
     this.IsWaitingForNext(true);
 
@@ -156,7 +167,7 @@ class SlideShell {
       action();
       return;
     }
-    var sub = knockout.computed(check).subscribe((v) => {
+    const sub = knockout.computed(check).subscribe((v) => {
       sub.dispose();
       action();
     });
