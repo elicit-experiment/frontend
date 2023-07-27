@@ -2,7 +2,9 @@
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
 
-class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: boolean }> {
+type AnswerType = { Id: string; Correct: boolean };
+
+class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   private _isOptional: boolean;
 
   public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
@@ -20,7 +22,11 @@ class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: bo
 
     this._isOptional = parseInt(this.GetInstrument('IsOptional')) == 1;
 
-    this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
+    this.SetItems(
+      this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)),
+    );
+
+    this.AddEvent('Render', '', JSON.stringify(this.Items));
 
     this.RevealAnswers.subscribe((reveal: boolean) => {
       if (!reveal) return;
@@ -44,7 +50,7 @@ class RadioButtonGroup extends MultiselectQuestionBase<{ Id: string; Correct: bo
     });
   }
 
-  protected HasValidAnswer(answer: any): boolean {
+  protected HasValidAnswer(answer: AnswerType): boolean {
     const item = this.Items.find((item) => item.Id === answer.Id);
     if (this.MustAnswerCorrectly && !item?.Correct) return false;
     if (this._isOptional) return true;

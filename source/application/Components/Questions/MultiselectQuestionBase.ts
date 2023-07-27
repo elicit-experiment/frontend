@@ -45,8 +45,6 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
     this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
 
-    this.AddEvent('Render', '', JSON.stringify(this.Items));
-
     this.CorrectnessClass = knockout.computed(() => {
       if (!this.RevealAnswers()) return '';
 
