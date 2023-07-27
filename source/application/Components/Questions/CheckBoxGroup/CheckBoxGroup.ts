@@ -30,7 +30,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
 
     console.log(this._minNoOfSelections);
     this.CanSelectMore = knockout.computed(() => {
-      console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
+      //console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
       return this.Answer().length < this._maxNoOfSelections;
     });
     this.SetItems(
@@ -41,7 +41,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       if (!reveal) return;
 
       const firstIncorrectItemIndex = this.ItemCorrectness.findIndex((x: boolean) => !x);
-      if (!firstIncorrectItemIndex) return;
+      if (firstIncorrectItemIndex === -1) return;
 
       const firstIncorrectItem = this.Items[firstIncorrectItemIndex];
       if (firstIncorrectItem) {
@@ -49,6 +49,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       } else {
         this.FeedbackText(this.FeedbackCorrect());
       }
+      //console.dir(this.ItemCorrectness);
 
       this.ItemCorrectness.forEach((correct, index) =>
         this.GetAnswer().Selections.indexOf(this.Items[index].Id) !== -1 || !correct
@@ -90,7 +91,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
       IsEnabled: knockout.computed(() => {
-        console.dir([this.CanAnswer(), this.Answer().indexOf(item.Id) !== -1, this.CanSelectMore()]);
+        // console.dir([this.CanAnswer(), this.Answer().indexOf(item.Id) !== -1, this.CanSelectMore()]);
         const canAnswer = this.CanAnswer();
         const alreadyAnswered = this.Answer().indexOf(item.Id) !== -1;
         const canSelectMore = this.CanSelectMore();
