@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionBase = require('Components/Questions/QuestionBase');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
@@ -10,8 +10,8 @@ type ItemInfo = {
   AudioInfo: AudioInfo;
   HasStimulus: boolean;
   IsActive: boolean;
-  IsSelected: KnockoutComputed<boolean>;
-  ButtonElement: KnockoutObservable<HTMLElement>;
+  IsSelected: knockout.Computed<boolean>;
+  ButtonElement: knockout.Observable<HTMLElement>;
 };
 type Item = { Id: string; ChoiceButton: { Label: string; Selected: string; Active?: string }; Stimulus: IStimulus };
 
@@ -20,10 +20,10 @@ class KAcPS extends QuestionBase<{ Id: string }> {
   public HeaderLabel: string;
   public MediaLabel: string;
   public Items: ItemInfo[];
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-  public CanAnswer: KnockoutObservable<boolean>;
+  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
+  public CanAnswer: knockout.Observable<boolean>;
   public HasNoStimulus: boolean;
-  public MaxButtonWidth: KnockoutComputed<number>;
+  public MaxButtonWidth: knockout.Computed<number>;
 
   private _hasActives: boolean;
 

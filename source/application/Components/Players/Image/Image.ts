@@ -1,11 +1,11 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import jquery = require('jquery');
 import MediaInfo = require('Components/Players/MediaInfo');
 
 type Source = { Source: string; Width: string; Height: string };
 
 class Image {
-  public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
+  public PlayerElement: knockout.Observable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
   public Sources: Source[];
   public Width: string;
   public Height: string;

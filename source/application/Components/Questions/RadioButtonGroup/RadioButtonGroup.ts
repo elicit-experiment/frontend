@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
 
@@ -7,13 +7,13 @@ type AnswerType = { Id: string; Correct: boolean };
 class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   private _isOptional: boolean;
 
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
 
-  public CorrectnessClass: KnockoutComputed<string>;
-  public CorrectnessLabel: KnockoutComputed<string>;
+  public CorrectnessClass: knockout.Computed<string>;
+  public CorrectnessLabel: knockout.Computed<string>;
 
-  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
-  public IsAnswerable: KnockoutObservable<boolean>;
+  public FeedbackText: knockout.Observable<string> = knockout.observable<string>(null);
+  public IsAnswerable: knockout.Computed<boolean>;
 
   protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
 
@@ -68,9 +68,7 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
     return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
-      IsEnabled: knockout.computed(
-          () => true,
-      ),
+      IsEnabled: knockout.computed(() => true),
       Correct: item.Correct,
       Feedback: item.Feedback,
       AnsweredCorrectly,

@@ -1,11 +1,11 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionModel = require('Models/Question');
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 
 class FreetextBase<T> extends QuestionWithStimulusBase<T> {
   public Id: string;
   public Label = '';
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
   public LabelPosition = 'left';
   public LabelPositionLeft = false;
   public LabelPositionTop = false;

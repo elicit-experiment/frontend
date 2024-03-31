@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
@@ -8,7 +8,7 @@ import TextFormatter = require('Managers/TextFormatter');
 
 abstract class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel {
   protected Model: QuestionModel;
-  protected HasAnswer: KnockoutComputed<boolean>;
+  protected HasAnswer: knockout.Computed<boolean>;
   private _events: CockpitPortal.IQuestionEvent[];
 
   constructor(question: QuestionModel, requiresInput = true) {
@@ -197,7 +197,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
   protected WhenAllMediaHavePlayed(
     media: MediaInfo | MediaInfo[],
     returnTrueOnAnswer = false,
-  ): KnockoutComputed<boolean> {
+  ): knockout.Computed<boolean> {
     media = media || [];
 
     if (media instanceof MediaInfo) media = [<MediaInfo>media];

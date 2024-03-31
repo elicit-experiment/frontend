@@ -193,7 +193,7 @@ class MouseTrackingManager extends DisposableComponent {
                 console.error('datapoint error');
               }
             });
-            resolve();
+            resolve(true);
           })
           .catch((err) => {
             console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed due to ${err}`);

@@ -1,14 +1,14 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import jquery = require('jquery');
 import MediaInfo = require('Components/Players/MediaInfo');
 
 type Source = { Type: string; Source: string };
 
 class Audio {
-  public PlayerElement: KnockoutObservable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
+  public PlayerElement: knockout.Observable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
   public Sources: Source[];
-  public IsPlaying: KnockoutObservable<boolean>;
-  public IsPlayed: KnockoutObservable<boolean>;
+  public IsPlaying: knockout.Observable<boolean>;
+  public IsPlayed: knockout.Observable<boolean>;
 
   private _info: MediaInfo;
   private static _activePlayer: Audio = null;

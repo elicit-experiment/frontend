@@ -1,7 +1,9 @@
-﻿export default {
+﻿import knockout from 'knockout';
+
+export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
-    const value: KnockoutObservable<number> = valueAccessor();
+    const value: knockout.Observable<number> = valueAccessor();
     value(element.width);
   },
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
-} as KnockoutBindingHandler;
+} as knockout.BindingHandler;

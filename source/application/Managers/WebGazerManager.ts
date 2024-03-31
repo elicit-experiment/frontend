@@ -1,7 +1,7 @@
-import webgazer = require('WebGazer');
+webgazer = require('WebGazer');
 import DisposableComponent = require('Components/DisposableComponent');
 import ExperimentManager = require('Managers/Portal/Experiment');
-import knockout = require('knockout');
+import knockout from 'knockout';
 import PortalClient = require('PortalClient');
 import methods = require('../Utility/TimeSeries');
 
@@ -26,9 +26,16 @@ class WebGazerManager extends DisposableComponent {
 
   private static _instance: WebGazerManager;
 
-  static get Instance() {
+  static get Instance(): WebGazerManager {
     // Do you need arguments? Make it a regular static method instead.
     return this._instance || (this._instance = new this());
+  }
+
+  public static getInstance(): WebGazerManager {
+    if (!WebGazerManager._instance) {
+      WebGazerManager._instance = new WebGazerManager();
+    }
+    return WebGazerManager._instance;
   }
 
   static POINT_BUFFER_SIZE = 1000;
@@ -396,7 +403,7 @@ class WebGazerManager extends DisposableComponent {
             console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
             dataPoint.value = JSON.stringify(dataPointValue);
             ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {});
-            resolve();
+            resolve(true);
           })
           .catch((err) => {
             console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`);
@@ -414,3 +421,5 @@ class WebGazerManager extends DisposableComponent {
 }
 
 export default WebGazerManager;
+const getInstance = (): WebGazerManager => WebGazerManager.getInstance();
+export { getInstance };

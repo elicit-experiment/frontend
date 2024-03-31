@@ -1,26 +1,26 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import DisposableAction = require('Utility/DisposableAction');
 
 abstract class DisposableComponent {
   private _actions: DisposableAction[] = [];
-  private _subscriptions: KnockoutSubscription[] = [];
-  private _computed: KnockoutComputed<any>[] = [];
+  private _subscriptions: knockout.Subscription[] = [];
+  private _computed: knockout.Computed<any>[] = [];
 
-  protected Computed<T>(value: () => T): KnockoutComputed<T> {
+  protected Computed<T>(value: () => T): knockout.Computed<T> {
     const computed = knockout.computed(value);
     this._computed.push(computed);
 
     return computed;
   }
 
-  protected PureComputed<T>(read: () => T, write?: (value: T) => void): KnockoutComputed<T> {
+  protected PureComputed<T>(read: () => T, write?: (value: T) => void): knockout.Computed<T> {
     const computed = write == null ? knockout.pureComputed(read) : knockout.pureComputed({ read: read, write: write });
     this._computed.push(computed);
 
     return computed;
   }
 
-  protected Subscribe<T>(subscribable: KnockoutSubscribable<T>, callback: (value: T) => void): () => void {
+  protected Subscribe<T>(subscribable: knockout.Subscribable<T>, callback: (value: T) => void): () => void {
     const subscription = subscribable.subscribe(callback);
     this._subscriptions.push(subscription);
 
@@ -28,7 +28,7 @@ abstract class DisposableComponent {
   }
 
   protected SubscribeToArray<T>(
-    subscribable: KnockoutObservableArray<T>,
+    subscribable: knockout.ObservableArray<T>,
     callback: (value: T, status: string) => void,
   ): () => void {
     const subscription = subscribable.subscribe(
@@ -43,7 +43,7 @@ abstract class DisposableComponent {
     return () => subscription.dispose();
   }
 
-  protected SubscribeUntilChange<T>(subscribable: KnockoutSubscribable<T>, callback: (value: T) => void): () => void {
+  protected SubscribeUntilChange<T>(subscribable: knockout.Subscribable<T>, callback: (value: T) => void): () => void {
     const unsubscriber = this.Subscribe(subscribable, (v) => {
       unsubscriber();
       callback(v);

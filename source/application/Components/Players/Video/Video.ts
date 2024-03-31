@@ -1,4 +1,4 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import jquery = require('jquery');
 import MediaInfo = require('Components/Players/MediaInfo');
 
@@ -12,18 +12,18 @@ declare global {
 
 // TODO: probably should be refactored into a container for HTMLVideo or YouTubeVideo children
 class Video {
-  public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
-  public PlayerControlsElement: KnockoutObservable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
-  public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
-  public PlayButtonElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
+  public PlayerElement: knockout.Observable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
+  public PlayerControlsElement: knockout.Observable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
+  public YouTubePlayerElement: knockout.Observable<HTMLElement> = knockout.observable<HTMLElement>();
+  public PlayButtonElement: knockout.Observable<HTMLElement> = knockout.observable<HTMLElement>();
   public Sources: Source[];
-  public IsPlaying: KnockoutObservable<boolean>;
-  public IsPlayed: KnockoutObservable<boolean>;
+  public IsPlaying: knockout.Observable<boolean>;
+  public IsPlayed: knockout.Observable<boolean>;
   public IsPausable: boolean;
   public IsReplayable: boolean;
   public MaxReplayCount: number;
-  public PlayCount: KnockoutObservable<number> = knockout.observable(0);
-  public PlayTimestamp: KnockoutComputed<number>;
+  public PlayCount: knockout.Observable<number> = knockout.observable(0);
+  public PlayTimestamp: knockout.Computed<number>;
   public IsOptional: boolean;
   public SourceType: string;
   public PlayerElementId: string;

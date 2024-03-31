@@ -1,4 +1,6 @@
-﻿const _unsupported = 'Unsupported';
+﻿import FaceLandmark from "Components/Questions/FaceLandmark/FaceLandmark";
+
+const _unsupported = 'Unsupported';
 let _map: { [key: string]: QuestionMap };
 
 export function Get(key: string) {
@@ -34,6 +36,7 @@ function Initialize() {
     // NEW Components
     SoloStimulus: new QuestionMap('Questions/SoloStimulus'),
     WebGazerCalibrate: new QuestionMap('Questions/WebGazerCalibrate'),
+    FaceLandmark: new QuestionMap('Questions/FaceLandmark'),
   };
 
   _map[_unsupported] = new QuestionMap('Questions/Unsupported', false);

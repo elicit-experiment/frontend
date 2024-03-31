@@ -1,15 +1,10 @@
 import * as knockout from 'knockout';
 
-export interface IKoComponentOptions {
+export interface IKoComponentOptions extends knockout.components.Config {
   synchronous?: boolean | undefined;
   name?: string;
-  template:
-    | string
-    | Node[]
-    | DocumentFragment
-    | KnockoutComponentTypes.TemplateElement
-    | KnockoutComponentTypes.AMDModule;
 }
+
 
 export interface IKoComponentStatic {
   new (...param: any[]): IKoComponentInstance;
@@ -17,7 +12,7 @@ export interface IKoComponentStatic {
 
 export interface IKoComponentInstance {}
 
-export function KoComponent(options: IKoComponentOptions | undefined = undefined) {
+export function KoComponent(options: IKoComponentOptions| undefined = undefined) {
   return (clazz: IKoComponentStatic): any => {
     if (!options) {
       options = {

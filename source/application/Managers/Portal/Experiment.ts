@@ -1,9 +1,8 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import Portal = require('Managers/Portal/Portal');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import Navigation = require('Managers/Navigation/Navigation');
 import Title = require('Managers/Title');
-import WebGazer = require('Managers/WebGazerManager');
 import Notification = require('Managers/Notification');
 import CallRepeater = require('Managers/CallRepeater');
 import CallQueue = require('Managers/CallQueue');
@@ -18,23 +17,23 @@ class Experiment extends DisposableComponent {
   }
   private _testExperiment: TestExperiment;
 
-  public IsReady: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
+  public IsReady: knockout.Observable<boolean> = knockout.observable<boolean>(false);
 
-  public CurrentSlideIndex: KnockoutObservable<number> = knockout.observable(0);
-  public NumberOfSlides: KnockoutObservable<number> = knockout.observable<number>(0);
+  public CurrentSlideIndex: knockout.Observable<number> = knockout.observable(0);
+  public NumberOfSlides: knockout.Observable<number> = knockout.observable<number>(0);
 
-  public IsExperimentCompleted: KnockoutObservable<boolean> = knockout.observable(false);
+  public IsExperimentCompleted: knockout.Observable<boolean> = knockout.observable(false);
 
-  public Title: KnockoutObservable<string> = knockout.observable('');
-  public SlideTitle: KnockoutObservable<string> = knockout.observable('');
-  public FooterLabel: KnockoutObservable<string> = knockout.observable(null);
-  public StyleSheet: KnockoutObservable<string> = knockout.observable(null);
-  public CompletedUrl: KnockoutObservable<string> = knockout.observable(null);
+  public Title: knockout.Observable<string> = knockout.observable('');
+  public SlideTitle: knockout.Observable<string> = knockout.observable('');
+  public FooterLabel: knockout.Observable<string> = knockout.observable(null);
+  public StyleSheet: knockout.Observable<string> = knockout.observable(null);
+  public CompletedUrl: knockout.Observable<string> = knockout.observable(null);
   public ScrollToInvalidAnswerDuration = 2000;
 
-  public CloseExperimentEnabled: KnockoutComputed<boolean>;
-  public CloseSlidesEnabled: KnockoutObservable<boolean> = knockout.observable(false);
-  public GoToPreviousSlideEnabled: KnockoutObservable<boolean> = knockout.observable(true);
+  public CloseExperimentEnabled: knockout.Computed<boolean>;
+  public CloseSlidesEnabled: knockout.Observable<boolean> = knockout.observable(false);
+  public GoToPreviousSlideEnabled: knockout.Observable<boolean> = knockout.observable(true);
 
   private _id: string;
   private _hasLoadedCurrentSlide = false;

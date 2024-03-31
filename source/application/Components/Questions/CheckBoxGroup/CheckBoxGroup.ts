@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
 import QuestionModel = require('Models/Question');
 
@@ -8,9 +8,9 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
   private readonly _minNoOfSelections: number;
   private readonly _maxNoOfSelections: number;
 
-  public Answer: KnockoutObservableArray<string> = knockout.observableArray<string>();
+  public Answer: knockout.ObservableArray<string> = knockout.observableArray<string>();
 
-  public CanSelectMore: KnockoutComputed<boolean>;
+  public CanSelectMore: knockout.Computed<boolean>;
 
   public ItemCorrectness: boolean[];
 

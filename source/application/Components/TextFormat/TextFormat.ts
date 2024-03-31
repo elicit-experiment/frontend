@@ -1,11 +1,11 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import TextFormatter = require('Managers/TextFormatter');
 
 class TextFormat {
-  public Input: KnockoutObservable<string> = knockout.observable<string>(
+  public Input: knockout.Observable<string> = knockout.observable<string>(
     'Lorem {{b|ipsum}} dolor sit amet, {{i|consectetur}} adipiscing elit. {{u|Quisque}} porta pulvinar erat. {{s|Suspendisse}} a tel{{sub|lus}} odi{{super|o}}. {{mark|Vivamus}} ac libero. Fusce {{tiny|ornare}} nisl in {{small|augue}} tristique, non {{large|fermentum}} metus lobortis. Quis nisi {{color|green|finibus}} ornare. Proin {{color|#ffaaff|semper}} sapien. Quisque {{style|font-variant: small-caps;border: 1px solid magenta;|fermentum}} quis risus vitae posuere. Vitae {{link|http://refrain.dk}} est egestas {{link|http://refrain.dk|blandit|current}}. {{image|App/Images/DTULogo.png|15|30}}Aliquam erat volutpat. Quisque fermentum quis {{n}} risus vitae posuere. Morbi{{tab}}sagittis diam in leo {{b|vestibulum {{s|dapibus}}. Cras}} rhoncus faucibus libero, id ullamcorper mi suscipit sit amet. {{right|Integer orci felis, imperdiet vitae felis ac, cursus iaculis elit.}}{{center|Integer orci felis, imperdiet vitae felis ac, cursus iaculis elit.}}{{justify|Integer orci felis, imperdiet vitae felis ac, cursus iaculis elit.}} Praesent blandit tincidunt pretium. Fusce ornare nisl in augue tristique, non fermentum metus lobortis. {{image|App/Images/DTULogo.png|left}} Pellentesque cursus fringilla lobortis. In blandit nisi et lacus placerat, sed blandit nunc pharetra. Lorem ipsum dolor sit amet, consectetur.',
   );
-  public Output: KnockoutComputed<string>;
+  public Output: knockout.Computed<string>;
 
   public Examples: FormatExample[];
 

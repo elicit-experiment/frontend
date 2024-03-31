@@ -1,40 +1,40 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import ExperimentManager = require('Managers/Portal/Experiment');
 import SlideModel = require('Models/Slide');
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import SlideStep from '../../Models/SlideStep';
 
 class SlideShell {
-  public Title: KnockoutObservable<string>;
-  public HasTitle: KnockoutComputed<boolean>;
+  public Title: knockout.Observable<string>;
+  public HasTitle: knockout.Computed<boolean>;
 
-  public SlideData: KnockoutObservable<SlideModel> = knockout.observable<SlideModel>();
+  public SlideData: knockout.Observable<SlideModel> = knockout.observable<SlideModel>();
 
-  public SlideComponent: KnockoutComputed<{ name: string; params: any }>;
+  public SlideComponent: knockout.Computed<{ name: string; params: any }>;
 
-  public AreAllQuestionsAnswered: KnockoutObservable<boolean> = knockout.observable(false);
-  public ShowFeedback: KnockoutObservable<boolean> = knockout.observable(false);
-  public CurrentSlideStep: KnockoutObservable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
-  public SlideIndex: KnockoutObservable<number>;
-  public SlideNumber: KnockoutComputed<number>;
-  public NumberOfSlides: KnockoutObservable<number>;
+  public AreAllQuestionsAnswered: knockout.Observable<boolean> = knockout.observable(false);
+  public ShowFeedback: knockout.Observable<boolean> = knockout.observable(false);
+  public CurrentSlideStep: knockout.Observable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
+  public SlideIndex: knockout.Observable<number>;
+  public SlideNumber: knockout.Computed<number>;
+  public NumberOfSlides: knockout.Observable<number>;
 
-  public IsLoadingSlide: KnockoutComputed<boolean>;
+  public IsLoadingSlide: knockout.Computed<boolean>;
 
-  public IsPreviousSlideVisible: KnockoutComputed<boolean>;
-  public IsPreviousSlideEnabled: KnockoutComputed<boolean>;
-  public IsNextSlideVisible: KnockoutComputed<boolean>;
-  public IsNextSlideEnabled: KnockoutComputed<boolean>;
-  public IsCloseExperimentVisible: KnockoutComputed<boolean>;
-  public IsCloseExperimentEnabled: KnockoutComputed<boolean>;
-  public IsHighlighted: KnockoutObservable<boolean> = knockout.observable(false);
-  public IsWaiting: KnockoutComputed<boolean>;
-  public IsWaitingForNext: KnockoutObservable<boolean> = knockout.observable(false);
-  public NextText: KnockoutComputed<string> = knockout.computed(() => {
+  public IsPreviousSlideVisible: knockout.Computed<boolean>;
+  public IsPreviousSlideEnabled: knockout.Computed<boolean>;
+  public IsNextSlideVisible: knockout.Computed<boolean>;
+  public IsNextSlideEnabled: knockout.Computed<boolean>;
+  public IsCloseExperimentVisible: knockout.Computed<boolean>;
+  public IsCloseExperimentEnabled: knockout.Computed<boolean>;
+  public IsHighlighted: knockout.Observable<boolean> = knockout.observable(false);
+  public IsWaiting: knockout.Computed<boolean>;
+  public IsWaitingForNext: knockout.Observable<boolean> = knockout.observable(false);
+  public NextText: knockout.Computed<string> = knockout.computed(() => {
     return this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING ? 'See Answers' : 'Next';
   });
 
-  private _subscriptions: KnockoutSubscription[] = [];
+  private _subscriptions: knockout.Subscription[] = [];
 
   constructor() {
     this.IsLoadingSlide = knockout.computed(() => {

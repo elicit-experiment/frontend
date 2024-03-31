@@ -47,6 +47,7 @@ import TextBlock = require('Components/Questions/TextBlock/TextBlock');
 import TwoDScaleK = require('Components/Questions/TwoDScaleK/TwoDScaleK');
 import Unsupported = require('Components/Questions/Unsupported/Unsupported');
 import WebGazerCalibrate = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate');
+import FaceLandmark from './Components/Questions/FaceLandmark/FaceLandmark';
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';
 
@@ -94,5 +95,6 @@ knockout.applyBindings({
     TwoDScaleK,
     Unsupported,
     WebGazerCalibrate,
+    FaceLandmark,
   ],
 });

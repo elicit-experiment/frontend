@@ -1,12 +1,12 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import Routie = require('routie');
 import NavigationPage = require('Managers/Navigation/NavigationPage');
 import Title = require('Managers/Title');
 
 class Navigation {
-  public CurrentPage: KnockoutObservable<NavigationPage> = knockout.observable<NavigationPage>();
-  public ExperimentId: KnockoutObservable<string> = knockout.observable(null);
-  public ExperimentListId: KnockoutObservable<string> = knockout.observable(null);
+  public CurrentPage: knockout.Observable<NavigationPage> = knockout.observable<NavigationPage>();
+  public ExperimentId: knockout.Observable<string> = knockout.observable(null);
+  public ExperimentListId: knockout.Observable<string> = knockout.observable(null);
 
   constructor() {
     Routie({

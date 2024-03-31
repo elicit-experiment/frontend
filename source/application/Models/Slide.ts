@@ -1,26 +1,26 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import SlideStep from './SlideStep';
 
 class Slide {
   public Index: number;
   public Name: string;
-  public IsWorking: KnockoutComputed<boolean>;
-  public CanGoToNextSlide: KnockoutObservable<boolean>;
-  public SlideHasFeedbackToShow: KnockoutObservable<boolean>;
-  public SlideCurrentStep: KnockoutObservable<SlideStep>;
+  public IsWorking: knockout.Computed<boolean>;
+  public CanGoToNextSlide: knockout.Observable<boolean>;
+  public SlideHasFeedbackToShow: knockout.Observable<boolean>;
+  public SlideCurrentStep: knockout.Observable<SlideStep>;
   public Questions: CockpitPortal.IQuestion[];
   public SlideCompleted: (completed: () => void) => void;
   public ScrollToFirstInvalidAnswerCallback: () => void;
 
-  private _isWorking: KnockoutObservable<KnockoutComputed<boolean>> = knockout.observable(null);
+  private _isWorking: knockout.Observable<knockout.Computed<boolean>> = knockout.observable(null);
 
   constructor(
     name: string,
     index: number = null,
-    canGoToNextSlide: KnockoutObservable<boolean> = null,
-    showFeedback: KnockoutObservable<boolean> = null,
-    currentSlideStep: KnockoutObservable<SlideStep> = null,
+    canGoToNextSlide: knockout.Observable<boolean> = null,
+    showFeedback: knockout.Observable<boolean> = null,
+    currentSlideStep: knockout.Observable<SlideStep> = null,
     questions: CockpitPortal.IQuestion[] = null,
   ) {
     this.Index = index;
@@ -42,7 +42,7 @@ class Slide {
     if (this.ScrollToFirstInvalidAnswerCallback != null) this.ScrollToFirstInvalidAnswerCallback();
   }
 
-  public SetIsWorking(observeable: KnockoutComputed<boolean>): void {
+  public SetIsWorking(observeable: knockout.Computed<boolean>): void {
     this._isWorking(observeable);
   }
 }

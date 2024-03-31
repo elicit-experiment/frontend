@@ -1,9 +1,9 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 
 class DisposableAction {
   private _condition: () => boolean;
   private _action: () => void;
-  private _observableCondition: KnockoutComputed<boolean>;
+  private _observableCondition: knockout.Computed<boolean>;
 
   constructor(condition: () => boolean, action: () => void) {
     this._condition = condition;

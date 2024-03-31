@@ -1,4 +1,4 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import Notification = require('Managers/Notification');
 import DisposableComponent = require('Components/DisposableComponent');
@@ -7,7 +7,7 @@ type SearchResult = {
   Name: string;
   ChannelName: string;
   Start: string;
-  IsSelected: KnockoutComputed<boolean>;
+  IsSelected: knockout.Computed<boolean>;
   Select: () => void;
 };
 
@@ -18,7 +18,7 @@ export default class Search extends DisposableComponent {
   public Results = knockout.observableArray<SearchResult>();
   public Selected = knockout.observable<SearchResult>();
 
-  public HasSearched: KnockoutComputed<boolean>;
+  public HasSearched: knockout.Computed<boolean>;
 
   constructor(searchButtonLabel: string) {
     super();

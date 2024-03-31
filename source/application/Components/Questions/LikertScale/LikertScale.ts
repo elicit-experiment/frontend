@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 
@@ -7,8 +7,8 @@ type Item = { Label: string; Id: string; Selected: string };
 
 class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
   public Items: ItemInfo[];
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-  public CanAnswer: KnockoutObservable<boolean>;
+  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
+  public CanAnswer: knockout.Observable<boolean>;
   public AnswerIsRequired = true;
   public IsStimuliBlockVisible = true;
 

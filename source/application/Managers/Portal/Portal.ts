@@ -1,4 +1,4 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import PortalClient = require('PortalClient');
 import Configuration = require('Managers/Configuration');
 

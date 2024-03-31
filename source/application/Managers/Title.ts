@@ -1,7 +1,7 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 
 class Title {
-  public Title: KnockoutObservable<string>;
+  public Title: knockout.Observable<string>;
   private isDefault = true;
   private static defaultName: string = document.title;
 

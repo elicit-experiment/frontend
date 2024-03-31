@@ -1,13 +1,13 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import Navigation = require('Managers/Navigation/Navigation');
 import NavigationPage = require('Managers/Navigation/NavigationPage');
 import TextFormatter = require('Managers/TextFormatter');
 import ExperimentManager = require('Managers/Portal/Experiment');
 
 class Shell {
-  public Page: KnockoutObservable<NavigationPage>;
-  public FooterLabel: KnockoutComputed<string>;
-  public IsFooterVisible: KnockoutComputed<boolean>;
+  public Page: knockout.Observable<NavigationPage>;
+  public FooterLabel: knockout.Computed<string>;
+  public IsFooterVisible: knockout.Computed<boolean>;
 
   constructor() {
     this.Page = Navigation.CurrentPage;

@@ -1,4 +1,4 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import DisposableComponent = require('Components/DisposableComponent');
 
 type Item = { Label: string; Id: string };

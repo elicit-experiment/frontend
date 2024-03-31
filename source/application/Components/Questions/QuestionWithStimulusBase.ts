@@ -1,6 +1,6 @@
 ﻿import QuestionModel = require('Models/Question');
 import MediaInfo = require('Components/Players/MediaInfo');
-
+import knockout from 'knockout';
 import QuestionsBase = require('Components/Questions/QuestionBase');
 
 abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
@@ -20,7 +20,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public Id: string;
   public HeaderLabel: string;
   public HasMedia = false;
-  public CanAnswer: KnockoutObservable<boolean>;
+  public CanAnswer: knockout.Observable<boolean> | knockout.Computed<boolean>;
   public IsColumnLayout = false;
   public QuestionsPerRow() {
     return this._questionsPerRow;

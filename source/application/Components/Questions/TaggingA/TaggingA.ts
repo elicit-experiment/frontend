@@ -1,10 +1,10 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
-type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
+type Tag = { Data: TagData; IsAdded: knockout.Observable<boolean>; Toggle: () => void };
 
 class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
@@ -18,9 +18,9 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public UserItems = knockout.observableArray<Tag>();
   public AddedItems = knockout.observableArray<Tag>();
 
-  public HasSelectionItems: KnockoutComputed<boolean>;
-  public HasUserItems: KnockoutComputed<boolean>;
-  public HasAddedItems: KnockoutComputed<boolean>;
+  public HasSelectionItems: knockout.Computed<boolean>;
+  public HasUserItems: knockout.Computed<boolean>;
+  public HasAddedItems: knockout.Computed<boolean>;
 
   protected readonly InstrumentTemplateName = TaggingA.name;
 

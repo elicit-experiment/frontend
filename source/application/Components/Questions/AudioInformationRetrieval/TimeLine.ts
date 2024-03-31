@@ -1,8 +1,8 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import DisposableComponent = require('Components/DisposableComponent');
 
 type Segment = { Title: string; Start: number; End: number; Length: number };
-type Channel = { Title: string; Segments: Segment[]; TrackElement: KnockoutObservable<HTMLElement> };
+type Channel = { Title: string; Segments: Segment[]; TrackElement: knockout.Observable<HTMLElement> };
 type TimeSegment = { Text: string; Position: number };
 
 export default class TimeLine extends DisposableComponent {
@@ -12,8 +12,8 @@ export default class TimeLine extends DisposableComponent {
   public TimeSegments = knockout.observableArray<TimeSegment>();
 
   public ZoomLevel = knockout.observable(1);
-  public Position: KnockoutComputed<number>;
-  public Length: KnockoutComputed<number>;
+  public Position: knockout.Computed<number>;
+  public Length: knockout.Computed<number>;
 
   constructor() {
     super();

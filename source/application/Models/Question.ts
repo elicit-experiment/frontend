@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import QuestionMap = require('Components/Questions/QuestionMap');
 import SlideStep from './SlideStep';
@@ -10,18 +10,18 @@ class Question {
   public HasUIElement: boolean;
   public Input: any[];
   public Component: any[];
-  public Answer: KnockoutObservable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
-  public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
-  public SlideStep: KnockoutObservable<SlideStep>;
+  public Answer: knockout.Observable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
+  public HasValidAnswer: knockout.Observable<boolean> = knockout.observable(false);
+  public SlideStep: knockout.Observable<SlideStep>;
   public RequiresInput: boolean;
-  public ScrollToCallback: KnockoutObservable<(duration: number) => void> = knockout.observable(null);
+  public ScrollToCallback: knockout.Observable<(duration: number) => void> = knockout.observable(null);
   public AllRequiredMediaHavePlayed = knockout.observable(false);
   public HasFeedbackToShow = knockout.observable(false);
   private _loadedCallback: () => void;
 
   constructor(
     question: CockpitPortal.IQuestion,
-    slideStep: KnockoutObservable<SlideStep>,
+    slideStep: knockout.Observable<SlideStep>,
     answerChangedCallback: (question: Question) => void,
     questionLoadedCallback: () => void,
   ) {
@@ -37,6 +37,9 @@ class Question {
 
       if (question.Type == 'NewComponent::WebGazerCalibrate') {
         questionMap = QuestionMap.Get('WebGazerCalibrate');
+        input = component;
+      } else if (question.Type == 'NewComponent::FaceLandmark') {
+        questionMap = QuestionMap.Get('FaceLandmark');
         input = component;
       } else if (question.Type == 'NewComponent') {
         const numStimuli = 'Stimuli' in component ? component.Stimuli.length : 0;

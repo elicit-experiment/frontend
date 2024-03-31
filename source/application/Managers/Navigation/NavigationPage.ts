@@ -1,8 +1,8 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 
 class NavigationPage {
-  public Name: KnockoutObservable<string> = knockout.observable<string>();
-  public Data: KnockoutObservable<any> = knockout.observable<any>();
+  public Name: knockout.Observable<string> = knockout.observable<string>();
+  public Data: knockout.Observable<any> = knockout.observable<any>();
 
   constructor(name?: string, data?: any) {
     this.Name(name);

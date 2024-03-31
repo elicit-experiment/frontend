@@ -1,4 +1,4 @@
-import knockout = require('knockout');
+import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import Notification = require('Managers/Notification');
 import Configuration = require('Managers/Configuration');
@@ -19,14 +19,14 @@ class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }
   public TimeLine: TimeLine;
   public Rating: Rating;
 
-  public HasSelected: KnockoutComputed<boolean>;
+  public HasSelected: knockout.Computed<boolean>;
 
-  public IsLoginReady: KnockoutObservable<boolean>;
-  public IsAuthenticated: KnockoutObservable<boolean>;
-  public CanLogin: KnockoutObservable<boolean>;
+  public IsLoginReady: knockout.Observable<boolean>;
+  public IsAuthenticated: knockout.Observable<boolean>;
+  public CanLogin: knockout.Observable<boolean>;
   private _wayfAuthenticator: WayfAuthenticator;
 
-  public Position: KnockoutComputed<number>;
+  public Position: knockout.Computed<number>;
   private _audio = knockout.observable<Audio>();
 
   constructor(question: QuestionModel) {
@@ -54,7 +54,7 @@ class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }
 
     this.IsLoginReady = this._wayfAuthenticator.IsReady;
     this.IsAuthenticated = this._wayfAuthenticator.IsAuthenticated;
-    this.CanLogin = this._wayfAuthenticator.CanLogin;
+    this._wayfAuthenticator.CanLogin.subscribe((canLogin) => this.CanLogin(canLogin));
   }
 
   public Login(): void {

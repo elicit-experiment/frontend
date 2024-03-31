@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 
@@ -20,15 +20,15 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
   public Y1Ticks: Tick[];
   public Y2Ticks: Tick[];
 
-  public X1Height: KnockoutObservable<number> = knockout.observable(0);
-  public X2Height: KnockoutObservable<number> = knockout.observable(0);
+  public X1Height: knockout.Observable<number> = knockout.observable(0);
+  public X2Height: knockout.Observable<number> = knockout.observable(0);
 
   public HasY1Ticks: boolean;
   public HasY2Ticks: boolean;
 
-  public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
-  public IsValueNotSet: KnockoutComputed<boolean>;
-  public CanAnswer: KnockoutObservable<boolean>;
+  public Answer: knockout.Observable<number> = knockout.observable<number>(null);
+  public IsValueNotSet: knockout.Computed<boolean>;
+  public CanAnswer: knockout.Observable<boolean>;
 
   public IsStimuliBlockVisible = true;
 

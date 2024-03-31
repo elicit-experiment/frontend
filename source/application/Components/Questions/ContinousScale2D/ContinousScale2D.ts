@@ -1,4 +1,4 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 
@@ -16,12 +16,12 @@ class ContinousScale2D extends QuestionWithStimulusBase<ContinousScale2DAnswer> 
 
   private DefaultPosition: ContinousScale2DAnswer = null;
   private Position: ContinousScale2DAnswer = null;
-  public Answer: KnockoutObservable<ContinousScale2DAnswer> = knockout.observable<ContinousScale2DAnswer>(null);
-  public IsValueNotSet: KnockoutComputed<boolean>;
+  public Answer: knockout.Observable<ContinousScale2DAnswer> = knockout.observable<ContinousScale2DAnswer>(null);
+  public IsValueNotSet: knockout.Computed<boolean>;
 
-  public Context: KnockoutObservable<CanvasRenderingContext2D> = knockout.observable<CanvasRenderingContext2D>();
-  public Width: KnockoutObservable<number> = knockout.observable<number>();
-  public Height: KnockoutObservable<number> = knockout.observable<number>();
+  public Context: knockout.Observable<CanvasRenderingContext2D> = knockout.observable<CanvasRenderingContext2D>();
+  public Width: knockout.Observable<number> = knockout.observable<number>();
+  public Height: knockout.Observable<number> = knockout.observable<number>();
 
   private XMinLabel = 'Cheap';
   private XMaxLabel = 'Expensive';

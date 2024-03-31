@@ -1,6 +1,6 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import jquery = require('jquery');
-import Highcharts = require('highcharts'); //Highcharts;
+import * as highcharts from 'highcharts';
 import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 import QuestionModel = require('Models/Question');
 import AudioInfo = require('Components/Players/Audio/AudioInfo');
@@ -12,15 +12,15 @@ namespace XHighcharts {
   }
 }
 
-type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptions };
+type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: highcharts.SeriesOptionsType };
 type AnswerItem = { Id: string; Position: string };
 
 class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   public Title: string;
-  public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
+  public ChartElement: knockout.Observable<HTMLElement> = knockout.observable<HTMLElement>();
   public Items: Item[];
 
-  private _chart: Highcharts.ChartObject;
+  private _chart: highcharts.Chart;
 
   constructor(question: QuestionModel) {
     super(question);
@@ -38,7 +38,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     if (answer.Scalings) {
       this.GetAnswer().Scalings.forEach((scaling: AnswerItem) => {
         const coordinates = scaling.Position.split(' ');
-        answers[scaling.Id] = { x: parseFloat(coordinates[0]), y: parseFloat(coordinates[1]) };
+        answers[scaling.Id] = {x: parseFloat(coordinates[0]), y: parseFloat(coordinates[1])};
       });
     }
 
@@ -46,7 +46,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private InitializeChart(): void {
-    jquery(this.ChartElement()).highcharts({
+    jquery(this.ChartElement()).highcharts('Foo', {
       chart: {
         type: 'bubble',
         animation: false,
@@ -71,7 +71,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
         },
       },
       xAxis: {
-        title: { text: this.GetInstrumentFormatted('X1AxisLabel') },
+        title: {text: this.GetInstrumentFormatted('X1AxisLabel')},
         min: -1,
         max: 1,
         lineWidth: 1,
@@ -85,10 +85,10 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
             color: 'black',
           },
         ],
-        labels: { enabled: false },
+        labels: {enabled: false},
       },
       yAxis: {
-        title: { text: this.GetInstrumentFormatted('Y1AxisLabel') },
+        title: {text: this.GetInstrumentFormatted('Y1AxisLabel')},
         min: -1,
         max: 1,
         lineWidth: 1,
@@ -102,12 +102,11 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
             color: 'black',
           },
         ],
-        labels: { enabled: false },
+        labels: {enabled: false},
       },
-      tooltip: { enabled: false },
+      tooltip: {enabled: false},
       series: this.Items.map((item) => item.GraphData).filter((data) => data != null),
-    });
-    this._chart = jquery(this.ChartElement()).highcharts();
+    }, (chart) => this._chart = chart);
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -123,13 +122,13 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private CreateAnswerItem(item: Item): AnswerItem {
-    const point = <Highcharts.DataPoint>item.GraphData.data[0];
+    const point = <highcharts.Point>item.GraphData.point;
 
-    return { Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString() };
+    return {Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString()};
   }
 
   private CreateItem(data: any, answer: { x: number; y: number }): Item {
-    const audioInfo = new AudioInfo([{ Type: data.Stimulus.Type, Source: data.Stimulus.URI }]);
+    const audioInfo = new AudioInfo([{Type: data.Stimulus.Type, Source: data.Stimulus.URI}]);
 
     const item = {
       Id: data.Id,
@@ -142,7 +141,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
       this.AddEvent(isPlaying ? 'Start' : 'Stop', data.Id);
 
       if (isPlaying && item.GraphData == null) {
-        item.GraphData = this.CreateGraphItem(data, { x: 0, y: 0 });
+        item.GraphData = this.CreateGraphItem(data, {x: 0, y: 0});
 
         this._chart.addSeries(item.GraphData);
       }
@@ -151,7 +150,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     return item;
   }
 
-  private CreateGraphItem(data: any, answer: { x: number; y: number }): Highcharts.SeriesOptions {
+  private CreateGraphItem(data: any, answer: { x: number; y: number }): Highcharts.SeriesOptionsType {
     return {
       name: data.List.Label,
       // @ts-ignore:TS2322
@@ -168,6 +167,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
 }
 
 import template = require('Components/Questions/TwoDScaleK/TwoDScaleK.html');
+
 knockout.components.register('Questions/TwoDScaleK', {
   viewModel: TwoDScaleK,
   template: template.default,

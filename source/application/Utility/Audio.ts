@@ -1,20 +1,20 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import SoundManager from 'soundmanager2';
 import Notification = require('Managers/Notification');
 
 export default class Audio {
-  public static IsReady: KnockoutObservable<boolean> = knockout.observable(false);
+  public static IsReady: knockout.Observable<boolean> = knockout.observable(false);
   private static SoundManager: ISoundManager;
 
-  public IsReady: KnockoutObservable<boolean> = knockout.observable(false);
-  public IsPlaying: KnockoutObservable<boolean> = knockout.observable(false);
-  public IsFinnished: KnockoutObservable<boolean> = knockout.observable(false);
-  public Position: KnockoutObservable<number> = knockout.observable(0);
-  public Duration: KnockoutObservable<number> = knockout.observable(0);
-  public Volume: KnockoutObservable<number> = knockout.observable(100);
+  public IsReady: knockout.Observable<boolean> = knockout.observable(false);
+  public IsPlaying: knockout.Observable<boolean> = knockout.observable(false);
+  public IsFinnished: knockout.Observable<boolean> = knockout.observable(false);
+  public Position: knockout.Observable<number> = knockout.observable(0);
+  public Duration: knockout.Observable<number> = knockout.observable(0);
+  public Volume: knockout.Observable<number> = knockout.observable(100);
 
   private _sound: ISound;
-  private _isReadySubscription: KnockoutSubscription = null;
+  private _isReadySubscription: knockout.Subscription = null;
 
   constructor(url: string, id?: string) {
     if (!id) id = `Player${Math.ceil(Math.random() * 100000)}`;
@@ -172,7 +172,7 @@ export default class Audio {
   }
 
   private AddVolumeListener(): any {
-    this.Volume.subscribe((v) => {
+    this.Volume.subscribe((v: any) => {
       this._sound.setVolume(v);
     });
   }

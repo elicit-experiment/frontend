@@ -1,11 +1,11 @@
-﻿import knockout = require('knockout');
+﻿import knockout from 'knockout';
 import CockpitPortal = require('Managers/Portal/Cockpit');
 import Portal = require('Managers/Portal/Portal');
 import PortalClient = require('PortalClient');
 import DisposableComponent = require('Components/DisposableComponent');
 
 class CreateExperiment extends DisposableComponent {
-  public IsAuthenticated: KnockoutObservable<boolean>;
+  public IsAuthenticated: knockout.Observable<boolean>;
   public Email = knockout.observable('');
   public Password = knockout.observable('');
 
