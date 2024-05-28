@@ -1,6 +1,6 @@
-﻿import knockout from 'knockout';
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
 
 class Unsupported extends QuestionBase<any> {
   constructor(question: QuestionModel) {
@@ -13,4 +13,4 @@ class Unsupported extends QuestionBase<any> {
   }
 }
 
-export = Unsupported;
+export default Unsupported;

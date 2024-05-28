@@ -1,9 +1,7 @@
-import DisposableComponent = require('Components/DisposableComponent');
-import ExperimentManager = require('Managers/Portal/Experiment');
-import PortalClient = require('PortalClient');
-import methods = require('../Utility/TimeSeries');
-
-const { postTimeSeriesAsJson, postTimeSeriesAsFile } = methods;
+import DisposableComponent from 'Components/DisposableComponent';
+import ExperimentManager from 'Managers/Portal/Experiment';
+import PortalClient from 'PortalClient';
+import { postTimeSeriesAsJson, postTimeSeriesAsFile } from 'Utility/TimeSeries';
 
 interface IMouseTrackingRow {
   x: number;
@@ -212,4 +210,4 @@ class MouseTrackingManager extends DisposableComponent {
   }
 }
 
-export = MouseTrackingManager;
+export default MouseTrackingManager;

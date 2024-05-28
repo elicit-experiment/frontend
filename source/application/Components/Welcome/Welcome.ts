@@ -1,11 +1,11 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class Welcome {}
 
-import template = require('Components/Welcome/Welcome.html');
+import template from 'Components/Welcome/Welcome.html';
 knockout.components.register('Questions/Welcome', {
   viewModel: Welcome,
-  template: template.default,
+  template,
 });
 
-export = Welcome;
+export default Welcome;

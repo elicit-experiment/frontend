@@ -1,6 +1,6 @@
-﻿import knockout from 'knockout';
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
 
 type ContinousScale2DAnswer = { X: number; Y: number; T: number } | null;
 
@@ -16,12 +16,12 @@ class ContinousScale2D extends QuestionWithStimulusBase<ContinousScale2DAnswer> 
 
   private DefaultPosition: ContinousScale2DAnswer = null;
   private Position: ContinousScale2DAnswer = null;
-  public Answer: knockout.Observable<ContinousScale2DAnswer> = knockout.observable<ContinousScale2DAnswer>(null);
-  public IsValueNotSet: knockout.Computed<boolean>;
+  public Answer: ko.Observable<ContinousScale2DAnswer> = knockout.observable<ContinousScale2DAnswer>(null);
+  public IsValueNotSet: ko.Computed<boolean>;
 
-  public Context: knockout.Observable<CanvasRenderingContext2D> = knockout.observable<CanvasRenderingContext2D>();
-  public Width: knockout.Observable<number> = knockout.observable<number>();
-  public Height: knockout.Observable<number> = knockout.observable<number>();
+  public Context: ko.Observable<CanvasRenderingContext2D> = knockout.observable<CanvasRenderingContext2D>();
+  public Width: ko.Observable<number> = knockout.observable<number>();
+  public Height: ko.Observable<number> = knockout.observable<number>();
 
   private XMinLabel = 'Cheap';
   private XMaxLabel = 'Expensive';
@@ -166,10 +166,10 @@ class ContinousScale2D extends QuestionWithStimulusBase<ContinousScale2DAnswer> 
   }
 }
 
-import template = require('Components/Questions/ContinousScale2D/ContinousScale2D.html');
+import template from 'Components/Questions/ContinousScale2D/ContinousScale2D.html';
 knockout.components.register('Questions/ContinousScale2D', {
   viewModel: ContinousScale2D,
-  template: template.default,
+  template,
 });
 
-export = ContinousScale2D;
+export default ContinousScale2D;

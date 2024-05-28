@@ -1,14 +1,14 @@
-﻿import knockout from 'knockout';
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
 
 type ItemInfo = { Id: string; Label: string };
 type Item = { Label: string; Id: string; Selected: string };
 
 class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
   public Items: ItemInfo[];
-  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
-  public CanAnswer: knockout.Observable<boolean>;
+  public Answer: ko.Observable<string> = knockout.observable<string>(null);
+  public CanAnswer: ko.Observable<boolean>;
   public AnswerIsRequired = true;
   public IsStimuliBlockVisible = true;
 
@@ -48,10 +48,10 @@ class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
   }
 }
 
-import template = require('Components/Questions/LikertScale/LikertScale.html');
+import template from 'Components/Questions/LikertScale/LikertScale.html';
 knockout.components.register('Questions/LikertScale', {
   viewModel: LikertScale,
-  template: template.default,
+  template,
 });
 
-export = LikertScale;
+export default LikertScale;

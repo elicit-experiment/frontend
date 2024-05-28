@@ -1,9 +1,6 @@
-import knockout from 'knockout';
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import Notification = require('Managers/Notification');
-import Configuration = require('Managers/Configuration');
-import QuestionModel = require('Models/Question');
-import QuestionBase = require('Components/Questions/QuestionBase');
+import * as knockout from 'knockout';
+import QuestionModel from 'Models/Question';
+import QuestionBase from 'Components/Questions/QuestionBase';
 import WayfAuthenticator from 'Components/Questions/AudioInformationRetrieval/WayfAuthenticator';
 import Search from 'Components/Questions/AudioInformationRetrieval/Search';
 import TimeLine from 'Components/Questions/AudioInformationRetrieval/TimeLine';
@@ -19,14 +16,14 @@ class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }
   public TimeLine: TimeLine;
   public Rating: Rating;
 
-  public HasSelected: knockout.Computed<boolean>;
+  public HasSelected: ko.Computed<boolean>;
 
-  public IsLoginReady: knockout.Observable<boolean>;
-  public IsAuthenticated: knockout.Observable<boolean>;
-  public CanLogin: knockout.Observable<boolean>;
+  public IsLoginReady: ko.Observable<boolean>;
+  public IsAuthenticated: ko.Observable<boolean>;
+  public CanLogin: ko.Observable<boolean>;
   private _wayfAuthenticator: WayfAuthenticator;
 
-  public Position: knockout.Computed<number>;
+  public Position: ko.Computed<number>;
   private _audio = knockout.observable<Audio>();
 
   constructor(question: QuestionModel) {
@@ -78,10 +75,10 @@ class AudioInformationRetrieval extends QuestionBase<{ Selections: Selection[] }
   }
 }
 
-import template = require('Components/Questions/AudioInformationRetrieval/AudioInformationRetrieval.html');
+import template from 'Components/Questions/AudioInformationRetrieval/AudioInformationRetrieval.html';
 knockout.components.register('Questions/AudioInformationRetrieval', {
   viewModel: AudioInformationRetrieval,
-  template: template.default,
+  template,
 });
 
-export = AudioInformationRetrieval;
+export default AudioInformationRetrieval;

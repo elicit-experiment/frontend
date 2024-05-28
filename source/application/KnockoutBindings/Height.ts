@@ -1,4 +1,4 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
@@ -10,4 +10,4 @@ export default {
     } else throw new Error('Invalid configuration of Height binding: ' + value);
   },
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
-} as knockout.BindingHandler;
+} as ko.BindingHandler;

@@ -1,9 +1,9 @@
-﻿import knockout from 'knockout';
-import jquery = require('jquery');
+﻿import * as knockout from 'knockout';
+import * as jQuery from 'jquery';
 import * as highcharts from 'highcharts';
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
-import AudioInfo = require('Components/Players/Audio/AudioInfo');
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
+import AudioInfo from 'Components/Players/Audio/AudioInfo';
 
 namespace XHighcharts {
   interface SeriesOptions {
@@ -12,15 +12,15 @@ namespace XHighcharts {
   }
 }
 
-type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: highcharts.SeriesOptionsType };
+type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptionsType };
 type AnswerItem = { Id: string; Position: string };
 
 class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   public Title: string;
-  public ChartElement: knockout.Observable<HTMLElement> = knockout.observable<HTMLElement>();
+  public ChartElement: ko.Observable<HTMLElement> = knockout.observable<HTMLElement>();
   public Items: Item[];
 
-  private _chart: highcharts.Chart;
+  private _chart: Highcharts.Chart;
 
   constructor(question: QuestionModel) {
     super(question);
@@ -46,7 +46,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private InitializeChart(): void {
-    jquery(this.ChartElement()).highcharts('Foo', {
+    jQuery(this.ChartElement()).highcharts('Foo', {
       chart: {
         type: 'bubble',
         animation: false,
@@ -122,7 +122,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private CreateAnswerItem(item: Item): AnswerItem {
-    const point = <highcharts.Point>item.GraphData.point;
+    const point = <Highcharts.Point>item.GraphData.point;
 
     return {Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString()};
   }
@@ -166,11 +166,11 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 }
 
-import template = require('Components/Questions/TwoDScaleK/TwoDScaleK.html');
+import template from 'Components/Questions/TwoDScaleK/TwoDScaleK.html';
 
 knockout.components.register('Questions/TwoDScaleK', {
   viewModel: TwoDScaleK,
-  template: template.default,
+  template,
 });
 
-export = TwoDScaleK;
+export default TwoDScaleK;

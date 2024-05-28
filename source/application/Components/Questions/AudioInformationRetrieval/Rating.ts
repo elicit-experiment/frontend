@@ -1,5 +1,5 @@
-import knockout from 'knockout';
-import DisposableComponent = require('Components/DisposableComponent');
+import * as knockout from 'knockout';
+import DisposableComponent from 'Components/DisposableComponent';
 
 type Item = { Label: string; Id: string };
 

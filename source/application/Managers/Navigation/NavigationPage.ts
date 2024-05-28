@@ -1,8 +1,8 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class NavigationPage {
-  public Name: knockout.Observable<string> = knockout.observable<string>();
-  public Data: knockout.Observable<any> = knockout.observable<any>();
+  public Name: ko.Observable<string> = knockout.observable<string>();
+  public Data: ko.Observable<any> = knockout.observable<any>();
 
   constructor(name?: string, data?: any) {
     this.Name(name);
@@ -10,4 +10,4 @@ class NavigationPage {
   }
 }
 
-export = NavigationPage;
+export default NavigationPage;

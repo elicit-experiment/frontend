@@ -1,13 +1,12 @@
 {
     "compilerOptions": {
 		"noImplicitAny": false,
-		"module": "node16",
+		"module": "es2020",
 		"outDir": "app",
-        "target": "es5",
-        "moduleResolution": "node16",
+        "target": "es2020",
         "types": [ "youtube" ],
         "lib": ["es2017", "dom", "es6"],
-        "esModuleInterop": true,
+        "moduleResolution": "node",
         "experimentalDecorators": true,
         "baseUrl": "./source/",
         "paths": {

@@ -1,12 +1,11 @@
 
 import './LandmarkExample.css';
 
-export default (FaceLandmarker:any, FilesetResolver:any, DrawingUtils: any) => {
+export default (FaceLandmarker: any, FilesetResolver: any, DrawingUtils: any, dataCallback: (any) => void) => {
 
   const demosSection = document.getElementById("demos");
   const imageBlendShapes = document.getElementById("image-blend-shapes");
   const videoBlendShapes = document.getElementById("video-blend-shapes");
-
 
   let faceLandmarker;
   let runningMode: "IMAGE" | "VIDEO" = "IMAGE";
@@ -210,7 +209,12 @@ export default (FaceLandmarker:any, FilesetResolver:any, DrawingUtils: any) => {
       lastVideoTime = video.currentTime;
       results = faceLandmarker.detectForVideo(video, startTimeMs);
     }
+
+    dataCallback(results);
+
     if (results.faceLandmarks) {
+
+
       for (const landmarks of results.faceLandmarks) {
         drawingUtils.drawConnectors(
           landmarks,

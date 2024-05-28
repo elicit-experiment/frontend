@@ -1,5 +1,5 @@
-﻿import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
+﻿import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
 import * as knockout from 'knockout';
 
 class TextBlock extends QuestionBase<any> {
@@ -21,10 +21,10 @@ class TextBlock extends QuestionBase<any> {
   }
 }
 
-import template = require('Components/Questions/TextBlock/TextBlock.html');
+import template from 'Components/Questions/TextBlock/TextBlock.html';
 knockout.components.register('Questions/TextBlock', {
   viewModel: TextBlock,
-  template: template.default,
+  template,
 });
 
-export = TextBlock;
+export default TextBlock;

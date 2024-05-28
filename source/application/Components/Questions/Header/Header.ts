@@ -1,7 +1,7 @@
-﻿import ExperimentManager = require('Managers/Portal/Experiment');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import knockout from 'knockout';
+﻿import ExperimentManager from 'Managers/Portal/Experiment';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import * as knockout from 'knockout';
 
 class Header extends QuestionBase<any> {
   public HeaderLabel: string;
@@ -32,4 +32,4 @@ knockout.components.register('Questions/Header', {
   template: '<div></div>',
 });
 
-export = Header;
+export default Header;

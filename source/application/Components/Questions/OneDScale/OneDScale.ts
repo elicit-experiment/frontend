@@ -1,6 +1,6 @@
-﻿import knockout from 'knockout';
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
 
 type Tick = {
   Label: string;
@@ -20,15 +20,15 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
   public Y1Ticks: Tick[];
   public Y2Ticks: Tick[];
 
-  public X1Height: knockout.Observable<number> = knockout.observable(0);
-  public X2Height: knockout.Observable<number> = knockout.observable(0);
+  public X1Height: ko.Observable<number> = knockout.observable(0);
+  public X2Height: ko.Observable<number> = knockout.observable(0);
 
   public HasY1Ticks: boolean;
   public HasY2Ticks: boolean;
 
-  public Answer: knockout.Observable<number> = knockout.observable<number>(null);
-  public IsValueNotSet: knockout.Computed<boolean>;
-  public CanAnswer: knockout.Observable<boolean>;
+  public Answer: ko.Observable<number> = knockout.observable<number>(null);
+  public IsValueNotSet: ko.Computed<boolean>;
+  public CanAnswer: ko.Observable<boolean>;
 
   public IsStimuliBlockVisible = true;
 
@@ -99,10 +99,10 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
   }
 }
 
-import template = require('Components/Questions/OneDScale/OneDScale.html');
+import template from 'Components/Questions/OneDScale/OneDScale.html';
 knockout.components.register('Questions/OneDScale', {
   viewModel: OneDScale,
-  template: template.default,
+  template,
 });
 
-export = OneDScale;
+export default OneDScale;

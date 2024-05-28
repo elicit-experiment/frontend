@@ -12,7 +12,7 @@ declare module 'Components/WebGazer/WebGazerCalibration' {
 
 	function swal(...params: any[]): Promise<boolean>;
 
-	var currentPoint:KnockoutObservable<any>;
+	var currentPoint:ko.Observable<any>;
 	function HideWebGazerVideo(): void;
 }
 

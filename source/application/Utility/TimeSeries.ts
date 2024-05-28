@@ -1,4 +1,4 @@
-import Configuration = require('Managers/Configuration');
+import Configuration from 'Managers/Configuration';
 
 function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: string) {
   if (sessionGuid === '') console.error('no session GUID');

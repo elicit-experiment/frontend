@@ -10,4 +10,4 @@ class Configuration {
 
 const instance = new Configuration();
 
-export = instance;
+export default instance;

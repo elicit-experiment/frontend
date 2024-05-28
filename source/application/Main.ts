@@ -2,7 +2,7 @@
 import './Main.scss';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-import jQuery from 'jquery';
+import * as jQuery from 'jquery';
 window.jQuery = jQuery;
 window.$ = jQuery;
 
@@ -26,27 +26,27 @@ import Audio from 'Components/Players/Audio/Audio';
 import Image from 'Components/Players/Image/Image';
 import Video from 'Components/Players/Video/Video';
 
-import QuestionRadioButtonGroup = require('Components/Questions/RadioButtonGroup/RadioButtonGroup');
-import AudioInformationRetrieval = require('Components/Questions/AudioInformationRetrieval/AudioInformationRetrieval');
-import CheckBoxGroup = require('Components/Questions/CheckBoxGroup/CheckBoxGroup');
-import CompletionCode = require('Components/Questions/CompletionCode/CompletionCode');
-import ContinousScale2D = require('Components/Questions/ContinousScale2D/ContinousScale2D');
-import EndOfExperiment = require('Components/Questions/EndOfExperiment/EndOfExperiment');
-import Freetext = require('Components/Questions/Freetext/Freetext');
-import FreetextHash = require('Components/Questions/FreetextHash/FreetextHash');
-import KAcPS = require('Components/Questions/KAcPS/KAcPS');
-import Monitor = require('Components/Questions/Monitor/Monitor');
-import Header = require('Components/Questions/Header/Header');
-import OneDScale = require('Components/Questions/OneDScale/OneDScale');
-import LikertScale = require('Components/Questions/LikertScale/LikertScale');
-import OneDScaleT = require('Components/Questions/OneDScaleT/OneDScaleT');
-import SoloStimulus = require('Components/Questions/SoloStimulus/SoloStimulus');
-import TaggingA = require('Components/Questions/TaggingA/TaggingA');
-import TaggingB = require('Components/Questions/TaggingB/TaggingB');
-import TextBlock = require('Components/Questions/TextBlock/TextBlock');
-import TwoDScaleK = require('Components/Questions/TwoDScaleK/TwoDScaleK');
-import Unsupported = require('Components/Questions/Unsupported/Unsupported');
-import WebGazerCalibrate = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate');
+import QuestionRadioButtonGroup from 'Components/Questions/RadioButtonGroup/RadioButtonGroup';
+import AudioInformationRetrieval from 'Components/Questions/AudioInformationRetrieval/AudioInformationRetrieval';
+import CheckBoxGroup from 'Components/Questions/CheckBoxGroup/CheckBoxGroup';
+import CompletionCode from 'Components/Questions/CompletionCode/CompletionCode';
+import ContinousScale2D from 'Components/Questions/ContinousScale2D/ContinousScale2D';
+import EndOfExperiment from 'Components/Questions/EndOfExperiment/EndOfExperiment';
+import Freetext from 'Components/Questions/Freetext/Freetext';
+import FreetextHash from 'Components/Questions/FreetextHash/FreetextHash';
+import KAcPS from 'Components/Questions/KAcPS/KAcPS';
+import Monitor from 'Components/Questions/Monitor/Monitor';
+import Header from 'Components/Questions/Header/Header';
+import OneDScale from 'Components/Questions/OneDScale/OneDScale';
+import LikertScale from 'Components/Questions/LikertScale/LikertScale';
+import OneDScaleT from 'Components/Questions/OneDScaleT/OneDScaleT';
+import SoloStimulus from 'Components/Questions/SoloStimulus/SoloStimulus';
+import TaggingA from 'Components/Questions/TaggingA/TaggingA';
+import TaggingB from 'Components/Questions/TaggingB/TaggingB';
+import TextBlock from 'Components/Questions/TextBlock/TextBlock';
+import TwoDScaleK from 'Components/Questions/TwoDScaleK/TwoDScaleK';
+import Unsupported from 'Components/Questions/Unsupported/Unsupported';
+import WebGazerCalibrate from 'Components/Questions/WebGazerCalibrate/WebGazerCalibrate';
 import FaceLandmark from './Components/Questions/FaceLandmark/FaceLandmark';
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';

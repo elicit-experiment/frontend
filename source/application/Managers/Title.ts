@@ -1,7 +1,7 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class Title {
-  public Title: knockout.Observable<string>;
+  public Title: ko.Observable<string>;
   private isDefault = true;
   private static defaultName: string = document.title;
 
@@ -21,4 +21,4 @@ class Title {
 
 const instance = new Title();
 
-export = instance;
+export default instance;

@@ -1,9 +1,7 @@
-﻿import knockout from 'knockout';
-
-export default {
+﻿export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
-    const value: knockout.Observable<(duration: number) => void> = valueAccessor();
+    const value: ko.Observable<(duration: number) => void> = valueAccessor();
 
     const $element = jQuery(element);
     const $document = jQuery('html, body');
@@ -12,4 +10,4 @@ export default {
       $document.animate({ scrollTop: $element.offset().top }, duration);
     });
   },
-} as knockout.BindingHandler;
+} as ko.BindingHandler;

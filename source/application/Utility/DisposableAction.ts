@@ -1,9 +1,9 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class DisposableAction {
   private _condition: () => boolean;
   private _action: () => void;
-  private _observableCondition: knockout.Computed<boolean>;
+  private _observableCondition: ko.Computed<boolean>;
 
   constructor(condition: () => boolean, action: () => void) {
     this._condition = condition;
@@ -32,4 +32,4 @@ class DisposableAction {
   }
 }
 
-export = DisposableAction;
+export default DisposableAction;

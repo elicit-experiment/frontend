@@ -1,4 +1,4 @@
-import knockout from 'knockout';
+import * as knockout from 'knockout';
 
 type Source = {
   Type: string;
@@ -13,14 +13,14 @@ type Source = {
 
 class MediaInfo {
   public Sources: Source[];
-  public IsPlaying: knockout.Observable<boolean> = knockout.observable(false);
-  public IsPlayed: knockout.Observable<boolean> = knockout.observable(false);
-  public IsStartable: knockout.Observable<boolean>;
-  public IsLayedOut: knockout.Observable<ClientRect | DOMRect> = knockout.observable(null);
-  public OnEvent: knockout.Subscribable<{ eventName: string; entityType: string }> = new knockout.subscribable();
+  public IsPlaying: ko.Observable<boolean> = knockout.observable(false);
+  public IsPlayed: ko.Observable<boolean> = knockout.observable(false);
+  public IsStartable: ko.Observable<boolean>;
+  public IsLayedOut: ko.Observable<ClientRect | DOMRect> = knockout.observable(null);
+  public OnEvent: ko.Subscribable<{ eventName: string; entityType: string }> = new knockout.subscribable();
   public MediaStateProviders = new Array<() => { PlaybackTimestamp: number }>();
 
-  constructor(sources: Source[], startable: knockout.Observable<boolean> = knockout.observable(true)) {
+  constructor(sources: Source[], startable: ko.Observable<boolean> = knockout.observable(true)) {
     this.Sources = sources;
     this.IsStartable = startable;
   }
@@ -77,7 +77,7 @@ class MediaInfo {
 
   public static Create(
     stimulus: IStimulus,
-    startable: knockout.Observable<boolean> = knockout.observable(true),
+    startable: ko.Observable<boolean> = knockout.observable(true),
     mimeType: string = null,
   ): MediaInfo {
     if (stimulus === null) return null;
@@ -95,4 +95,4 @@ class MediaInfo {
   }
 }
 
-export = MediaInfo;
+export default MediaInfo;

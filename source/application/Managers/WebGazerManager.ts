@@ -1,11 +1,9 @@
 webgazer = require('WebGazer');
-import DisposableComponent = require('Components/DisposableComponent');
-import ExperimentManager = require('Managers/Portal/Experiment');
-import knockout from 'knockout';
-import PortalClient = require('PortalClient');
-import methods = require('../Utility/TimeSeries');
-
-const { postTimeSeriesAsJson, postTimeSeriesAsFile } = methods;
+import DisposableComponent from 'Components/DisposableComponent';
+import ExperimentManager from 'Managers/Portal/Experiment';
+import * as knockout from 'knockout';
+import PortalClient from 'PortalClient';
+import { postTimeSeriesAsJson, postTimeSeriesAsFile }  from 'Utility/TimeSeries';
 
 enum WebGazerState {
   NotStarted,

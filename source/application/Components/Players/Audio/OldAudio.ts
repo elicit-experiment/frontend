@@ -1,13 +1,13 @@
-﻿import knockout from 'knockout';
-import jquery = require('jquery');
-import AudioInfo = require('Components/Players/Audio/AudioInfo');
+﻿import * as knockout from 'knockout';
+import * as jQuery from 'jquery';
+import AudioInfo from 'Components/Players/Audio/AudioInfo';
 
 type Source = { Type: string; Source: string };
 
 class OldAudio {
-  public PlayerElement: knockout.Observable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
+  public PlayerElement: ko.Observable<HTMLAudioElement> = knockout.observable<HTMLAudioElement>();
   public Sources: Source[];
-  public IsPlaying: knockout.Observable<boolean>;
+  public IsPlaying: ko.Observable<boolean>;
 
   private _info: AudioInfo;
   private static _activePlayer: OldAudio = null;
@@ -39,7 +39,7 @@ class OldAudio {
   }
 
   private InitializePlayer(player: HTMLAudioElement): void {
-    const $player = jquery(player);
+    const $player = jQuery(player);
 
     $player
       .on('playing', () => {
@@ -56,4 +56,4 @@ class OldAudio {
   }
 }
 
-export = OldAudio;
+export default OldAudio;

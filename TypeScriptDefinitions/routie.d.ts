@@ -23,5 +23,5 @@ declare var routie:RouteStatic;
 
 declare module "routie"
 {
-	export = routie;
+	export default routie;
 }

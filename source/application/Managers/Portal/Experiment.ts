@@ -1,13 +1,13 @@
-﻿import knockout from 'knockout';
-import Portal = require('Managers/Portal/Portal');
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import Navigation = require('Managers/Navigation/Navigation');
-import Title = require('Managers/Title');
-import Notification = require('Managers/Notification');
-import CallRepeater = require('Managers/CallRepeater');
-import CallQueue = require('Managers/CallQueue');
-import DisposableComponent = require('Components/DisposableComponent');
-import TestExperiment = require('Managers/Portal/TestExperiment');
+﻿import * as knockout from 'knockout';
+import Portal from 'Managers/Portal/Portal';
+import { Slide, Experiment as CockpitExperiment, IQuestion, Question as CockpitQuestion, Answer } from 'Managers/Portal/Cockpit';
+import Navigation from 'Managers/Navigation/Navigation';
+import Title from 'Managers/Title';
+import Notification from 'Managers/Notification';
+import CallRepeater from 'Managers/CallRepeater';
+import CallQueue from 'Managers/CallQueue';
+import DisposableComponent from 'Components/DisposableComponent';
+import TestExperiment from 'Managers/Portal/TestExperiment';
 
 class Experiment extends DisposableComponent {
   private static TestId = 'test';
@@ -17,23 +17,23 @@ class Experiment extends DisposableComponent {
   }
   private _testExperiment: TestExperiment;
 
-  public IsReady: knockout.Observable<boolean> = knockout.observable<boolean>(false);
+  public IsReady: ko.Observable<boolean> = knockout.observable<boolean>(false);
 
-  public CurrentSlideIndex: knockout.Observable<number> = knockout.observable(0);
-  public NumberOfSlides: knockout.Observable<number> = knockout.observable<number>(0);
+  public CurrentSlideIndex: ko.Observable<number> = knockout.observable(0);
+  public NumberOfSlides: ko.Observable<number> = knockout.observable<number>(0);
 
-  public IsExperimentCompleted: knockout.Observable<boolean> = knockout.observable(false);
+  public IsExperimentCompleted: ko.Observable<boolean> = knockout.observable(false);
 
-  public Title: knockout.Observable<string> = knockout.observable('');
-  public SlideTitle: knockout.Observable<string> = knockout.observable('');
-  public FooterLabel: knockout.Observable<string> = knockout.observable(null);
-  public StyleSheet: knockout.Observable<string> = knockout.observable(null);
-  public CompletedUrl: knockout.Observable<string> = knockout.observable(null);
+  public Title: ko.Observable<string> = knockout.observable('');
+  public SlideTitle: ko.Observable<string> = knockout.observable('');
+  public FooterLabel: ko.Observable<string> = knockout.observable(null);
+  public StyleSheet: ko.Observable<string> = knockout.observable(null);
+  public CompletedUrl: ko.Observable<string> = knockout.observable(null);
   public ScrollToInvalidAnswerDuration = 2000;
 
-  public CloseExperimentEnabled: knockout.Computed<boolean>;
-  public CloseSlidesEnabled: knockout.Observable<boolean> = knockout.observable(false);
-  public GoToPreviousSlideEnabled: knockout.Observable<boolean> = knockout.observable(true);
+  public CloseExperimentEnabled: ko.Computed<boolean>;
+  public CloseSlidesEnabled: ko.Observable<boolean> = knockout.observable(false);
+  public GoToPreviousSlideEnabled: ko.Observable<boolean> = knockout.observable(true);
 
   private _id: string;
   private _hasLoadedCurrentSlide = false;
@@ -74,7 +74,7 @@ class Experiment extends DisposableComponent {
   public ExperimentCompleted(): void {
     Portal.AllowPageLoads();
 
-    CockpitPortal.Slide.Completed(this._id, this.NumberOfSlides() - 1).WithCallback((response) => {
+    Slide.Completed(this._id, this.NumberOfSlides() - 1).WithCallback((response) => {
       if (response.Error != null) Notification.Error(`Failed to complete experiment: ${response.Error.Message}`);
     });
 
@@ -89,7 +89,7 @@ class Experiment extends DisposableComponent {
 
     if (!this.IsTestExperiment) {
       this.AddAction(Portal.IsReady, () => {
-        CockpitPortal.Experiment.Get(this._id).WithCallback((response) => {
+        CockpitExperiment.Get(this._id).WithCallback((response) => {
           if (response.Error != null) {
             Notification.Error(`Failed to load Experiment: ${response.Error.Message}`);
             Navigation.Navigate(`ExperimentNotFound/${id}`);
@@ -140,7 +140,7 @@ class Experiment extends DisposableComponent {
       return;
     }
 
-    CockpitPortal.Experiment.Next(listId).WithCallback((response) => {
+    CockpitExperiment.Next(listId).WithCallback((response) => {
       if (response.Error != null) {
         Navigation.Navigate('NoMoreExperiments');
         return;
@@ -155,17 +155,17 @@ class Experiment extends DisposableComponent {
     });
   }
 
-  public LoadNextSlide(callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
+  public LoadNextSlide(callback: (slideIndex: number, questions: IQuestion[]) => void): void {
     this.LoadSlide(this.CurrentSlideIndex() + (this._hasLoadedCurrentSlide ? 1 : 0), callback);
   }
 
-  public LoadPreviousSlide(callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
+  public LoadPreviousSlide(callback: (slideIndex: number, questions: IQuestion[]) => void): void {
     this.LoadSlide(this.CurrentSlideIndex() + -1, callback);
   }
 
-  private LoadSlide(index: number, callback: (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void): void {
+  private LoadSlide(index: number, callback: (slideIndex: number, questions: IQuestion[]) => void): void {
     if (!this.IsTestExperiment) {
-      CockpitPortal.Question.Get(this._id, index).WithCallback((response) => {
+      CockpitQuestion.Get(this._id, index).WithCallback((response) => {
         if (response.Error != null) {
           if (response.Error.Fullname === 'Chaos.Cockpit.Core.Core.Exceptions.SlideLockedException')
             Navigation.Navigate('SlideLocked');
@@ -206,7 +206,7 @@ class Experiment extends DisposableComponent {
       id,
       new CallRepeater((c) => {
         if (!this.IsTestExperiment) {
-          CockpitPortal.Answer.Set(id, answer).WithCallback((response) => {
+          Answer.Set(id, answer).WithCallback((response) => {
             if (response.Error != null) {
               if (response.Error.Fullname !== 'Chaos.Cockpit.Core.Core.Exceptions.ValidationException') {
                 c(false, false);
@@ -229,7 +229,7 @@ class Experiment extends DisposableComponent {
       id,
       new CallRepeater((c) => {
         if (!this.IsTestExperiment) {
-          CockpitPortal.Slide.DataPoint(id, datapoint).WithCallback((response) => {
+          Slide.DataPoint(id, datapoint).WithCallback((response) => {
             if (response.Error != null) {
               console.dir(response.Error);
               if (response.Error.Fullname !== 'Chaos.Cockpit.Core.Core.Exceptions.ValidationException') {
@@ -254,7 +254,7 @@ class Experiment extends DisposableComponent {
       this._callQueue.Queue(
         queueId,
         new CallRepeater(
-          (c: (sucess: boolean, fatal: boolean) => void) => {
+          (c: (success: boolean, fatal: boolean) => void) => {
             if (!this.IsTestExperiment) {
               callCount++;
               caller()
@@ -274,7 +274,7 @@ class Experiment extends DisposableComponent {
 
   public CloseSlide(index: number): void {
     if (!this.IsTestExperiment) {
-      CockpitPortal.Slide.Completed(this._id, index).WithCallback((response) => {
+      Slide.Completed(this._id, index).WithCallback((response) => {
         if (response.Error != null) Notification.Error(`Failed to close slide: ${response.Error.Message}`);
       });
     } else {
@@ -313,4 +313,4 @@ class Experiment extends DisposableComponent {
 
 const instance = new Experiment();
 
-export = instance;
+export default instance;

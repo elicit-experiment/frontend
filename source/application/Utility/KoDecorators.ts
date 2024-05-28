@@ -1,6 +1,7 @@
 import * as knockout from 'knockout';
 
-export interface IKoComponentOptions extends knockout.components.Config {
+
+export interface IKoComponentOptions extends ko.components.Config{
   synchronous?: boolean | undefined;
   name?: string;
 }

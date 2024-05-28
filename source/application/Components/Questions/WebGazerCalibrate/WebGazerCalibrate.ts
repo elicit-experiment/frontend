@@ -1,9 +1,9 @@
-import knockout from 'knockout';
+import * as knockout from 'knockout';
 import Swal, { SweetAlertResult } from 'sweetalert2';
-import ExperimentManager = require('Managers/Portal/Experiment');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import bootstrap = require('bootstrap');
+import ExperimentManager from 'Managers/Portal/Experiment';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import { Modal } from 'bootstrap';
 import type WebGazerManager from 'Managers/WebGazerManager';
 
 interface CalibrationPoint {
@@ -13,8 +13,8 @@ interface CalibrationPoint {
 class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   public AnswerIsRequired = true;
   public HasMedia = false;
-  public CanAnswer: knockout.Observable<boolean> = knockout.observable<boolean>(false);
-  public Answer: knockout.Observable<number> = knockout.observable<number>(null);
+  public CanAnswer: ko.Observable<boolean> = knockout.observable<boolean>(false);
+  public Answer: ko.Observable<number> = knockout.observable<number>(null);
 
   public PointCalibrate = 0;
   public CalibrationPoints: CalibrationPoint = {};
@@ -22,10 +22,10 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   public MaxNoOfAttempts: number;
   public NoOfAttempts = 1;
   public MinCalibrationAccuracyPct: number;
-  public CalibrationFailed: knockout.Observable<boolean> = knockout.observable<boolean>(false);
+  public CalibrationFailed: ko.Observable<boolean> = knockout.observable<boolean>(false);
 
-  private _helpModal: bootstrap.Modal = null;
-  private _loadingModal: bootstrap.Modal = null;
+  private _helpModal: Modal = null;
+  private _loadingModal: Modal = null;
 
   private webgazerManager: WebGazerManager = null;
 
@@ -42,7 +42,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
     this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
-    this._loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    this._loadingModal = new Modal(document.getElementById('loadingModal'));
     this._loadingModal.show();
     this.ClearCanvas();
 
@@ -176,7 +176,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       helpModal.querySelector('.calibrate-button').classList.add('d-none');
     }
 
-    this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
+    this._helpModal = new Modal(document.getElementById('helpModal')); // creating modal object
     this._helpModal.show();
     console.log('Show helpmodal');
     console.timeStamp('Show helpmodal');
@@ -501,11 +501,11 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 }
 
-import template = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html');
+import template from 'Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html';
 
 knockout.components.register('Questions/WebGazerCalibrate', {
   viewModel: WebGazerCalibrate,
-  template: template.default,
+  template,
 });
 export default WebGazerCalibrate;
 

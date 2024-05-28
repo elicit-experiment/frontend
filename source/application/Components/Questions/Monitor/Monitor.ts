@@ -1,7 +1,7 @@
-﻿import knockout from 'knockout';
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import MouseTrackingManager = require('Managers/MouseTrackingManager');
+﻿import * as knockout from 'knockout';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import MouseTrackingManager from 'Managers/MouseTrackingManager';
 
 class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; TimeZone: { Offset: number } }> {
   public KeyDownHandler: { (event: KeyboardEvent): void } | null = null;
@@ -58,4 +58,4 @@ knockout.components.register('Questions/Monitor', {
   template: '<div></div>',
 });
 
-export = Monitor;
+export default Monitor;

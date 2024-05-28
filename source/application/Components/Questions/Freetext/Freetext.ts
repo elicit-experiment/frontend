@@ -1,6 +1,6 @@
-﻿import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
-import QuestionModel = require('Models/Question');
-import knockout from 'knockout';
+﻿import FreetextBase from 'Components/Questions/Freetext/FreetextBase';
+import QuestionModel from 'Models/Question';
+import * as knockout from 'knockout';
 
 type Answer = { Text: string };
 
@@ -29,10 +29,10 @@ class Freetext extends FreetextBase<Answer> {
   }
 }
 
-import template = require('Components/Questions/Freetext/Freetext.html');
+import template from 'Components/Questions/Freetext/Freetext.html';
 knockout.components.register('Questions/Freetext', {
   viewModel: Freetext,
-  template: template.default,
+  template,
 });
 
-export = Freetext;
+export default Freetext;

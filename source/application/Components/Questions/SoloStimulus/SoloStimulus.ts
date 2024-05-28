@@ -1,9 +1,9 @@
-import knockout from 'knockout';
+import * as knockout from 'knockout';
 import Swal from 'sweetalert2';
-import ExperimentManager = require('Managers/Portal/Experiment');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import MediaInfo = require('Components/Players/MediaInfo');
+import ExperimentManager from 'Managers/Portal/Experiment';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import MediaInfo from 'Components/Players/MediaInfo';
 
 import type WebGazerManager from 'Managers/WebGazerManager';
 
@@ -11,19 +11,18 @@ class SoloStimulus extends QuestionBase<any> {
   public MediaLabel = '';
   public MediaInfo: MediaInfo = null;
   public HasMedia = true;
-  public AnswerIsRequired = true;
-  public CanAnswer: knockout.Observable<boolean> = knockout.observable(false);
+  public CanAnswer: ko.Observable<boolean> = knockout.observable(false);
   public Calibrating = false;
   public CalibrationElement: HTMLElement;
   public CalibrationPoints: Array<{ x: number; y: number }> = [];
-  public Answer: knockout.Observable<string> = knockout.observable<string>(null);
+  public Answer: ko.Observable<string> = knockout.observable<string>(null);
   public MediaComponentName = 'Players/Audio';
   public EventId = 'SoloStimulus';
-  public CanStartPlaying: knockout.Observable<boolean> = knockout.observable(true);
+  public CanStartPlaying: ko.Observable<boolean> = knockout.observable(true);
   public UsesWebGazer = false;
   private webgazerManager: WebGazerManager = null;
 
-  protected _pointsSubscription: knockout.Subscription;
+  protected _pointsSubscription: ko.Subscription;
 
   constructor(question: QuestionModel) {
     super(question, true);
@@ -266,11 +265,11 @@ class SoloStimulus extends QuestionBase<any> {
   }
 }
 
-import template = require('Components/Questions/SoloStimulus/SoloStimulus.html');
+import template from 'Components/Questions/SoloStimulus/SoloStimulus.html';
 
 knockout.components.register('Questions/SoloStimulus', {
   viewModel: SoloStimulus,
-  template: template.default,
+  template,
 });
 
-export = SoloStimulus;
+export default SoloStimulus;

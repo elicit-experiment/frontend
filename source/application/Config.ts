@@ -4,11 +4,11 @@
 // }
 
 // declare module 'WebGazer' {
-//   export = webgazer;
+//   export default webgazer;
 // }
 
 declare let CacheBuster: number;
 // declare module 'text!../../configuration.json' {
 //   var configuration: string;
-//   export = configuration;
+//   export default configuration;
 // }

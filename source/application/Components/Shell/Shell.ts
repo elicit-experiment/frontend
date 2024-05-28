@@ -1,13 +1,13 @@
-﻿import knockout from 'knockout';
-import Navigation = require('Managers/Navigation/Navigation');
-import NavigationPage = require('Managers/Navigation/NavigationPage');
-import TextFormatter = require('Managers/TextFormatter');
-import ExperimentManager = require('Managers/Portal/Experiment');
+﻿import * as knockout from 'knockout';
+import Navigation from 'Managers/Navigation/Navigation';
+import NavigationPage from 'Managers/Navigation/NavigationPage';
+import TextFormatter from 'Managers/TextFormatter';
+import ExperimentManager from 'Managers/Portal/Experiment';
 
 class Shell {
-  public Page: knockout.Observable<NavigationPage>;
-  public FooterLabel: knockout.Computed<string>;
-  public IsFooterVisible: knockout.Computed<boolean>;
+  public Page: ko.Observable<NavigationPage>;
+  public FooterLabel: ko.Computed<string>;
+  public IsFooterVisible: ko.Computed<boolean>;
 
   constructor() {
     this.Page = Navigation.CurrentPage;
@@ -16,10 +16,10 @@ class Shell {
   }
 }
 
-import template = require('Components/Shell/Shell.html');
+import template from 'Components/Shell/Shell.html';
 knockout.components.register('Shell', {
   viewModel: Shell,
-  template: template.default,
+  template,
 });
 
-export = Shell;
+export default Shell;

@@ -1,6 +1,6 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
-import QuestionModel = require('Models/Question');
+import QuestionModel from 'Models/Question';
 
 type AnswerType = { Selections: string[]; Correct: boolean };
 
@@ -8,9 +8,9 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
   private readonly _minNoOfSelections: number;
   private readonly _maxNoOfSelections: number;
 
-  public Answer: knockout.ObservableArray<string> = knockout.observableArray<string>();
+  public Answer: ko.ObservableArray<string> = knockout.observableArray<string>();
 
-  public CanSelectMore: knockout.Computed<boolean>;
+  public CanSelectMore: ko.Computed<boolean>;
 
   public ItemCorrectness: boolean[];
 
@@ -110,10 +110,10 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
   }
 }
 
-import template = require('Components/Questions/CheckBoxGroup/CheckBoxGroup.html');
+import template from 'Components/Questions/CheckBoxGroup/CheckBoxGroup.html';
 knockout.components.register('Questions/CheckBoxGroup', {
   viewModel: CheckBoxGroup,
-  template: template.default,
+  template,
 });
 
-export = CheckBoxGroup;
+export default CheckBoxGroup;

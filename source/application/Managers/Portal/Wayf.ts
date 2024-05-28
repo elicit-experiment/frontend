@@ -1,6 +1,6 @@
-﻿import PortalClient = require('PortalClient');
-import Notification = require('Managers/Notification');
-import Configuration = require('Managers/Configuration');
+﻿import PortalClient from 'PortalClient';
+import Notification from 'Managers/Notification';
+import Configuration from 'Managers/Configuration';
 import IServiceCaller = CHAOS.Portal.Client.IServiceCaller;
 
 class Wayf {
@@ -47,4 +47,4 @@ class Wayf {
 
 const instance = new Wayf();
 
-export = instance;
+export default instance;

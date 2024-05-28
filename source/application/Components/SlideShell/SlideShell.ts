@@ -1,40 +1,40 @@
-﻿import knockout from 'knockout';
-import ExperimentManager = require('Managers/Portal/Experiment');
-import SlideModel = require('Models/Slide');
-import CockpitPortal = require('Managers/Portal/Cockpit');
+﻿import * as knockout from 'knockout';
+import ExperimentManager from 'Managers/Portal/Experiment';
+import SlideModel from 'Models/Slide';
+import { IQuestion } from 'Managers/Portal/Cockpit';
 import SlideStep from '../../Models/SlideStep';
 
 class SlideShell {
-  public Title: knockout.Observable<string>;
-  public HasTitle: knockout.Computed<boolean>;
+  public Title: ko.Observable<string>;
+  public HasTitle: ko.Computed<boolean>;
 
-  public SlideData: knockout.Observable<SlideModel> = knockout.observable<SlideModel>();
+  public SlideData: ko.Observable<SlideModel> = knockout.observable<SlideModel>();
 
-  public SlideComponent: knockout.Computed<{ name: string; params: any }>;
+  public SlideComponent: ko.Computed<{ name: string; params: any }>;
 
-  public AreAllQuestionsAnswered: knockout.Observable<boolean> = knockout.observable(false);
-  public ShowFeedback: knockout.Observable<boolean> = knockout.observable(false);
-  public CurrentSlideStep: knockout.Observable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
-  public SlideIndex: knockout.Observable<number>;
-  public SlideNumber: knockout.Computed<number>;
-  public NumberOfSlides: knockout.Observable<number>;
+  public AreAllQuestionsAnswered: ko.Observable<boolean> = knockout.observable(false);
+  public ShowFeedback: ko.Observable<boolean> = knockout.observable(false);
+  public CurrentSlideStep: ko.Observable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
+  public SlideIndex: ko.Observable<number>;
+  public SlideNumber: ko.Computed<number>;
+  public NumberOfSlides: ko.Observable<number>;
 
-  public IsLoadingSlide: knockout.Computed<boolean>;
+  public IsLoadingSlide: ko.Computed<boolean>;
 
-  public IsPreviousSlideVisible: knockout.Computed<boolean>;
-  public IsPreviousSlideEnabled: knockout.Computed<boolean>;
-  public IsNextSlideVisible: knockout.Computed<boolean>;
-  public IsNextSlideEnabled: knockout.Computed<boolean>;
-  public IsCloseExperimentVisible: knockout.Computed<boolean>;
-  public IsCloseExperimentEnabled: knockout.Computed<boolean>;
-  public IsHighlighted: knockout.Observable<boolean> = knockout.observable(false);
-  public IsWaiting: knockout.Computed<boolean>;
-  public IsWaitingForNext: knockout.Observable<boolean> = knockout.observable(false);
-  public NextText: knockout.Computed<string> = knockout.computed(() => {
+  public IsPreviousSlideVisible: ko.Computed<boolean>;
+  public IsPreviousSlideEnabled: ko.Computed<boolean>;
+  public IsNextSlideVisible: ko.Computed<boolean>;
+  public IsNextSlideEnabled: ko.Computed<boolean>;
+  public IsCloseExperimentVisible: ko.Computed<boolean>;
+  public IsCloseExperimentEnabled: ko.Computed<boolean>;
+  public IsHighlighted: ko.Observable<boolean> = knockout.observable(false);
+  public IsWaiting: ko.Computed<boolean>;
+  public IsWaitingForNext: ko.Observable<boolean> = knockout.observable(false);
+  public NextText: ko.Computed<string> = knockout.computed(() => {
     return this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING ? 'See Answers' : 'Next';
   });
 
-  private _subscriptions: knockout.Subscription[] = [];
+  private _subscriptions: ko.Subscription[] = [];
 
   constructor() {
     this.IsLoadingSlide = knockout.computed(() => {
@@ -147,7 +147,7 @@ class SlideShell {
     ExperimentManager.LoadPreviousSlide(this.MakeLoadSlideCallback());
   }
 
-  public MakeLoadSlideCallback(): (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void {
+  public MakeLoadSlideCallback(): (slideIndex: number, questions: IQuestion[]) => void {
     return (slideIndex, questions) => {
       this.SlideData(
         new SlideModel(
@@ -196,10 +196,10 @@ class SlideShell {
   }
 }
 
-import template = require('Components/SlideShell/SlideShell.html');
+import template from 'Components/SlideShell/SlideShell.html';
 knockout.components.register('SlideShell', {
   viewModel: SlideShell,
-  template: template.default,
+  template,
 });
 
-export = SlideShell;
+export default SlideShell;

@@ -1,5 +1,5 @@
-﻿import PortalClient = require('PortalClient');
-import Configuration = require('Managers/Configuration');
+﻿import PortalClient from 'PortalClient';
+import Configuration from 'Managers/Configuration';
 
 export class Experiment {
   public static Get(

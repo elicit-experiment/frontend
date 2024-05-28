@@ -1,11 +1,10 @@
-﻿import knockout from 'knockout';
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import Portal = require('Managers/Portal/Portal');
-import PortalClient = require('PortalClient');
-import DisposableComponent = require('Components/DisposableComponent');
+﻿import * as knockout from 'knockout';
+import Portal from 'Managers/Portal/Portal';
+import PortalClient from 'PortalClient';
+import DisposableComponent from 'Components/DisposableComponent';
 
 class CreateExperiment extends DisposableComponent {
-  public IsAuthenticated: knockout.Observable<boolean>;
+  public IsAuthenticated: ko.Observable<boolean>;
   public Email = knockout.observable('');
   public Password = knockout.observable('');
 
@@ -64,10 +63,10 @@ class CreateExperiment extends DisposableComponent {
   }
 }
 
-import template = require('Components/CreateExperiment/CreateExperiment.html');
+import template from 'Components/CreateExperiment/CreateExperiment.html';
 knockout.components.register('CreateExperiment', {
   viewModel: CreateExperiment,
-  template: template.default,
+  template,
 });
 
-export = CreateExperiment;
+export default CreateExperiment;
