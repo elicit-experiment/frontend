@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="RadioButtonGroupButtons">
-    <div class="row QuestionBlock correctable-question">
+    <div class="row QuestionBlock correctable-question" data-bind="css: `${CorrectnessClass()}`">
         <!-- ko if: ShowCorrectness -->
-        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`, html: CorrectnessLabel">
+        <div data-bind="css: `correctness-icon group-result ${CorrectnessClass()}`, html: CorrectnessLabel">
         </div>
         <!-- /ko -->
 
@@ -20,7 +20,7 @@
         </div>
 
         <!-- ko if: ShowFeedback && FeedbackText -->
-        <div data-bind="css: `row feedback`">
+        <div data-bind="css: `row feedback ${CorrectnessClass()}`">
             <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
                 ⮕
             </div>
