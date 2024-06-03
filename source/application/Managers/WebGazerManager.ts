@@ -1,4 +1,4 @@
-webgazer = require('WebGazer');
+import webgazer from 'webgazer';
 import DisposableComponent from 'Components/DisposableComponent';
 import ExperimentManager from 'Managers/Portal/Experiment';
 import * as knockout from 'knockout';
@@ -87,11 +87,12 @@ class WebGazerManager extends DisposableComponent {
   ];
 
   public Ready(): boolean {
-    return webgazer ? webgazer.isReady() : false;
+    return this.webgazer ? this.webgazer.isReady() : false;
   }
 
   public Init(): Promise<void> {
     this.webgazer = webgazer;
+    window.webgazer = webgazer;
 
     // Set up the webgazer video feedback.
     const setupVideoCanvas = function () {
