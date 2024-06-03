@@ -6,9 +6,9 @@ function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: stri
   return new Promise((resolve, reject) => {
     const url = new URL(`/v6/time_series/${seriesType}/file`, Configuration.PortalPath);
     const formData = new FormData();
-    formData.append('series_type', seriesType);
-    formData.append('file', new Blob([tsv]), 'file');
+    formData.append('seriesType', seriesType);
     formData.append('sessionGUID', sessionGuid);
+    formData.append('file', new Blob([tsv]), 'file');
 
     fetch(url.href, {
       method: 'POST',
