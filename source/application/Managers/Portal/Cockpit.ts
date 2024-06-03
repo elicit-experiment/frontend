@@ -48,6 +48,7 @@ export class Slide {
       PortalClient.HttpMethod.Post,
       { questionaireId: questionaireId, content: JSON.stringify(dataPoint) },
       true,
+      'json2'
     );
   }
 }
