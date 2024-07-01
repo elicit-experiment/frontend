@@ -43,10 +43,12 @@ export class Slide {
   ): CHAOS.Portal.Client.ICallState<CockpitResults<any>> {
     if (serviceCaller == null) serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
+    const parameters = questionaireId == 'mouse' ? { seriesType: 'mouse', data: JSON.stringify(dataPoint) } :
+      { questionaireId: questionaireId, content: JSON.stringify(dataPoint) }
     return serviceCaller.CallService(
       'Slide/DataPoint',
       PortalClient.HttpMethod.Post,
-      { questionaireId: questionaireId, content: JSON.stringify(dataPoint) },
+      parameters,
       true,
       'json2'
     );

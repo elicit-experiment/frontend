@@ -35,7 +35,7 @@ function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: stri
 function postTimeSeriesAsJson(body: any, seriesType: string) {
   return new Promise((resolve, reject) => {
     const url = new URL(`/v6/time_series/${seriesType}`, Configuration.PortalPath);
-    console.log(`MouseTrackingManager: Sending points to ${url.href}`);
+    console.log(`TimeSeries: Sending points to ${url.href}`);
     fetch(url.href, {
       method: 'POST',
       //credentials: 'include', // include the sessionGUID cookie
