@@ -95,6 +95,11 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
         if (this.config.StripZCoordinates) {
           dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.z));
         }
+        dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.visibility));
+        dataPoint.faceBlendshapes.forEach((blendShape) =>
+          blendShape.categories.forEach((category) => delete category.displayName),
+        );
+
         if (this.config.IncludeBlandshapes || this.config.IncludeBlendshapes) {
           const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
             Object.fromEntries(faceBlendShape.categories.map((blendShape, index) => [blendShape.categoryName, index])),

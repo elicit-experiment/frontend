@@ -28,7 +28,7 @@ export default (
   let webcamRunning: boolean = false;
   const videoWidth = 480;
 
-  // Before we can use HandLandmarker class we must wait for it to finish
+  // Before we can use FaceLandmarker class we must wait for it to finish
   // loading. Machine Learning models can be large and take a moment to
   // get everything needed to run.
   async function createFaceLandmarker() {
@@ -62,7 +62,7 @@ export default (
 
     // Now let's go through all of these and add a click event listener.
     Array.from(imageContainers).forEach((imageContainer) => {
-      // Add event listener to the child element whichis the img element.
+      // Add event listener to the child element which is the img element.
       imageContainer.children[0].addEventListener('click', handleClick);
     });
 
