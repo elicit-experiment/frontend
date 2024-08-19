@@ -55,7 +55,8 @@ type FaceLandmarkComponentConfig = {
   Blendshapes?: boolean;
   FaceTransformation?: boolean;
   StripZCoordinates?: boolean;
-  IncludeBlandshapes?: string;
+  IncludeBlandshapes?: string; // TODO: Deprecate Blandshapes
+  IncludeBlendshapes?: string;
 };
 
 class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
@@ -94,17 +95,17 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
         if (this.config.StripZCoordinates) {
           dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.z));
         }
-        if (this.config.IncludeBlandshapes) {
+        if (this.config.IncludeBlandshapes || this.config.IncludeBlendshapes) {
           const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
             Object.fromEntries(faceBlendShape.categories.map((blendShape, index) => [blendShape.categoryName, index])),
           );
 
           let indexRemapIndex = 0;
           let faceLandmarks = [];
+          // TODO: Deprecate Blandshapes
+          const includeBlendshapes = (this.config.IncludeBlendshapes || this.config.IncludeBlandshapes).split(',');
           dataPoint.faceBlendshapes = dataPoint.faceBlendshapes.map((faceBlendshape, faceIndex) => {
-            const blendShapeIndices = this.config.IncludeBlandshapes.split(',').map(
-              (blendShape) => blendShapeToIndex[faceIndex][blendShape],
-            );
+            const blendShapeIndices = includeBlendshapes.map((blendShape) => blendShapeToIndex[faceIndex][blendShape]);
             const categories = blendShapeIndices.map((index) => faceBlendshape.categories[index]);
 
             Object.fromEntries(
