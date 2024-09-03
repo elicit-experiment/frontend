@@ -194,10 +194,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     });
   }
 
-  protected WhenAllMediaHavePlayed(
-    media: MediaInfo | MediaInfo[],
-    returnTrueOnAnswer = false,
-  ): ko.Computed<boolean> {
+  protected WhenAllMediaHavePlayed(media: MediaInfo | MediaInfo[], _returnTrueOnAnswer = false): ko.Computed<boolean> {
     media = media || [];
 
     if (media instanceof MediaInfo) media = [<MediaInfo>media];

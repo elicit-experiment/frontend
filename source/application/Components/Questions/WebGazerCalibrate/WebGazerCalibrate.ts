@@ -507,5 +507,5 @@ knockout.components.register('Questions/WebGazerCalibrate', {
   viewModel: WebGazerCalibrate,
   template,
 });
-export default WebGazerCalibrate;
 
+export default WebGazerCalibrate;

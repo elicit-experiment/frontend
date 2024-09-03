@@ -1,6 +1,12 @@
 ﻿import * as knockout from 'knockout';
 import Portal from 'Managers/Portal/Portal';
-import { Slide, Experiment as CockpitExperiment, IQuestion, Question as CockpitQuestion, Answer } from 'Managers/Portal/Cockpit';
+import {
+  Slide,
+  Experiment as CockpitExperiment,
+  IQuestion,
+  Question as CockpitQuestion,
+  Answer,
+} from 'Managers/Portal/Cockpit';
 import Navigation from 'Managers/Navigation/Navigation';
 import Title from 'Managers/Title';
 import Notification from 'Managers/Notification';

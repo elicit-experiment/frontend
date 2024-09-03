@@ -38,7 +38,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     if (answer.Scalings) {
       this.GetAnswer().Scalings.forEach((scaling: AnswerItem) => {
         const coordinates = scaling.Position.split(' ');
-        answers[scaling.Id] = {x: parseFloat(coordinates[0]), y: parseFloat(coordinates[1])};
+        answers[scaling.Id] = { x: parseFloat(coordinates[0]), y: parseFloat(coordinates[1]) };
       });
     }
 
@@ -46,67 +46,71 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private InitializeChart(): void {
-    jQuery(this.ChartElement()).highcharts('Foo', {
-      chart: {
-        type: 'bubble',
-        animation: false,
-        showAxes: true,
-      },
-      title: {
-        text: null,
-      },
-      credits: {
-        enabled: false,
-      },
-      plotOptions: {
-        series: {
-          point: {
-            events: {
-              update: () => {
-                this.UpdateAnswer();
-                return true;
+    jQuery(this.ChartElement()).highcharts(
+      'Foo',
+      {
+        chart: {
+          type: 'bubble',
+          animation: false,
+          showAxes: true,
+        },
+        title: {
+          text: null,
+        },
+        credits: {
+          enabled: false,
+        },
+        plotOptions: {
+          series: {
+            point: {
+              events: {
+                update: () => {
+                  this.UpdateAnswer();
+                  return true;
+                },
               },
             },
           },
         },
+        xAxis: {
+          title: { text: this.GetInstrumentFormatted('X1AxisLabel') },
+          min: -1,
+          max: 1,
+          lineWidth: 1,
+          gridLineWidth: 1,
+          showEmpty: true,
+          tickInterval: 0.25,
+          plotLines: [
+            {
+              value: 0,
+              width: 2,
+              color: 'black',
+            },
+          ],
+          labels: { enabled: false },
+        },
+        yAxis: {
+          title: { text: this.GetInstrumentFormatted('Y1AxisLabel') },
+          min: -1,
+          max: 1,
+          lineWidth: 1,
+          gridLineWidth: 1,
+          showEmpty: true,
+          tickInterval: 0.25,
+          plotLines: [
+            {
+              value: 0,
+              width: 2,
+              color: 'black',
+            },
+          ],
+          labels: { enabled: false },
+        },
+        tooltip: { enabled: false },
+        series: this.Items.map((item) => item.GraphData).filter((data) => data != null),
       },
-      xAxis: {
-        title: {text: this.GetInstrumentFormatted('X1AxisLabel')},
-        min: -1,
-        max: 1,
-        lineWidth: 1,
-        gridLineWidth: 1,
-        showEmpty: true,
-        tickInterval: 0.25,
-        plotLines: [
-          {
-            value: 0,
-            width: 2,
-            color: 'black',
-          },
-        ],
-        labels: {enabled: false},
-      },
-      yAxis: {
-        title: {text: this.GetInstrumentFormatted('Y1AxisLabel')},
-        min: -1,
-        max: 1,
-        lineWidth: 1,
-        gridLineWidth: 1,
-        showEmpty: true,
-        tickInterval: 0.25,
-        plotLines: [
-          {
-            value: 0,
-            width: 2,
-            color: 'black',
-          },
-        ],
-        labels: {enabled: false},
-      },
-      tooltip: {enabled: false},
-      series: this.Items.map((item) => item.GraphData).filter((data) => data != null),
-    }, (chart) => this._chart = chart);
+      (chart) => (this._chart = chart),
+    );
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -124,11 +128,11 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   private CreateAnswerItem(item: Item): AnswerItem {
     const point = <Highcharts.Point>item.GraphData.point;
 
-    return {Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString()};
+    return { Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString() };
   }
 
   private CreateItem(data: any, answer: { x: number; y: number }): Item {
-    const audioInfo = new AudioInfo([{Type: data.Stimulus.Type, Source: data.Stimulus.URI}]);
+    const audioInfo = new AudioInfo([{ Type: data.Stimulus.Type, Source: data.Stimulus.URI }]);
 
     const item = {
       Id: data.Id,
@@ -141,7 +145,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
       this.AddEvent(isPlaying ? 'Start' : 'Stop', data.Id);
 
       if (isPlaying && item.GraphData == null) {
-        item.GraphData = this.CreateGraphItem(data, {x: 0, y: 0});
+        item.GraphData = this.CreateGraphItem(data, { x: 0, y: 0 });
 
         this._chart.addSeries(item.GraphData);
       }
