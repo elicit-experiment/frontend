@@ -1,7 +1,7 @@
 enum SlideStep {
-    ANSWERING = 'ANSWERING',
-    REVEALING = 'REVEALING',
-    NEXT = 'NEXT',
+  ANSWERING = 'ANSWERING',
+  REVEALING = 'REVEALING',
+  NEXT = 'NEXT',
 }
 
 export default SlideStep;

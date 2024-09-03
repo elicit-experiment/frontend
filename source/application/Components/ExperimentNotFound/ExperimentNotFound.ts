@@ -1,4 +1,4 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class ExperimentNotFound {
   public Id: string;
@@ -8,10 +8,10 @@ class ExperimentNotFound {
   }
 }
 
-import template = require('Components/ExperimentNotFound/ExperimentNotFound.html');
+import template from 'Components/ExperimentNotFound/ExperimentNotFound.html';
 knockout.components.register('Questions/ExperimentNotFound', {
   viewModel: ExperimentNotFound,
-  template: template.default,
+  template,
 });
 
-export = ExperimentNotFound;
+export default ExperimentNotFound;

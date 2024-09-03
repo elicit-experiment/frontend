@@ -1,11 +1,11 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class NoMoreExperiments {}
 
-import template = require('Components/NoMoreExperiments/NoMoreExperiments.html');
+import template from 'Components/NoMoreExperiments/NoMoreExperiments.html';
 knockout.components.register('Questions/NoMoreExperiments', {
   viewModel: NoMoreExperiments,
-  template: template.default,
+  template,
 });
 
-export = NoMoreExperiments;
+export default NoMoreExperiments;

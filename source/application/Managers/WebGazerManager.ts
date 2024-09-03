@@ -1,11 +1,9 @@
-import webgazer = require('WebGazer');
-import DisposableComponent = require('Components/DisposableComponent');
-import ExperimentManager = require('Managers/Portal/Experiment');
-import knockout = require('knockout');
-import PortalClient = require('PortalClient');
-import methods = require('../Utility/TimeSeries');
-
-const { postTimeSeriesAsJson, postTimeSeriesAsFile } = methods;
+import webgazer from 'webgazer';
+import DisposableComponent from 'Components/DisposableComponent';
+import ExperimentManager from 'Managers/Portal/Experiment';
+import * as knockout from 'knockout';
+import PortalClient from 'PortalClient';
+import { postTimeSeriesAsJson, postTimeSeriesAsFile } from 'Utility/TimeSeries';
 
 enum WebGazerState {
   NotStarted,
@@ -26,9 +24,16 @@ class WebGazerManager extends DisposableComponent {
 
   private static _instance: WebGazerManager;
 
-  static get Instance() {
+  static get Instance(): WebGazerManager {
     // Do you need arguments? Make it a regular static method instead.
     return this._instance || (this._instance = new this());
+  }
+
+  public static getInstance(): WebGazerManager {
+    if (!WebGazerManager._instance) {
+      WebGazerManager._instance = new WebGazerManager();
+    }
+    return WebGazerManager._instance;
   }
 
   static POINT_BUFFER_SIZE = 1000;
@@ -82,11 +87,12 @@ class WebGazerManager extends DisposableComponent {
   ];
 
   public Ready(): boolean {
-    return webgazer ? webgazer.isReady() : false;
+    return this.webgazer ? this.webgazer.isReady() : false;
   }
 
   public Init(): Promise<void> {
     this.webgazer = webgazer;
+    window.webgazer = webgazer;
 
     // Set up the webgazer video feedback.
     const setupVideoCanvas = function () {
@@ -396,7 +402,7 @@ class WebGazerManager extends DisposableComponent {
             console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
             dataPoint.value = JSON.stringify(dataPointValue);
             ExperimentManager.SendSlideDataPoint('webgazer', dataPoint, () => {});
-            resolve();
+            resolve(true);
           })
           .catch((err) => {
             console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed`);
@@ -414,3 +420,5 @@ class WebGazerManager extends DisposableComponent {
 }
 
 export default WebGazerManager;
+const getInstance = (): WebGazerManager => WebGazerManager.getInstance();
+export { getInstance };

@@ -1,6 +1,6 @@
-﻿import ExperimentManager = require('Managers/Portal/Experiment');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
+﻿import ExperimentManager from 'Managers/Portal/Experiment';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
 import * as knockout from 'knockout';
 
 class EndOfExperiment extends QuestionBase<any> {
@@ -20,4 +20,4 @@ knockout.components.register('Questions/EndOfExperiment', {
   template: '',
 });
 
-export = EndOfExperiment;
+export default EndOfExperiment;

@@ -1,10 +1,10 @@
-﻿import knockout = require('knockout');
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
-type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
+type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
 class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
@@ -18,9 +18,9 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public UserItems = knockout.observableArray<Tag>();
   public AddedItems = knockout.observableArray<Tag>();
 
-  public HasSelectionItems: KnockoutComputed<boolean>;
-  public HasUserItems: KnockoutComputed<boolean>;
-  public HasAddedItems: KnockoutComputed<boolean>;
+  public HasSelectionItems: ko.Computed<boolean>;
+  public HasUserItems: ko.Computed<boolean>;
+  public HasAddedItems: ko.Computed<boolean>;
 
   protected readonly InstrumentTemplateName = TaggingA.name;
 
@@ -176,10 +176,10 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   }
 }
 
-import template = require('Components/Questions/TaggingA/TaggingA.html');
+import template from 'Components/Questions/TaggingA/TaggingA.html';
 knockout.components.register('Questions/TaggingA', {
   viewModel: TaggingA,
-  template: template.default,
+  template,
 });
 
-export = TaggingA;
+export default TaggingA;

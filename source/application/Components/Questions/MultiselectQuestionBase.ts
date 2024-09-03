@@ -1,17 +1,17 @@
-import knockout = require('knockout');
+import * as knockout from 'knockout';
 import QuestionWithStimulusBase from './QuestionWithStimulusBase';
-import QuestionModel = require('Models/Question');
+import QuestionModel from 'Models/Question';
 import SlideStep from '../../Models/SlideStep';
 import { shuffleInPlace } from '../../Utility/ShuffleInPlace';
 
 export type ItemInfo = {
   Id: string;
   Label: string;
-  IsEnabled: KnockoutComputed<boolean>;
+  IsEnabled: ko.Computed<boolean>;
   Correct: boolean;
   Feedback: string;
-  AnsweredCorrectly: KnockoutObservable<boolean>;
-  CorrectnessClass: KnockoutComputed<string>;
+  AnsweredCorrectly: ko.Observable<boolean>;
+  CorrectnessClass: ko.Computed<string>;
 };
 export type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
 
@@ -27,15 +27,15 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   public AnswerOnce: boolean;
   public MustAnswerCorrectly: boolean;
   public ShowCorrectness: boolean;
-  public RevealAnswers: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
+  public RevealAnswers: ko.Observable<boolean> = knockout.observable<boolean>(false);
 
-  public AddFillerItem: KnockoutComputed<boolean>;
-  public AddOneFillerItem: KnockoutComputed<boolean>;
-  public AddHalfFillerItem: KnockoutComputed<boolean>;
+  public AddFillerItem: ko.Computed<boolean>;
+  public AddOneFillerItem: ko.Computed<boolean>;
+  public AddHalfFillerItem: ko.Computed<boolean>;
 
-  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
-  public CorrectnessClass: KnockoutComputed<string>;
-  public CorrectnessLabel: KnockoutComputed<string>;
+  public FeedbackText: ko.Observable<string> = knockout.observable<string>(null);
+  public CorrectnessClass: ko.Computed<string>;
+  public CorrectnessLabel: ko.Computed<string>;
 
   protected constructor(question: QuestionModel) {
     super(question);

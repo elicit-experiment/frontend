@@ -1,9 +1,9 @@
-import knockout = require('knockout');
-import PortalClient = require('PortalClient');
-import Notification = require('Managers/Notification');
-import Wayf = require('Managers/Portal/Wayf');
-import Configuration = require('Managers/Configuration');
-import DisposableComponent = require('Components/DisposableComponent');
+import * as knockout from 'knockout';
+import PortalClient from 'PortalClient';
+import Notification from 'Managers/Notification';
+import Wayf from 'Managers/Portal/Wayf';
+import Configuration from 'Managers/Configuration';
+import DisposableComponent from 'Components/DisposableComponent';
 
 export default class WayfAuthenticator extends DisposableComponent {
   private _larmClient: CHAOS.Portal.Client.IPortalClient;
@@ -11,7 +11,7 @@ export default class WayfAuthenticator extends DisposableComponent {
   public IsReady = knockout.observable(false);
   public IsAuthenticating = knockout.observable(false);
   public IsAuthenticated = knockout.observable(false);
-  public CanLogin: KnockoutComputed<boolean>;
+  public CanLogin: ko.Computed<boolean>;
   public get ServiceCaller(): CHAOS.Portal.Client.IServiceCaller {
     return <CHAOS.Portal.Client.IServiceCaller>(<any>this._larmClient);
   }

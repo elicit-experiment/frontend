@@ -1,20 +1,19 @@
-﻿import knockout = require('knockout');
-import SlideModel = require('Models/Slide');
-import QuestionModel = require('Models/Question');
-import ExperimentManager = require('Managers/Portal/Experiment');
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import { KoComponent } from '../../../Utility/KoDecorators';
+﻿import * as knockout from 'knockout';
+import SlideModel from 'Models/Slide';
+import QuestionModel from 'Models/Question';
+import ExperimentManager from 'Managers/Portal/Experiment';
+import { IQuestion } from 'Managers/Portal/Cockpit';
 
 class Default {
   private _slide: SlideModel;
   private _uiLessQuestions: IQuestionViewModel[] = [];
-  private _activeAnsweSets: KnockoutObservable<number> = knockout.observable(0);
-  private _isWorking: KnockoutObservable<boolean> = knockout.observable(false);
+  private _activeAnsweSets: ko.Observable<number> = knockout.observable(0);
+  private _isWorking: ko.Observable<boolean> = knockout.observable(false);
 
-  private _loadingQuestions: KnockoutObservable<boolean> = knockout.observable(true);
+  private _loadingQuestions: ko.Observable<boolean> = knockout.observable(true);
 
   public Questions: QuestionModel[] = [];
-  public HaveActiveAnswersSets: KnockoutComputed<boolean>;
+  public HaveActiveAnswersSets: ko.Computed<boolean>;
 
   constructor(slide: SlideModel) {
     this._slide = slide;
@@ -29,7 +28,7 @@ class Default {
     this.InitializeQuestions(slide.Questions);
   }
 
-  private InitializeQuestions(questions: CockpitPortal.IQuestion[]): void {
+  private InitializeQuestions(questions: IQuestion[]): void {
     this._slide.SetIsWorking(knockout.computed(() => true));
     //console.log('Default.ts:InitializeQuestions');
     let numberToLoad = questions.length;
@@ -57,11 +56,11 @@ class Default {
 
       // The UI-less elements won't get created by knockout, so we have to create them ourselves
       if (!questionModel.HasUIElement) {
-        knockout.components.get(questionModel.Type, (definition: KnockoutComponentTypes.Definition) => {
-          const question = definition.createViewModel(questionModel, {
-            element: document.getElementsByTagName('body')[0],
-          });
-          this._uiLessQuestions.push(question);
+        const element = document.getElementsByTagName('body')[0];
+        knockout.components.get(questionModel.Type, (definition: ko.components.Component) => {
+          // @ts-ignore
+          this._uiLessQuestions.push(definition.createViewModel(questionModel, null));
+          loaded();
         });
       }
     }
@@ -153,10 +152,10 @@ class Default {
   }
 }
 
-import template = require('Components/Slides/Default/Default.html');
+import template from 'Components/Slides/Default/Default.html';
 knockout.components.register('Slides/Default', {
   viewModel: Default,
-  template: template.default,
+  template,
 });
 
-export = Default;
+export default Default;

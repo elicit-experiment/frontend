@@ -1,12 +1,12 @@
-﻿import knockout = require('knockout');
-import Routie = require('routie');
-import NavigationPage = require('Managers/Navigation/NavigationPage');
-import Title = require('Managers/Title');
+﻿import * as knockout from 'knockout';
+import Routie from 'routie';
+import NavigationPage from 'Managers/Navigation/NavigationPage';
+import Title from 'Managers/Title';
 
 class Navigation {
-  public CurrentPage: KnockoutObservable<NavigationPage> = knockout.observable<NavigationPage>();
-  public ExperimentId: KnockoutObservable<string> = knockout.observable(null);
-  public ExperimentListId: KnockoutObservable<string> = knockout.observable(null);
+  public CurrentPage: ko.Observable<NavigationPage> = knockout.observable<NavigationPage>();
+  public ExperimentId: ko.Observable<string> = knockout.observable(null);
+  public ExperimentListId: ko.Observable<string> = knockout.observable(null);
 
   constructor() {
     Routie({
@@ -69,4 +69,4 @@ class Navigation {
 
 const instance = new Navigation();
 
-export = instance;
+export default instance;

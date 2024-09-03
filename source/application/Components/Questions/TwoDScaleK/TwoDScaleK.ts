@@ -1,9 +1,9 @@
-﻿import knockout = require('knockout');
-import jquery = require('jquery');
-import Highcharts = require('highcharts'); //Highcharts;
-import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
-import QuestionModel = require('Models/Question');
-import AudioInfo = require('Components/Players/Audio/AudioInfo');
+﻿import * as knockout from 'knockout';
+import * as jQuery from 'jquery';
+import * as highcharts from 'highcharts';
+import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
+import QuestionModel from 'Models/Question';
+import AudioInfo from 'Components/Players/Audio/AudioInfo';
 
 namespace XHighcharts {
   interface SeriesOptions {
@@ -12,15 +12,15 @@ namespace XHighcharts {
   }
 }
 
-type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptions };
+type Item = { Id: string; Name: string; AudioInfo: AudioInfo; GraphData: Highcharts.SeriesOptionsType };
 type AnswerItem = { Id: string; Position: string };
 
 class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   public Title: string;
-  public ChartElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
+  public ChartElement: ko.Observable<HTMLElement> = knockout.observable<HTMLElement>();
   public Items: Item[];
 
-  private _chart: Highcharts.ChartObject;
+  private _chart: Highcharts.Chart;
 
   constructor(question: QuestionModel) {
     super(question);
@@ -46,68 +46,71 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private InitializeChart(): void {
-    jquery(this.ChartElement()).highcharts({
-      chart: {
-        type: 'bubble',
-        animation: false,
-        showAxes: true,
-      },
-      title: {
-        text: null,
-      },
-      credits: {
-        enabled: false,
-      },
-      plotOptions: {
-        series: {
-          point: {
-            events: {
-              update: () => {
-                this.UpdateAnswer();
-                return true;
+    jQuery(this.ChartElement()).highcharts(
+      'Foo',
+      {
+        chart: {
+          type: 'bubble',
+          animation: false,
+          showAxes: true,
+        },
+        title: {
+          text: null,
+        },
+        credits: {
+          enabled: false,
+        },
+        plotOptions: {
+          series: {
+            point: {
+              events: {
+                update: () => {
+                  this.UpdateAnswer();
+                  return true;
+                },
               },
             },
           },
         },
+        xAxis: {
+          title: { text: this.GetInstrumentFormatted('X1AxisLabel') },
+          min: -1,
+          max: 1,
+          lineWidth: 1,
+          gridLineWidth: 1,
+          showEmpty: true,
+          tickInterval: 0.25,
+          plotLines: [
+            {
+              value: 0,
+              width: 2,
+              color: 'black',
+            },
+          ],
+          labels: { enabled: false },
+        },
+        yAxis: {
+          title: { text: this.GetInstrumentFormatted('Y1AxisLabel') },
+          min: -1,
+          max: 1,
+          lineWidth: 1,
+          gridLineWidth: 1,
+          showEmpty: true,
+          tickInterval: 0.25,
+          plotLines: [
+            {
+              value: 0,
+              width: 2,
+              color: 'black',
+            },
+          ],
+          labels: { enabled: false },
+        },
+        tooltip: { enabled: false },
+        series: this.Items.map((item) => item.GraphData).filter((data) => data != null),
       },
-      xAxis: {
-        title: { text: this.GetInstrumentFormatted('X1AxisLabel') },
-        min: -1,
-        max: 1,
-        lineWidth: 1,
-        gridLineWidth: 1,
-        showEmpty: true,
-        tickInterval: 0.25,
-        plotLines: [
-          {
-            value: 0,
-            width: 2,
-            color: 'black',
-          },
-        ],
-        labels: { enabled: false },
-      },
-      yAxis: {
-        title: { text: this.GetInstrumentFormatted('Y1AxisLabel') },
-        min: -1,
-        max: 1,
-        lineWidth: 1,
-        gridLineWidth: 1,
-        showEmpty: true,
-        tickInterval: 0.25,
-        plotLines: [
-          {
-            value: 0,
-            width: 2,
-            color: 'black',
-          },
-        ],
-        labels: { enabled: false },
-      },
-      tooltip: { enabled: false },
-      series: this.Items.map((item) => item.GraphData).filter((data) => data != null),
-    });
-    this._chart = jquery(this.ChartElement()).highcharts();
+      (chart) => (this._chart = chart),
+    );
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -123,7 +126,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 
   private CreateAnswerItem(item: Item): AnswerItem {
-    const point = <Highcharts.DataPoint>item.GraphData.data[0];
+    const point = <Highcharts.Point>item.GraphData.point;
 
     return { Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString() };
   }
@@ -151,7 +154,7 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     return item;
   }
 
-  private CreateGraphItem(data: any, answer: { x: number; y: number }): Highcharts.SeriesOptions {
+  private CreateGraphItem(data: any, answer: { x: number; y: number }): Highcharts.SeriesOptionsType {
     return {
       name: data.List.Label,
       // @ts-ignore:TS2322
@@ -167,10 +170,11 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
   }
 }
 
-import template = require('Components/Questions/TwoDScaleK/TwoDScaleK.html');
+import template from 'Components/Questions/TwoDScaleK/TwoDScaleK.html';
+
 knockout.components.register('Questions/TwoDScaleK', {
   viewModel: TwoDScaleK,
-  template: template.default,
+  template,
 });
 
-export = TwoDScaleK;
+export default TwoDScaleK;

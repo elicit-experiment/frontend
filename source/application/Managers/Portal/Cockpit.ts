@@ -1,5 +1,5 @@
-﻿import PortalClient = require('PortalClient');
-import Configuration = require('Managers/Configuration');
+﻿import PortalClient from 'PortalClient';
+import Configuration from 'Managers/Configuration';
 
 export class Experiment {
   public static Get(
@@ -43,12 +43,11 @@ export class Slide {
   ): CHAOS.Portal.Client.ICallState<CockpitResults<any>> {
     if (serviceCaller == null) serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
-    return serviceCaller.CallService(
-      'Slide/DataPoint',
-      PortalClient.HttpMethod.Post,
-      { questionaireId: questionaireId, content: JSON.stringify(dataPoint) },
-      true,
-    );
+    const parameters =
+      questionaireId == 'mouse'
+        ? { seriesType: 'mouse', data: JSON.stringify(dataPoint) }
+        : { questionaireId: questionaireId, content: JSON.stringify(dataPoint) };
+    return serviceCaller.CallService('Slide/DataPoint', PortalClient.HttpMethod.Post, parameters, true, 'json2');
   }
 }
 

@@ -1,11 +1,11 @@
-﻿import knockout from 'knockout';
+﻿import * as knockout from 'knockout';
 
 class NotFound {}
 
-import template = require('Components/NotFound/NotFound.html');
+import template from 'Components/NotFound/NotFound.html';
 knockout.components.register('Questions/NotFound', {
   viewModel: NotFound,
-  template: template.default,
+  template,
 });
 
-export = NotFound;
+export default NotFound;

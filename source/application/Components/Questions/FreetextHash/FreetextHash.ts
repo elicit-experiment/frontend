@@ -1,7 +1,7 @@
-﻿import QuestionModel = require('Models/Question');
-import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
-import CryptoJS = require('crypto-js');
-import knockout from 'knockout';
+﻿import QuestionModel from 'Models/Question';
+import FreetextBase from 'Components/Questions/Freetext/FreetextBase';
+import CryptoJS from 'crypto-js';
+import * as knockout from 'knockout';
 
 type Answer = { Value: string; Length: number };
 
@@ -30,10 +30,10 @@ class FreetextHash extends FreetextBase<Answer> {
   }
 }
 
-import template = require('Components/Questions/FreetextHash/FreetextHash.html');
+import template from 'Components/Questions/FreetextHash/FreetextHash.html';
 knockout.components.register('Questions/FreetextHash', {
   viewModel: FreetextHash,
-  template: template.default,
+  template,
 });
 
-export = FreetextHash;
+export default FreetextHash;

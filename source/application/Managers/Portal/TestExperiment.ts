@@ -1,22 +1,22 @@
-import CockpitPortal = require('Managers/Portal/Cockpit');
+import { IQuestion } from 'Managers/Portal/Cockpit';
 
 class TestExperiment {
-  public Slides: CockpitPortal.IQuestion[][];
+  public Slides: IQuestion[][];
 
   constructor() {
     //this.Slides = [[this.CreateAudioInformationRetrieval()]];
     this.Slides = [[this.CreateTaggingA()]];
   }
 
-  public CreateTaggingA(): CockpitPortal.IQuestion {
+  public CreateTaggingA(): IQuestion {
     return this.CreateTagging('TaggingA');
   }
 
-  public CreateTaggingB(): CockpitPortal.IQuestion {
+  public CreateTaggingB(): IQuestion {
     return this.CreateTagging('TaggingB');
   }
 
-  private CreateTagging(componentName: string): CockpitPortal.IQuestion {
+  private CreateTagging(componentName: string): IQuestion {
     return this.CreateStandardQuestion(
       componentName,
       {
@@ -51,7 +51,7 @@ class TestExperiment {
     };
   }
 
-  public CreateAudioInformationRetrieval(): CockpitPortal.IQuestion {
+  public CreateAudioInformationRetrieval(): IQuestion {
     return this.CreateStandardQuestion('AudioInformationRetrieval', {
       SearchView: {
         Enabled: true,
@@ -75,7 +75,7 @@ class TestExperiment {
     });
   }
 
-  public CreateStandardQuestion(type: string, instruments: any, output: any = null): CockpitPortal.IQuestion {
+  public CreateStandardQuestion(type: string, instruments: any, output: any = null): IQuestion {
     return this.CreateQuestion(
       new Date().getTime().toString(),
       type,
@@ -85,7 +85,7 @@ class TestExperiment {
     );
   }
 
-  public CreateQuestion(id: string, type: string, input: any[], output: any, events: any[]): CockpitPortal.IQuestion {
+  public CreateQuestion(id: string, type: string, input: any[], output: any, events: any[]): IQuestion {
     if (output == null) output = {};
     if (events == null) events = [];
 
@@ -101,4 +101,4 @@ class TestExperiment {
   }
 }
 
-export = TestExperiment;
+export default TestExperiment;

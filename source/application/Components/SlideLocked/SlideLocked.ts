@@ -1,11 +1,11 @@
-﻿import knockout = require('knockout');
+﻿import * as knockout from 'knockout';
 
 class SlideLocked {}
 
-import template = require('Components/SlideLocked/SlideLocked.html');
+import template from 'Components/SlideLocked/SlideLocked.html';
 knockout.components.register('Questions/SlideLocked', {
   viewModel: SlideLocked,
-  template: template.default,
+  template,
 });
 
-export = SlideLocked;
+export default SlideLocked;

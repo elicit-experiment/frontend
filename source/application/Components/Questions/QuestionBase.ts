@@ -1,15 +1,14 @@
-﻿import knockout = require('knockout');
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import QuestionModel = require('Models/Question');
-import AudioInfo = require('Components/Players/Audio/AudioInfo');
-import MediaInfo = require('Components/Players/MediaInfo');
-import DisposableComponent = require('Components/DisposableComponent');
-import TextFormatter = require('Managers/TextFormatter');
+﻿import * as knockout from 'knockout';
+import { IQuestionEvent } from 'Managers/Portal/Cockpit';
+import QuestionModel from 'Models/Question';
+import MediaInfo from 'Components/Players/MediaInfo';
+import DisposableComponent from 'Components/DisposableComponent';
+import TextFormatter from 'Managers/TextFormatter';
 
 abstract class QuestionsBase<T> extends DisposableComponent implements IQuestionViewModel {
   protected Model: QuestionModel;
-  protected HasAnswer: KnockoutComputed<boolean>;
-  private _events: CockpitPortal.IQuestionEvent[];
+  protected HasAnswer: ko.Computed<boolean>;
+  private _events: IQuestionEvent[];
 
   constructor(question: QuestionModel, requiresInput = true) {
     super();
@@ -23,6 +22,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     this._events = answer != null && answer.Events ? answer.Events : [];
 
     setTimeout(() => {
+      console.log(this.constructor.name + 'LOOADED')
       this.UpdateIsAnswerValid();
       this.Model.Loaded();
     }, 0); //Give descendant time to override HasValidAnswer
@@ -165,7 +165,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     this.SetAnswer(this.GetAnswer());
   }
 
-  private CloneEvent(event: CockpitPortal.IQuestionEvent): CockpitPortal.IQuestionEvent {
+  private CloneEvent(event: IQuestionEvent): IQuestionEvent {
     return {
       Id: event.Id,
       Type: event.Type,
@@ -194,10 +194,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     });
   }
 
-  protected WhenAllMediaHavePlayed(
-    media: MediaInfo | MediaInfo[],
-    returnTrueOnAnswer = false,
-  ): KnockoutComputed<boolean> {
+  protected WhenAllMediaHavePlayed(media: MediaInfo | MediaInfo[], _returnTrueOnAnswer = false): ko.Computed<boolean> {
     media = media || [];
 
     if (media instanceof MediaInfo) media = [<MediaInfo>media];
@@ -232,4 +229,4 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
   }
 }
 
-export = QuestionsBase;
+export default QuestionsBase;

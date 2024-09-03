@@ -23,5 +23,5 @@ interface TaggleOptions
 
 declare module "taggle"
 {
-	export = Taggle;
+	export default Taggle;
 }

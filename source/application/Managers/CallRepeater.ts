@@ -1,4 +1,4 @@
-﻿import Notification = require('Managers/Notification');
+﻿import Notification from 'Managers/Notification';
 
 type CallerCalback = (sucess: boolean, fatal: boolean) => void;
 type Caller = (callback: CallerCalback) => void;
@@ -39,4 +39,4 @@ class CallRepeater {
   }
 }
 
-export = CallRepeater;
+export default CallRepeater;

@@ -1,11 +1,12 @@
-﻿import jquery = require('jquery');
+﻿import * as jQuery from 'jquery';
+
 export default {
   init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
     const value: (x: number, y: number) => void = valueAccessor();
-    const $element = jquery(element);
-    jquery(element).click((event) =>
+    const $element = jQuery(element);
+    jQuery(element).click((event) =>
       value.call(viewModel, event.pageX - $element.position().left, event.pageY - $element.position().top),
     );
   },
   update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
-} as KnockoutBindingHandler;
+} as ko.BindingHandler;

@@ -1,5 +1,5 @@
-import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
-import QuestionModel = require('Models/Question');
+import FreetextBase from 'Components/Questions/Freetext/FreetextBase';
+import QuestionModel from 'Models/Question';
 import * as knockout from 'knockout';
 
 type Answer = { Text: string };
@@ -50,10 +50,10 @@ class CompletionCode extends FreetextBase<Answer> {
   }
 }
 
-import template = require('Components/Questions/CompletionCode/CompletionCode.html');
+import template from 'Components/Questions/CompletionCode/CompletionCode.html';
 knockout.components.register('Questions/CompletionCode', {
   viewModel: CompletionCode,
-  template: template.default,
+  template,
 });
 
-export = CompletionCode;
+export default CompletionCode;

@@ -1,27 +1,27 @@
-﻿import knockout = require('knockout');
-import CockpitPortal = require('Managers/Portal/Cockpit');
+﻿import * as knockout from 'knockout';
+import { IQuestion } from 'Managers/Portal/Cockpit';
 import SlideStep from './SlideStep';
 
 class Slide {
   public Index: number;
   public Name: string;
-  public IsWorking: KnockoutComputed<boolean>;
-  public CanGoToNextSlide: KnockoutObservable<boolean>;
-  public SlideHasFeedbackToShow: KnockoutObservable<boolean>;
-  public SlideCurrentStep: KnockoutObservable<SlideStep>;
-  public Questions: CockpitPortal.IQuestion[];
+  public IsWorking: ko.Computed<boolean>;
+  public CanGoToNextSlide: ko.Observable<boolean>;
+  public SlideHasFeedbackToShow: ko.Observable<boolean>;
+  public SlideCurrentStep: ko.Observable<SlideStep>;
+  public Questions: IQuestion[];
   public SlideCompleted: (completed: () => void) => void;
   public ScrollToFirstInvalidAnswerCallback: () => void;
 
-  private _isWorking: KnockoutObservable<KnockoutComputed<boolean>> = knockout.observable(null);
+  private _isWorking: ko.Observable<ko.Computed<boolean>> = knockout.observable(null);
 
   constructor(
     name: string,
     index: number = null,
-    canGoToNextSlide: KnockoutObservable<boolean> = null,
-    showFeedback: KnockoutObservable<boolean> = null,
-    currentSlideStep: KnockoutObservable<SlideStep> = null,
-    questions: CockpitPortal.IQuestion[] = null,
+    canGoToNextSlide: ko.Observable<boolean> = null,
+    showFeedback: ko.Observable<boolean> = null,
+    currentSlideStep: ko.Observable<SlideStep> = null,
+    questions: IQuestion[] = null,
   ) {
     this.Index = index;
     this.Name = name;
@@ -42,9 +42,10 @@ class Slide {
     if (this.ScrollToFirstInvalidAnswerCallback != null) this.ScrollToFirstInvalidAnswerCallback();
   }
 
-  public SetIsWorking(observeable: KnockoutComputed<boolean>): void {
+  public SetIsWorking(observeable: ko.Computed<boolean>): void {
+    console.log('ISWorking', observeable());
     this._isWorking(observeable);
   }
 }
 
-export = Slide;
+export default Slide;

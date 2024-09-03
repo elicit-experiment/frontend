@@ -1,4 +1,4 @@
-﻿import CallRepeater = require('Managers/CallRepeater');
+﻿import CallRepeater from 'Managers/CallRepeater';
 
 class CallQueue {
   private _queues: { [id: string]: CallRepeater[] } = {};
@@ -37,4 +37,4 @@ class CallQueue {
   }
 }
 
-export = CallQueue;
+export default CallQueue;

@@ -1,7 +1,6 @@
-﻿import QuestionModel = require('Models/Question');
-import MediaInfo = require('Components/Players/MediaInfo');
-
-import QuestionsBase = require('Components/Questions/QuestionBase');
+﻿import QuestionModel from 'Models/Question';
+import MediaInfo from 'Components/Players/MediaInfo';
+import QuestionsBase from 'Components/Questions/QuestionBase';
 
 abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public IsStimuliBlockVisible = true;
@@ -20,7 +19,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public Id: string;
   public HeaderLabel: string;
   public HasMedia = false;
-  public CanAnswer: KnockoutObservable<boolean>;
+  public CanAnswer: ko.Observable<boolean> | ko.Computed<boolean>;
   public IsColumnLayout = false;
   public QuestionsPerRow() {
     return this._questionsPerRow;
@@ -70,4 +69,4 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   }
 }
 
-export = QuestionsWithStimulusBase;
+export default QuestionsWithStimulusBase;

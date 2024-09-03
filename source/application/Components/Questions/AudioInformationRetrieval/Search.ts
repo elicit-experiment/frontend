@@ -1,13 +1,13 @@
-import knockout = require('knockout');
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import Notification = require('Managers/Notification');
-import DisposableComponent = require('Components/DisposableComponent');
+import * as knockout from 'knockout';
+import { AudioInformation } from 'Managers/Portal/Cockpit';
+import Notification from 'Managers/Notification';
+import DisposableComponent from 'Components/DisposableComponent';
 
 type SearchResult = {
   Name: string;
   ChannelName: string;
   Start: string;
-  IsSelected: KnockoutComputed<boolean>;
+  IsSelected: ko.Computed<boolean>;
   Select: () => void;
 };
 
@@ -18,7 +18,7 @@ export default class Search extends DisposableComponent {
   public Results = knockout.observableArray<SearchResult>();
   public Selected = knockout.observable<SearchResult>();
 
-  public HasSearched: KnockoutComputed<boolean>;
+  public HasSearched: ko.Computed<boolean>;
 
   constructor(searchButtonLabel: string) {
     super();
@@ -28,7 +28,7 @@ export default class Search extends DisposableComponent {
   }
 
   public Search(): void {
-    CockpitPortal.AudioInformation.Search().WithCallback((response) => {
+    AudioInformation.Search().WithCallback((response) => {
       if (response.Error != null) {
         Notification.Error('Failed to search: ' + response.Error.Message);
         return;

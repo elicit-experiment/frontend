@@ -1,10 +1,10 @@
-﻿import knockout = require('knockout');
+﻿import * as knockout from 'knockout';
 
 type Source = { Type: string; Source: string };
 
 class AudioInfo {
   public Sources: Source[];
-  public IsPlaying: KnockoutObservable<boolean> = knockout.observable(false);
+  public IsPlaying: ko.Observable<boolean> = knockout.observable(false);
 
   constructor(sources: Source[]) {
     this.Sources = sources;
@@ -23,4 +23,4 @@ class AudioInfo {
   }
 }
 
-export = AudioInfo;
+export default AudioInfo;

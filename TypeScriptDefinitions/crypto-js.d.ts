@@ -63,5 +63,5 @@ declare module CryptoJS {
 
 declare module 'crypto-js' {
 	import hashes = CryptoJS.hashes;
-	export = hashes;
+	export default hashes;
 }

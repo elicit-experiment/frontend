@@ -1,6 +1,6 @@
-﻿import knockout = require('knockout');
-import CockpitPortal = require('Managers/Portal/Cockpit');
-import QuestionMap = require('Components/Questions/QuestionMap');
+﻿import * as knockout from 'knockout';
+import { IOutput, IQuestion } from 'Managers/Portal/Cockpit';
+import { Get as QuestionMapGet } from 'Components/Questions/QuestionMap';
 import SlideStep from './SlideStep';
 
 class Question {
@@ -10,18 +10,18 @@ class Question {
   public HasUIElement: boolean;
   public Input: any[];
   public Component: any[];
-  public Answer: KnockoutObservable<CockpitPortal.IOutput> = knockout.observable<CockpitPortal.IOutput>();
-  public HasValidAnswer: KnockoutObservable<boolean> = knockout.observable(false);
-  public SlideStep: KnockoutObservable<SlideStep>;
+  public Answer: ko.Observable<IOutput> = knockout.observable<IOutput>();
+  public HasValidAnswer: ko.Observable<boolean> = knockout.observable(false);
+  public SlideStep: ko.Observable<SlideStep>;
   public RequiresInput: boolean;
-  public ScrollToCallback: KnockoutObservable<(duration: number) => void> = knockout.observable(null);
+  public ScrollToCallback: ko.Observable<(duration: number) => void> = knockout.observable(null);
   public AllRequiredMediaHavePlayed = knockout.observable(false);
   public HasFeedbackToShow = knockout.observable(false);
   private _loadedCallback: () => void;
 
   constructor(
-    question: CockpitPortal.IQuestion,
-    slideStep: KnockoutObservable<SlideStep>,
+    question: IQuestion,
+    slideStep: ko.Observable<SlideStep>,
     answerChangedCallback: (question: Question) => void,
     questionLoadedCallback: () => void,
   ) {
@@ -36,7 +36,10 @@ class Question {
       //console.dir(component);
 
       if (question.Type == 'NewComponent::WebGazerCalibrate') {
-        questionMap = QuestionMap.Get('WebGazerCalibrate');
+        questionMap = QuestionMapGet('WebGazerCalibrate');
+        input = component;
+      } else if (question.Type == 'NewComponent::FaceLandmark') {
+        questionMap = QuestionMapGet('FaceLandmark');
         input = component;
       } else if (question.Type == 'NewComponent') {
         const numStimuli = 'Stimuli' in component ? component.Stimuli.length : 0;
@@ -44,7 +47,7 @@ class Question {
 
         //console.log(`i: ${numInstruments} s: ${numStimuli}`);
         if (numStimuli == 1 && numInstruments == 0) {
-          questionMap = QuestionMap.Get('SoloStimulus');
+          questionMap = QuestionMapGet('SoloStimulus');
           input = component.Stimuli; // TODO: Handle more than one stimulus ?
         }
         if (numStimuli == 0 && numInstruments == 1) {
@@ -53,7 +56,7 @@ class Question {
           input = input.map((x) => {
             return { Instrument: x[type] };
           });
-          questionMap = QuestionMap.Get(type);
+          questionMap = QuestionMapGet(type);
         }
         if (numStimuli == 1 && numInstruments == 1) {
           input = [component.Instruments[0].Instrument]; // TODO: Handle more than one instrument
@@ -61,14 +64,14 @@ class Question {
           input = input.map((x) => {
             return { Instrument: { ...x[type], Stimulus: component.Stimuli[0] } };
           });
-          questionMap = QuestionMap.Get(type);
+          questionMap = QuestionMapGet(type);
         }
       }
       //console.dir(input);
       //console.dir(questionMap);
     } else {
       input = question.Component;
-      questionMap = QuestionMap.Get(question.Type);
+      questionMap = QuestionMapGet(question.Type);
     }
     this.Id = question.Id;
     this.Type = questionMap.Type;
@@ -106,4 +109,4 @@ class Question {
   }
 }
 
-export = Question;
+export default Question;

@@ -1,11 +1,11 @@
-import knockout = require('knockout');
-import jquery = require('jquery');
-import MediaInfo = require('Components/Players/MediaInfo');
+import * as knockout from 'knockout';
+import * as jQuery from 'jquery';
+import MediaInfo from 'Components/Players/MediaInfo';
 
 type Source = { Source: string; Width: string; Height: string };
 
 class Image {
-  public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
+  public PlayerElement: ko.Observable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
   public Sources: Source[];
   public Width: string;
   public Height: string;
@@ -18,7 +18,7 @@ class Image {
 
     const sub = this.PlayerElement.subscribe((e) => {
       sub.dispose();
-      const $player = jquery(e);
+      const $player = jQuery(e);
 
       this.Sources.forEach((s) => {
         let style = '';
@@ -38,10 +38,10 @@ class Image {
   }
 }
 
-import template = require('Components/Players/Image/Image.html');
+import template from 'Components/Players/Image/Image.html';
 knockout.components.register('Players/Image', {
   viewModel: Image,
-  template: template.default,
+  template,
 });
 
-export = Image;
+export default Image;

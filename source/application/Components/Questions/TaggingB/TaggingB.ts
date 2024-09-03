@@ -1,11 +1,11 @@
-﻿import knockout = require('knockout');
-import TaggingA = require('Components/Questions/TaggingA/TaggingA');
-import Taggle = require('taggle');
-import QuestionModel = require('Models/Question');
+﻿import * as knockout from 'knockout';
+import TaggingA from 'Components/Questions/TaggingA/TaggingA';
+import Taggle from 'taggle';
+import QuestionModel from 'Models/Question';
 
 type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
-type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
+type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
 class TaggingB extends TaggingA {
   public TagBoxElement = knockout.observable<HTMLElement>();
@@ -59,10 +59,10 @@ class TaggingB extends TaggingA {
   }
 }
 
-import template = require('Components/Questions/TaggingB/TaggingB.html');
+import template from 'Components/Questions/TaggingB/TaggingB.html';
 knockout.components.register('Questions/TaggingB', {
   viewModel: TaggingA,
-  template: template.default,
+  template,
 });
 
-export = TaggingB;
+export default TaggingB;

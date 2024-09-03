@@ -1,6 +1,6 @@
-import knockout = require('knockout');
-import jquery = require('jquery');
-import MediaInfo = require('Components/Players/MediaInfo');
+import * as knockout from 'knockout';
+import * as jQuery from 'jquery';
+import MediaInfo from 'Components/Players/MediaInfo';
 
 type Source = { Type: string; Source: string; Width: string; Height: string };
 
@@ -12,18 +12,18 @@ declare global {
 
 // TODO: probably should be refactored into a container for HTMLVideo or YouTubeVideo children
 class Video {
-  public PlayerElement: KnockoutObservable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
-  public PlayerControlsElement: KnockoutObservable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
-  public YouTubePlayerElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
-  public PlayButtonElement: KnockoutObservable<HTMLElement> = knockout.observable<HTMLElement>();
+  public PlayerElement: ko.Observable<HTMLVideoElement> = knockout.observable<HTMLVideoElement>();
+  public PlayerControlsElement: ko.Observable<HTMLDivElement> = knockout.observable<HTMLDivElement>();
+  public YouTubePlayerElement: ko.Observable<HTMLElement> = knockout.observable<HTMLElement>();
+  public PlayButtonElement: ko.Observable<HTMLElement> = knockout.observable<HTMLElement>();
   public Sources: Source[];
-  public IsPlaying: KnockoutObservable<boolean>;
-  public IsPlayed: KnockoutObservable<boolean>;
+  public IsPlaying: ko.Observable<boolean>;
+  public IsPlayed: ko.Observable<boolean>;
   public IsPausable: boolean;
   public IsReplayable: boolean;
   public MaxReplayCount: number;
-  public PlayCount: KnockoutObservable<number> = knockout.observable(0);
-  public PlayTimestamp: KnockoutComputed<number>;
+  public PlayCount: ko.Observable<number> = knockout.observable(0);
+  public PlayTimestamp: ko.Computed<number>;
   public IsOptional: boolean;
   public SourceType: string;
   public PlayerElementId: string;
@@ -240,7 +240,7 @@ class Video {
   }
 
   private InitializeHTML5VideoPlayer(player: HTMLVideoElement): void {
-    const $player = jquery(player);
+    const $player = jQuery(player);
 
     $player
       .on('playing', () => this._info.IsPlaying(true))
@@ -270,10 +270,10 @@ class Video {
   }
 }
 
-import template = require('Components/Players/Video/Video.html');
+import template from 'Components/Players/Video/Video.html';
 knockout.components.register('Players/Video', {
   viewModel: Video,
-  template: template.default,
+  template,
 });
 
-export = Video;
+export default Video;

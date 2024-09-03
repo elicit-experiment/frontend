@@ -1,14 +1,8 @@
 import * as knockout from 'knockout';
 
-export interface IKoComponentOptions {
+export interface IKoComponentOptions extends ko.components.Config {
   synchronous?: boolean | undefined;
   name?: string;
-  template:
-    | string
-    | Node[]
-    | DocumentFragment
-    | KnockoutComponentTypes.TemplateElement
-    | KnockoutComponentTypes.AMDModule;
 }
 
 export interface IKoComponentStatic {

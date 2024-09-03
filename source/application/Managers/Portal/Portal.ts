@@ -1,6 +1,6 @@
-import knockout = require('knockout');
-import PortalClient = require('PortalClient');
-import Configuration = require('Managers/Configuration');
+import * as knockout from 'knockout';
+import PortalClient from 'PortalClient';
+import Configuration from 'Managers/Configuration';
 
 class MyCallHandler<T> implements CHAOS.Portal.Client.ICallHandler {
   public ProcessResponse<T>(
@@ -127,4 +127,4 @@ class Portal {
 
 const instance = new Portal();
 
-export = instance;
+export default instance;

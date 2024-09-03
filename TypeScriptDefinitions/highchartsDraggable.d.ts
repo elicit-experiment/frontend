@@ -7,6 +7,6 @@
 	} 	
 }
 
-export = Highcharts;
+export default Highcharts;
 export as namespace Highcharts;
 

@@ -1,26 +1,26 @@
 {
     "compilerOptions": {
-		"noImplicitAny": true,
-		"module": "amd",
+		"noImplicitAny": false,
+		"module": "es2020",
 		"outDir": "app",
-        "target": "es5",
-        "moduleResolution": "classic",
+        "target": "es2020",
         "types": [ "youtube" ],
-        "lib": ["es2017", "dom", "es6"],
-        "esModuleInterop": true,
+        "lib": ["es2019", "dom", "es6"],
+        "moduleResolution": "node",
         "experimentalDecorators": true,
         "baseUrl": "./source/",
         "paths": {
-            "Components/*": ["application/Components"],
-            "Managers/*": ["application/Managers"],
-            "Models/*": ["application/Models"],
-            "Images/*": ["application/Images"],
-            "Utility/*": ["application/Utility"],
-            "KnockoutBindings/*": ["application/KnockoutBindings"]
+            "Components/*": ["application/Components/*"],
+            "Managers/*": ["application/Managers/*"],
+            "Models/*": ["application/Models/*"],
+            "Images/*": ["application/Images/*"],
+            "Utility/*": ["application/Utility/*"],
+            "KnockoutBindings/*": ["application/KnockoutBindings/*"],
+            "PortalClient": ["../dependencies/PortalClient/PortalClient.min.js"],
         }
     },
     "include": [
-        "source/**/*.ts", "source/**/*.html", "source/**/*.json", "global.d.ts"
+        "source/**/*.ts", "source/**/*.html", "source/**/*.json", "global.d.ts", "TypeScriptDefinitions/**/*.d.ts"
     ],
     "exclude": [
         "node_modules",

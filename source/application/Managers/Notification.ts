@@ -10,4 +10,4 @@
 
 const instance = new Notification();
 
-export = instance;
+export default instance;

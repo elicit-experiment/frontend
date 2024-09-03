@@ -1,4 +1,4 @@
-import Configuration = require('Managers/Configuration');
+import Configuration from 'Managers/Configuration';
 
 function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: string) {
   if (sessionGuid === '') console.error('no session GUID');
@@ -6,9 +6,9 @@ function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: stri
   return new Promise((resolve, reject) => {
     const url = new URL(`/v6/time_series/${seriesType}/file`, Configuration.PortalPath);
     const formData = new FormData();
-    formData.append('series_type', seriesType);
-    formData.append('file', new Blob([tsv]), 'file');
+    formData.append('seriesType', seriesType);
     formData.append('sessionGUID', sessionGuid);
+    formData.append('file', new Blob([tsv]), 'file');
 
     fetch(url.href, {
       method: 'POST',
@@ -33,9 +33,18 @@ function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: stri
 }
 
 function postTimeSeriesAsJson(body: any, seriesType: string) {
-  return new Promise((resolve, reject) => {
-    const url = new URL(`/v6/time_series/${seriesType}`, Configuration.PortalPath);
-    console.log(`MouseTrackingManager: Sending points to ${url.href}`);
+  const jsonString = JSON.stringify(body);
+
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const readableStream = blob.stream();
+
+  const compressedReadableStream = readableStream.pipeThrough(new CompressionStream('gzip'));
+  const url = new URL(`/v6/time_series/${seriesType}`, Configuration.PortalPath);
+
+  return new Promise(async (resolve, reject) => {
+    console.log(`TimeSeries: Sending points to ${url.href}`);
+    const compressedResponse = new Response(compressedReadableStream);
+    const timeSeriesBlob = await compressedResponse.blob();
     fetch(url.href, {
       method: 'POST',
       //credentials: 'include', // include the sessionGUID cookie
@@ -43,9 +52,10 @@ function postTimeSeriesAsJson(body: any, seriesType: string) {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Content-Encoding': 'gzip',
       },
       credentials: 'include',
-      body: JSON.stringify(body),
+      body: timeSeriesBlob,
     })
       .then((rawResponse) => {
         if (rawResponse.ok) {

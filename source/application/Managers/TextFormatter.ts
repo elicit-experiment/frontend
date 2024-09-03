@@ -93,4 +93,4 @@
 
 const instance = new TextFormatter();
 
-export = instance;
+export default instance;

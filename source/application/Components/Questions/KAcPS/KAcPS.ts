@@ -1,7 +1,7 @@
-﻿import knockout = require('knockout');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import AudioInfo = require('Components/Players/Audio/AudioInfo');
+﻿import * as knockout from 'knockout';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import AudioInfo from 'Components/Players/Audio/AudioInfo';
 
 type ItemInfo = {
   Id: string;
@@ -10,8 +10,8 @@ type ItemInfo = {
   AudioInfo: AudioInfo;
   HasStimulus: boolean;
   IsActive: boolean;
-  IsSelected: KnockoutComputed<boolean>;
-  ButtonElement: KnockoutObservable<HTMLElement>;
+  IsSelected: ko.Computed<boolean>;
+  ButtonElement: ko.Observable<HTMLElement>;
 };
 type Item = { Id: string; ChoiceButton: { Label: string; Selected: string; Active?: string }; Stimulus: IStimulus };
 
@@ -20,10 +20,10 @@ class KAcPS extends QuestionBase<{ Id: string }> {
   public HeaderLabel: string;
   public MediaLabel: string;
   public Items: ItemInfo[];
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-  public CanAnswer: KnockoutObservable<boolean>;
+  public Answer: ko.Observable<string> = knockout.observable<string>(null);
+  public CanAnswer: ko.Observable<boolean>;
   public HasNoStimulus: boolean;
-  public MaxButtonWidth: KnockoutComputed<number>;
+  public MaxButtonWidth: ko.Computed<number>;
 
   private _hasActives: boolean;
 
@@ -63,7 +63,7 @@ class KAcPS extends QuestionBase<{ Id: string }> {
   }
 
   protected HasValidAnswer(answer: any): boolean {
-    return (!this._hasActives && this.CanAnswer()) || (answer.Id != undefined && answer.Id != null);
+    return (!this._hasActives && this.CanAnswer()) || (answer.Id != undefined && true);
   }
 
   private CreateItemInfo(data: Item): ItemInfo {
@@ -92,10 +92,10 @@ class KAcPS extends QuestionBase<{ Id: string }> {
   }
 }
 
-import template = require('Components/Questions/KAcPS/KAcPS.html');
+import template from 'Components/Questions/KAcPS/KAcPS.html';
 knockout.components.register('Questions/KAcPS', {
   viewModel: KAcPS,
-  template: template.default,
+  template,
 });
 
-export = KAcPS;
+export default KAcPS;

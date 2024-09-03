@@ -1,19 +1,19 @@
-﻿import knockout = require('knockout');
+﻿import * as knockout from 'knockout';
 import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
-import QuestionModel = require('Models/Question');
+import QuestionModel from 'Models/Question';
 
 type AnswerType = { Id: string; Correct: boolean };
 
 class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   private _isOptional: boolean;
 
-  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+  public Answer: ko.Observable<string> = knockout.observable<string>(null);
 
-  public CorrectnessClass: KnockoutComputed<string>;
-  public CorrectnessLabel: KnockoutComputed<string>;
+  public CorrectnessClass: ko.Computed<string>;
+  public CorrectnessLabel: ko.Computed<string>;
 
-  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
-  public IsAnswerable: KnockoutObservable<boolean>;
+  public FeedbackText: ko.Observable<string> = knockout.observable<string>(null);
+  public IsAnswerable: ko.Computed<boolean>;
 
   protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
 
@@ -68,9 +68,7 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
     return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
-      IsEnabled: knockout.computed(
-          () => true,
-      ),
+      IsEnabled: knockout.computed(() => true),
       Correct: item.Correct,
       Feedback: item.Feedback,
       AnsweredCorrectly,
@@ -83,10 +81,10 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   }
 }
 
-import template = require('Components/Questions/RadioButtonGroup/RadioButtonGroup.html');
+import template from 'Components/Questions/RadioButtonGroup/RadioButtonGroup.html';
 knockout.components.register('Questions/RadioButtonGroup', {
   viewModel: RadioButtonGroup,
-  template: template.default,
+  template,
 });
 
-export = RadioButtonGroup;
+export default RadioButtonGroup;

@@ -1,9 +1,10 @@
-import knockout = require('knockout');
+import * as knockout from 'knockout';
 import Swal, { SweetAlertResult } from 'sweetalert2';
-import ExperimentManager = require('Managers/Portal/Experiment');
-import QuestionBase = require('Components/Questions/QuestionBase');
-import QuestionModel = require('Models/Question');
-import bootstrap = require('bootstrap');
+import ExperimentManager from 'Managers/Portal/Experiment';
+import QuestionBase from 'Components/Questions/QuestionBase';
+import QuestionModel from 'Models/Question';
+import { Modal } from 'bootstrap';
+import type WebGazerManager from 'Managers/WebGazerManager';
 
 interface CalibrationPoint {
   [key: string]: number;
@@ -12,8 +13,8 @@ interface CalibrationPoint {
 class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   public AnswerIsRequired = true;
   public HasMedia = false;
-  public CanAnswer: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
-  public Answer: KnockoutObservable<number> = knockout.observable<number>(null);
+  public CanAnswer: ko.Observable<boolean> = knockout.observable<boolean>(false);
+  public Answer: ko.Observable<number> = knockout.observable<number>(null);
 
   public PointCalibrate = 0;
   public CalibrationPoints: CalibrationPoint = {};
@@ -21,12 +22,12 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   public MaxNoOfAttempts: number;
   public NoOfAttempts = 1;
   public MinCalibrationAccuracyPct: number;
-  public CalibrationFailed: KnockoutObservable<boolean> = knockout.observable<boolean>(false);
+  public CalibrationFailed: ko.Observable<boolean> = knockout.observable<boolean>(false);
 
-  private _helpModal: bootstrap.Modal = null;
-  private _loadingModal: bootstrap.Modal = null;
+  private _helpModal: Modal = null;
+  private _loadingModal: Modal = null;
 
-  private webgazerManager: typeof WebGazerManager = null;
+  private webgazerManager: WebGazerManager = null;
 
   constructor(question: QuestionModel) {
     super(question, true);
@@ -41,15 +42,15 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
     this.MaxNoOfAttempts = (question.Input as any).MaxNoOfAttempts;
     this.MinCalibrationAccuracyPct = (question.Input as any).MinCalibrationAccuracyPct;
 
-    this._loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    this._loadingModal = new Modal(document.getElementById('loadingModal'));
     this._loadingModal.show();
     this.ClearCanvas();
 
     import('Managers/WebGazerManager')
       .then((webgazerManagerImport) => {
-        this.webgazerManager = webgazerManagerImport.default;
+        this.webgazerManager = webgazerManagerImport.getInstance();
       })
-      .then(() => this.webgazerManager.Instance.Init())
+      .then(() => this.webgazerManager.Init())
       .then(() => {
         console.log('WebGazerCalibration: webgazer initialized');
         console.timeStamp('WebGazerCalibration: webgazer initialized');
@@ -136,11 +137,11 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
     console.timeStamp('WebGazerCalibration: Failed');
     ExperimentManager.SlideTitle('Calibration failed');
 
-    this.webgazerManager.Instance.HideCalibrationElements();
+    this.webgazerManager.HideCalibrationElements();
     this.ClearCanvas();
     this.CalibrationFailed(true);
 
-    this.webgazerManager.Instance.End();
+    this.webgazerManager.End();
   }
 
   protected HasValidAnswer(answer: any): boolean {
@@ -175,7 +176,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       helpModal.querySelector('.calibrate-button').classList.add('d-none');
     }
 
-    this._helpModal = new bootstrap.Modal(document.getElementById('helpModal')); // creating modal object
+    this._helpModal = new Modal(document.getElementById('helpModal')); // creating modal object
     this._helpModal.show();
     console.log('Show helpmodal');
     console.timeStamp('Show helpmodal');
@@ -213,7 +214,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       showCancelButton: true,
     }).then(() => {
       console.log('WebGazerCalibration: Starting calibration.');
-      this.webgazerManager.Instance.StartCalibration();
+      this.webgazerManager.StartCalibration();
       this.ShowCalibrationPoint();
     });
   }
@@ -227,7 +228,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
    * This function clears the calibration buttons memory
    */
   private ClearCalibration() {
-    this.webgazerManager.Instance.RestartCalibration().then(() => console.timeStamp('ClearCalibration complete'));
+    this.webgazerManager.RestartCalibration().then(() => console.timeStamp('ClearCalibration complete'));
 
     const $Calibration = $('.Calibration');
     $Calibration.css('background-color', 'red');
@@ -255,7 +256,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     this.HideWebGazerVideo();
 
-    this.webgazerManager.Instance.StartTracking();
+    this.webgazerManager.StartTracking();
 
     // TODO: maybe investigate parent of wgCalibrate from context?
     slideShell.GoToNextSlide();
@@ -337,7 +338,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
 
           this.sleep(5000).then(() => {
             this.stop_storing_points_variable(); // stop storing the prediction points
-            const past50 = this.webgazerManager.Instance.webgazer.getStoredPoints(); // retrieve the stored points
+            const past50 = this.webgazerManager.webgazer.getStoredPoints(); // retrieve the stored points
             const precisionMeasurement = this.calculatePrecision(past50);
             const accuracyLabel = '<a>Accuracy | ' + precisionMeasurement + '%</a>';
             document.getElementById('Accuracy').innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
@@ -408,7 +409,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 
   private store_points_variable() {
-    this.webgazerManager.Instance.webgazer.params.storingPoints = true;
+    this.webgazerManager.webgazer.params.storingPoints = true;
   }
 
   /*
@@ -416,7 +417,7 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
    * stored any more
    */
   private stop_storing_points_variable() {
-    this.webgazerManager.Instance.webgazer.params.storingPoints = false;
+    this.webgazerManager.webgazer.params.storingPoints = false;
   }
 
   private calculatePrecision(past50Array: number[][]) {
@@ -500,11 +501,11 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
   }
 }
 
-import template = require('Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html');
-import WebGazerManager from '../../../Managers/WebGazerManager';
+import template from 'Components/Questions/WebGazerCalibrate/WebGazerCalibrate.html';
+
 knockout.components.register('Questions/WebGazerCalibrate', {
   viewModel: WebGazerCalibrate,
-  template: template.default,
+  template,
 });
-console.log('WebGazerCalibrate');
-export = WebGazerCalibrate;
+
+export default WebGazerCalibrate;
