@@ -1,6 +1,6 @@
 import './LandmarkExample.css';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-//import FaceLandmark from 'Components/Questions/FaceLandmark/FaceLandmark';
+//import FaceLandmarkCalibration from 'Components/Questions/FaceLandmarkCalibration/FaceLandmarkCalibration';
 
 const CONSTRAINTS: MediaStreamConstraints = {
   audio: false,
@@ -49,6 +49,7 @@ export default (
 
   createFaceLandmarker().then(() => {
     console.log('createFaceLandmarker');
+    console.dir(FaceLandmarker.FACE_LANDMARKS_LEFT_EYE);
 
     /********************************************************************
      // Demo 1: Grab a bunch of images from the page and detection them

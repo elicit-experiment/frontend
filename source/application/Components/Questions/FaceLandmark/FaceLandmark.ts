@@ -6,6 +6,12 @@ import PortalClient from 'PortalClient';
 import { postTimeSeriesAsJson } from 'Utility/TimeSeries';
 import template from 'Components/Questions/FaceLandmark/FaceLandmark.html';
 import { FaceLandmarkerOptions, FaceLandmarkerResult } from '@mediapipe/tasks-vision';
+import {
+  FaceLandmarkComponentConfig,
+  ValidateConfig,
+  NormalizeConfig,
+  transformDatapoint,
+} from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 
 class DatapointAccumulator {
   public dataPoints: any[] = [];
@@ -48,19 +54,9 @@ class DatapointAccumulator {
   }
 }
 
-type FaceLandmarkComponentConfig = {
-  NumberOfFaces?: number;
-  CalibrationDuration?: number;
-  Landmarks?: boolean;
-  Blendshapes?: boolean;
-  FaceTransformation?: boolean;
-  StripZCoordinates?: boolean;
-  IncludeBlandshapes?: string; // TODO: Deprecate Blandshapes
-  IncludeBlendshapes?: string;
-};
-
 class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
   public config: FaceLandmarkComponentConfig;
+  public includeLandmarks?: number[];
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'FaceLandmark', 'Instrument', method, data);
@@ -70,6 +66,8 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
     super(question, true);
 
     this.config = question.Input as FaceLandmarkComponentConfig;
+    this.includeLandmarks = NormalizeConfig(question.Input as FaceLandmarkComponentConfig)?.includeLandmarks;
+    ValidateConfig(this.config);
 
     const datapointAccumulator = new DatapointAccumulator();
 
@@ -83,57 +81,14 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
       };
 
       demo(FaceLandmarker, FilesetResolver, DrawingUtils, options, (dataPoint: FaceLandmarkerResult) => {
-        if (!this.config.FaceTransformation && dataPoint.hasOwnProperty('facialTransformationMatrixes')) {
-          delete dataPoint.facialTransformationMatrixes;
-        }
-        if (!this.config.Blendshapes && dataPoint.hasOwnProperty('faceBlendshapes')) {
-          delete dataPoint.faceBlendshapes;
-        }
-        if (!this.config.Landmarks && dataPoint.hasOwnProperty('faceLandmarks')) {
-          delete dataPoint.faceBlendshapes;
-        }
-        if (this.config.StripZCoordinates) {
-          dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.z));
-        }
-        dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.visibility));
-        dataPoint.faceBlendshapes.forEach((blendShape) =>
-          blendShape.categories.forEach((category) => delete category.displayName),
-        );
+        const transformedDataPoint = transformDatapoint(this.config, dataPoint, this.includeLandmarks);
 
-        if (this.config.IncludeBlandshapes || this.config.IncludeBlendshapes) {
-          const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
-            Object.fromEntries(faceBlendShape.categories.map((blendShape, index) => [blendShape.categoryName, index])),
-          );
-
-          let indexRemapIndex = 0;
-          let faceLandmarks = [];
-          // TODO: Deprecate Blandshapes
-          const includeBlendshapes = (this.config.IncludeBlendshapes || this.config.IncludeBlandshapes).split(',');
-          dataPoint.faceBlendshapes = dataPoint.faceBlendshapes.map((faceBlendshape, faceIndex) => {
-            const blendShapeIndices = includeBlendshapes.map((blendShape) => blendShapeToIndex[faceIndex][blendShape]);
-            const categories = blendShapeIndices.map((index) => faceBlendshape.categories[index]);
-
-            Object.fromEntries(
-              categories.map((blendShape) => {
-                const oldIndex = blendShape.index;
-                faceLandmarks = faceLandmarks.concat(dataPoint.faceLandmarks[faceIndex][oldIndex]);
-                blendShape.index = indexRemapIndex;
-                return [oldIndex, indexRemapIndex++];
-              }),
-            );
-            return {
-              ...faceBlendshape,
-              categories,
-            };
-          });
-          dataPoint.faceLandmarks = faceLandmarks;
-        }
-        datapointAccumulator.accumulateAndDebounce(dataPoint);
+        datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
       });
     });
   }
 
-  protected HasValidAnswer(answer: any): boolean {
+  protected HasValidAnswer(_answer: any): boolean {
     return true;
   }
 }
