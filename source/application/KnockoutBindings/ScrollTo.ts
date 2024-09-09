@@ -1,21 +1,13 @@
-﻿import jquery = require("jquery");
-import knockout = require("knockout");
+﻿export default {
+  init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {},
+  update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) => {
+    const value: KnockoutObservable<(duration: number) => void> = valueAccessor();
 
-knockout.bindingHandlers["ScrollTo"] = {
-	init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) =>
-	{
-		
-	},
-	update: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) =>
-	{
-		var value: KnockoutObservable<(duration:number)=>void> = valueAccessor();
+    const $element = jQuery(element);
+    const $document = jQuery('html, body');
 
-		var $element = jQuery(element);
-		var $document = jQuery("html, body");
-
-		value(duration =>
-		{
-			$document.animate({scrollTop: $element.offset().top}, duration);
-		});
-	}
-};
+    value((duration) => {
+      $document.animate({ scrollTop: $element.offset().top }, duration);
+    });
+  },
+} as KnockoutBindingHandler;

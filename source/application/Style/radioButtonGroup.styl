@@ -1,0 +1,109 @@
+
+label.radio-button-group {
+  display: flex;
+  padding-left: 20px;
+  cursor: inherit;
+  align-items: center;
+  margin: auto;
+}
+
+label.checkbox-button-group,
+label.radio-button-group {
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+  justify-content: flex-start;
+  position: relative;
+}
+
+label.checkbox-button-group > input[type=checkbox],
+label.radio-button-group > input[type=radio] {
+  float: left;
+  width: 20px;
+  margin-left: -20px;
+  margin-top: 2px;
+  padding: 0;
+  -webkit-appearance: radio;
+}
+
+label.radio-button-group > span {
+  display: inline-block;
+  margin: 0 0 0 10px;
+}
+
+label.checkbox-button-group > span {
+}
+
+.QuestionBlock > .row {
+  &.correct {
+    border: 2px solid green;
+    padding: 0.1rem 2.0rem !important;
+  }
+  &.correct.feedback {
+    background: green;
+    font-weight: bold;
+    color: white;
+  }
+  &.incorrect {
+    border: 2px solid red;
+    padding: 0.1rem 2.0rem !important;
+  }
+  &.incorrect.feedback {
+    background: red;
+    font-weight: bold;
+    color: white;
+  }
+}
+
+.feedback {
+  margin-top: 1.5rem;
+  padding: 1rem 2.0rem !important;
+
+  .correctness-icon {
+    margin-top: -1.25rem;
+  }
+}
+
+.correctable-question {
+  position: relative;
+}
+
+.incorrect .correctness-icon, .highlight-result-icon.incorrect {
+  color: red;
+}
+.correct .correctness-icon, .highlight-result-icon.correct {
+  color: green;
+}
+
+.correctness-icon {
+  position: absolute;
+
+  &.group-result {
+    right: -1em;
+    top: calc(50% - 18px);
+    font-size: 36px;
+  }
+
+}
+
+.highlight-result-icon {
+  position: absolute;
+  left: 0;
+
+  &.individual {
+    font-size: unset;
+    left: -3.6em;
+    top: 0;
+  }
+
+  &.correct.individual:before,
+  &.incorrect.individual:before {
+    content: '⮕'
+  }
+
+  &.group-result {
+    right: -1em;
+    top: calc(50% - 18px);
+    font-size: 36px;
+  }
+}

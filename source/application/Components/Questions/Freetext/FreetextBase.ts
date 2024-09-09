@@ -1,88 +1,108 @@
-﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
+﻿import knockout = require('knockout');
+import QuestionModel = require('Models/Question');
+import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
 
-class FreetextBase<T> extends QuestionBase<T>
-{
-	public Id: string;
-	public Label: string = "";
-	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-	public LabelPosition:string = "left";
-	public LabelPositionLeft:boolean = false;
-	public LabelPositionTop:boolean = false;
-	public LabelPositionRight:boolean = false;
-	public LabelPositionBottom:boolean = false;
+class FreetextBase<T> extends QuestionWithStimulusBase<T> {
+  public Id: string;
+  public Label = '';
+  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
+  public LabelPosition = 'left';
+  public LabelPositionLeft = false;
+  public LabelPositionTop = false;
+  public LabelPositionRight = false;
+  public LabelPositionBottom = false;
 
-	private _validation: RegExp;
+  private _validation: RegExp;
+  private _boxHeight: string = null;
+  private _boxWidth: string = null;
+  private _resizeable = false;
 
-	constructor(question: QuestionModel)
-	{
-		super(question);
+  constructor(question: QuestionModel) {
+    super(question);
 
-		this.Id = this.Model.Id;
+    if (this.HasInstrument()) {
+      this.Label = this.GetInstrumentFormatted('Label');
 
-		if (this.HasInstrument())
-		{
-			this.Label = this.GetInstrumentFormatted("Label");
+      const validation = this.GetInstrument('Validation');
 
-			var validation = this.GetInstrument("Validation");
+      if (validation) this._validation = new RegExp(validation);
 
-			if (validation) this._validation = new RegExp(validation);
-		}
+      this._resizeable = !!this.GetInstrument('Resizeable');
+      this._boxHeight = this.GetInstrumentFormatted('BoxHeight');
+      this._boxWidth = this.GetInstrumentFormatted('BoxWidth');
+    }
 
-		this.LabelPosition = this.GetInstrument("LabelPosition");
+    this.LabelPosition = this.GetInstrument('LabelPosition');
 
-		switch (this.LabelPosition)
-		{
-			case "left":
-				this.LabelPositionLeft = true;
-				break;
-			case "top":
-				this.LabelPositionTop = true;
-				break;
-			case "right":
-				this.LabelPositionRight = true;
-				break;
-			case "bottom":
-				this.LabelPositionBottom = true;
-				break;
-		}
+    switch (this.LabelPosition) {
+      case 'left':
+        this.LabelPositionLeft = true;
+        break;
+      case 'top':
+        this.LabelPositionTop = true;
+        break;
+      case 'right':
+        this.LabelPositionRight = true;
+        break;
+      case 'bottom':
+        this.LabelPositionBottom = true;
+        break;
+    }
 
-		if (this.HasAnswer())
-			this.Answer(this.LoadText(this.GetAnswer()));
+    if (this.HasAnswer()) this.Answer(this.LoadText(this.GetAnswer()));
 
-		this.Answer.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 200 } });
-		this.Answer.subscribe(v => this.UpdateAnswer(v));
-	}
+    this.Answer.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 200 } });
+    this.Answer.subscribe((v) => this.UpdateAnswer(v));
+  }
 
-	protected UpdateAnswer(text:string):void
-	{
-		this.SetAnswer(this.SaveText(text));
-	}
+  protected IsResizeable(): boolean {
+    console.log(this._resizeable);
+    return this._resizeable;
+  }
+  protected BoxHeight(): string {
+    return this._boxHeight;
+  }
+  protected BoxWidth(): string {
+    return this._boxWidth;
+  }
 
-	protected LoadText(answer:T):string
-	{
-		throw new Error("Not implemented");
-	}
+  protected GetResizableDimensions() {
+    const properties: any = {};
+    if (this._boxWidth) {
+      properties.cols = this._boxWidth;
+    }
+    if (this._boxHeight) {
+      properties.rows = this._boxHeight;
+    }
 
-	protected SaveText(answer: string): T
-	{
-		throw new Error("Not implemented");
-	}
+    console.dir(properties);
 
-	protected HasValidAnswer(answer: T): boolean
-	{
-		if (!this._validation) return true;
+    return properties;
+  }
 
-		var text = answer == null ? "" : this.LoadText(answer);
+  protected UpdateAnswer(text: string): void {
+    this.SetAnswer(this.SaveText(text));
+  }
 
-		return this._validation.test(text);
-	}
+  protected LoadText(answer: T): string {
+    throw new Error('Not implemented');
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "FreeText", "Instrument", method, data);
-	}
+  protected SaveText(answer: string): T {
+    throw new Error('Not implemented');
+  }
+
+  protected HasValidAnswer(answer: T): boolean {
+    if (!this._validation) return true;
+
+    const text = answer == null ? '' : this.LoadText(answer);
+
+    return this._validation.test(text);
+  }
+
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'FreeText', 'Instrument', method, data);
+  }
 }
 
 export = FreetextBase;

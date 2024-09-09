@@ -1,35 +1,38 @@
-﻿import FreetextBase = require("Components/Questions/Freetext/FreetextBase");
-import QuestionModel = require("Models/Question");
+﻿import FreetextBase = require('Components/Questions/Freetext/FreetextBase');
+import QuestionModel = require('Models/Question');
+import knockout from 'knockout';
 
 type Answer = { Text: string };
 
-class Freetext extends FreetextBase<Answer>
-{
-	constructor(question: QuestionModel)
-	{
-		super(question);
-	}
+class Freetext extends FreetextBase<Answer> {
+  constructor(question: QuestionModel) {
+    super(question);
+  }
 
-	protected UpdateAnswer(text: string): void
-	{
-		this.AddEvent("Change", "Keyboard", text);
-		super.UpdateAnswer(text);
-	}
+  protected readonly InstrumentTemplateName = 'Freetext';
 
-	protected LoadText(answer: Answer): string
-	{
-		return answer == null || answer.Text == null ? "" : answer.Text;
-	}
+  protected UpdateAnswer(text: string): void {
+    this.AddEvent('Change', 'Keyboard', text);
+    super.UpdateAnswer(text);
+  }
 
-	protected SaveText(answer: string): Answer
-	{
-		return { Text: answer };
-	}
+  protected LoadText(answer: Answer): string {
+    return answer == null || answer.Text == null ? '' : answer.Text;
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "Freetext", "Instrument", method, data);
-	}
+  protected SaveText(answer: string): Answer {
+    return { Text: answer };
+  }
+
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'Freetext', 'Instrument', method, data);
+  }
 }
+
+import template = require('Components/Questions/Freetext/Freetext.html');
+knockout.components.register('Questions/Freetext', {
+  viewModel: Freetext,
+  template: template.default,
+});
 
 export = Freetext;

@@ -1,118 +1,107 @@
-import knockout = require("knockout");
-import DisposableComponent = require("Components/DisposableComponent");
+import knockout = require('knockout');
+import DisposableComponent = require('Components/DisposableComponent');
 
-type Segment = {Title:string, Start:number, End:number, Length:number};
-type Channel = {Title:string, Segments:Segment[], TrackElement:KnockoutObservable<HTMLElement>};
-type TimeSegment = {Text:string, Position:number};
+type Segment = { Title: string; Start: number; End: number; Length: number };
+type Channel = { Title: string; Segments: Segment[]; TrackElement: KnockoutObservable<HTMLElement> };
+type TimeSegment = { Text: string; Position: number };
 
-export default class TimeLine extends DisposableComponent
-{
-	public TracksElement = knockout.observable<HTMLElement>(null);
+export default class TimeLine extends DisposableComponent {
+  public TracksElement = knockout.observable<HTMLElement>(null);
 
-	public Channels = knockout.observableArray<Channel>();
-	public TimeSegments = knockout.observableArray<TimeSegment>();
+  public Channels = knockout.observableArray<Channel>();
+  public TimeSegments = knockout.observableArray<TimeSegment>();
 
-	public ZoomLevel = knockout.observable(1);
-	public Position:KnockoutComputed<number>;
-	public Length:KnockoutComputed<number>;
+  public ZoomLevel = knockout.observable(1);
+  public Position: KnockoutComputed<number>;
+  public Length: KnockoutComputed<number>;
 
-	constructor()
-	{
-		super();
+  constructor() {
+    super();
 
-		this.Channels.push(this.CreateChannel("Taler"), this.CreateChannel("Transkriptioner"));
-	}
+    this.Channels.push(this.CreateChannel('Taler'), this.CreateChannel('Transkriptioner'));
+  }
 
-	public Initialize():void
-	{
-		this.AdjustZoomLevelToFitLength();
-		this.Subscribe(this.Length, () => this.AdjustZoomLevelToFitLength());
-	}
+  public Initialize(): void {
+    this.AdjustZoomLevelToFitLength();
+    this.Subscribe(this.Length, () => this.AdjustZoomLevelToFitLength());
+  }
 
-	public CreateChannel(title:string):Channel
-	{
-		return {
-			Title: title,
-			Segments: this.CreateSegments(),
-			TrackElement: knockout.observable(null)
-		};
-	}
+  public CreateChannel(title: string): Channel {
+    return {
+      Title: title,
+      Segments: this.CreateSegments(),
+      TrackElement: knockout.observable(null),
+    };
+  }
 
-	public CreateSegments():Segment[] {
-		let segments:Segment[] = [];
+  public CreateSegments(): Segment[] {
+    const segments: Segment[] = [];
 
-		for (let i = 0; i < 1000; i++)
-			segments.push(this.CreateSegment("Segment " + i, i * 80, i * 80 + 50));
+    for (let i = 0; i < 1000; i++) segments.push(this.CreateSegment('Segment ' + i, i * 80, i * 80 + 50));
 
-		return segments;
-	}
+    return segments;
+  }
 
-	public ZoomTracks(viewModel:any, event:JQueryMouseEventObject):void
-	{
-		let originalEvent = (<WheelEvent>(<any>event).originalEvent);
+  public ZoomTracks(viewModel: any, event: JQueryMouseEventObject): void {
+    const originalEvent = <WheelEvent>(<any>event).originalEvent;
 
-		this.ZoomLevel(this.ZoomLevel() * (originalEvent.deltaY > 0 ? 1.1 : 0.9));
+    this.ZoomLevel(this.ZoomLevel() * (originalEvent.deltaY > 0 ? 1.1 : 0.9));
 
-		setTimeout(() => {
-			if(this.TracksElement() != null && this.TracksElement().scrollLeft > this.TracksElement().scrollWidth - this.TracksElement().clientWidth)
-			{
-				this.TracksElement().scrollLeft = this.TracksElement().scrollWidth - this.TracksElement().clientWidth
-			}
-		});
-	}
+    setTimeout(() => {
+      if (
+        this.TracksElement() != null &&
+        this.TracksElement().scrollLeft > this.TracksElement().scrollWidth - this.TracksElement().clientWidth
+      ) {
+        this.TracksElement().scrollLeft = this.TracksElement().scrollWidth - this.TracksElement().clientWidth;
+      }
+    });
+  }
 
-	private AddTimeSegments():void
-	{
-		this.TimeSegments.removeAll();
+  private AddTimeSegments(): void {
+    this.TimeSegments.removeAll();
 
-		for(let i = 0; i < this.Length(); i += 100000)
-		{
-			this.TimeSegments.push(this.CreateTimeSegment(i));
-		}
-	}
+    for (let i = 0; i < this.Length(); i += 100000) {
+      this.TimeSegments.push(this.CreateTimeSegment(i));
+    }
+  }
 
-	private CreateTimeSegment(position:number):TimeSegment
-	{
-		return {
-			Text: this.GetTimeCode(position),
-			Position: position
-		};
-	}
+  private CreateTimeSegment(position: number): TimeSegment {
+    return {
+      Text: this.GetTimeCode(position),
+      Position: position,
+    };
+  }
 
-	private CreateSegment(title:string, start:number, end:number):Segment
-	{
-		let result:Segment = {
-			Title: title,
-			Start: start,
-			End: end,
-			Length: end - start
-		};
+  private CreateSegment(title: string, start: number, end: number): Segment {
+    const result: Segment = {
+      Title: title,
+      Start: start,
+      End: end,
+      Length: end - start,
+    };
 
-		return result;
-	}
+    return result;
+  }
 
-	private GetTimeCode(position: number):string
-	{
-		let hours = Math.floor(position / (60 * 60 * 1000));
-		let minutes = Math.floor((position % (60 * 60 * 1000)) / (60 * 1000));
-		let seconds = Math.floor((position % (60 * 1000)) / 1000);
-		let milliseconds = position % 1000;
+  private GetTimeCode(position: number): string {
+    const hours = Math.floor(position / (60 * 60 * 1000));
+    const minutes = Math.floor((position % (60 * 60 * 1000)) / (60 * 1000));
+    const seconds = Math.floor((position % (60 * 1000)) / 1000);
+    const milliseconds = position % 1000;
 
-		return `${hours}:${this.ToTwoDigits(minutes)}:${this.ToTwoDigits(seconds)}.${milliseconds}`;
-	}
+    return `${hours}:${this.ToTwoDigits(minutes)}:${this.ToTwoDigits(seconds)}.${milliseconds}`;
+  }
 
-	private ToTwoDigits(value:number):string
-	{
-		return value < 10 ? "0" + value : value.toString();
-	}
+  private ToTwoDigits(value: number): string {
+    return value < 10 ? '0' + value : value.toString();
+  }
 
-	private AdjustZoomLevelToFitLength():void
-	{
-		if(this.TracksElement() == null) return;
+  private AdjustZoomLevelToFitLength(): void {
+    if (this.TracksElement() == null) return;
 
-		this.TracksElement().scrollLeft = 0;
-		this.ZoomLevel(this.TracksElement().clientWidth / this.Length());
+    this.TracksElement().scrollLeft = 0;
+    this.ZoomLevel(this.TracksElement().clientWidth / this.Length());
 
-		this.AddTimeSegments();
-	}
+    this.AddTimeSegments();
+  }
 }

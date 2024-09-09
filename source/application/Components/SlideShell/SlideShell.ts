@@ -1,170 +1,205 @@
-﻿import knockout = require("knockout");
-import ExperimentManager = require("Managers/Portal/Experiment");
-import SlideModel = require("Models/Slide");
-import CockpitPortal = require("Managers/Portal/Cockpit");
+﻿import knockout = require('knockout');
+import ExperimentManager = require('Managers/Portal/Experiment');
+import SlideModel = require('Models/Slide');
+import CockpitPortal = require('Managers/Portal/Cockpit');
+import SlideStep from '../../Models/SlideStep';
 
-class SlideShell
-{
-	public Title: KnockoutObservable<string>;
-	public HasTitle: KnockoutComputed<boolean>;
+class SlideShell {
+  public Title: KnockoutObservable<string>;
+  public HasTitle: KnockoutComputed<boolean>;
 
-	public SlideData: KnockoutObservable<SlideModel> = knockout.observable<SlideModel>();
+  public SlideData: KnockoutObservable<SlideModel> = knockout.observable<SlideModel>();
 
-	public AreAllQuestionsAnswered:KnockoutObservable<boolean> = knockout.observable(false);
-	public SlideIndex:KnockoutObservable<number>;
-	public SlideNumber:KnockoutComputed<number>;
-	public NumberOfSlides: KnockoutObservable<number>;
+  public SlideComponent: KnockoutComputed<{ name: string; params: any }>;
 
-	public IsLoadingSlide: KnockoutComputed<boolean>;
+  public AreAllQuestionsAnswered: KnockoutObservable<boolean> = knockout.observable(false);
+  public ShowFeedback: KnockoutObservable<boolean> = knockout.observable(false);
+  public CurrentSlideStep: KnockoutObservable<SlideStep> = knockout.observable(SlideStep.ANSWERING);
+  public SlideIndex: KnockoutObservable<number>;
+  public SlideNumber: KnockoutComputed<number>;
+  public NumberOfSlides: KnockoutObservable<number>;
 
-	public IsPreviousSlideVisible: KnockoutComputed<boolean>;
-	public IsPreviousSlideEnabled:KnockoutComputed<boolean>;
-	public IsNextSlideVisible: KnockoutComputed<boolean>;
-	public IsNextSlideEnabled: KnockoutComputed<boolean>;
-	public IsCloseExperimentVisible: KnockoutComputed<boolean>;
-	public IsCloseExperimentEnabled: KnockoutComputed<boolean>;
-	public IsHighlighted: KnockoutObservable<boolean> = knockout.observable(false);
-	public IsWaiting: KnockoutComputed<boolean>;
-	public IsWaitingForNext: KnockoutObservable<boolean> = knockout.observable(false);
+  public IsLoadingSlide: KnockoutComputed<boolean>;
 
-	private _subscriptions:KnockoutSubscription[] = [];
+  public IsPreviousSlideVisible: KnockoutComputed<boolean>;
+  public IsPreviousSlideEnabled: KnockoutComputed<boolean>;
+  public IsNextSlideVisible: KnockoutComputed<boolean>;
+  public IsNextSlideEnabled: KnockoutComputed<boolean>;
+  public IsCloseExperimentVisible: KnockoutComputed<boolean>;
+  public IsCloseExperimentEnabled: KnockoutComputed<boolean>;
+  public IsHighlighted: KnockoutObservable<boolean> = knockout.observable(false);
+  public IsWaiting: KnockoutComputed<boolean>;
+  public IsWaitingForNext: KnockoutObservable<boolean> = knockout.observable(false);
+  public NextText: KnockoutComputed<string> = knockout.computed(() => {
+    return this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING ? 'See Answers' : 'Next';
+  });
 
-	constructor()
-	{
-		this.IsLoadingSlide = knockout.computed(() => {
-			//console.log(`SlideShell.ts: IsLoadingSlide: ${this.SlideData()} `);
-			return !this.SlideData();
-		});
-		this.SlideIndex = ExperimentManager.CurrentSlideIndex;
-		this.SlideNumber = knockout.computed(() => this.SlideIndex() + 1);
-		this.NumberOfSlides = ExperimentManager.NumberOfSlides;
+  private _subscriptions: KnockoutSubscription[] = [];
 
-		this.IsWaiting = knockout.computed(() => this.IsWaitingForNext());
+  constructor() {
+    this.IsLoadingSlide = knockout.computed(() => {
+      return !this.SlideData();
+    });
 
-		this.IsPreviousSlideVisible = knockout.computed(() => ExperimentManager.GoToPreviousSlideEnabled() && !ExperimentManager.CloseSlidesEnabled());
-		this.IsPreviousSlideEnabled = knockout.computed(() => this.IsPreviousSlideVisible() && !this.IsLoadingSlide() && this.SlideIndex() !== 0 && !this.IsWaiting());
-		this.IsNextSlideVisible = knockout.computed(() => {
-			return this.SlideNumber() !== this.NumberOfSlides();
-		});
-		this.IsNextSlideEnabled = knockout.computed(() => {
-			const enabled = this.IsNextSlideVisible() && !this.IsLoadingSlide() && !this.IsWaiting()
-			//console.log(`SlideShell.ts: IsNextSlideEnabled: visible: ${this.IsNextSlideVisible()} not-loading: ${!this.IsLoadingSlide()} not waiting: ${!this.IsWaiting()} => ${enabled}`);
-			return enabled;
-		});
-		this.IsCloseExperimentVisible = knockout.computed(() => ExperimentManager.IsExperimentCompleted() && ExperimentManager.CloseExperimentEnabled());
-		this.IsCloseExperimentEnabled = knockout.computed(() => this.IsCloseExperimentVisible() && !this.IsWaiting());
+    this.SlideIndex = ExperimentManager.CurrentSlideIndex;
+    this.SlideNumber = knockout.computed(() => this.SlideIndex() + 1);
+    this.NumberOfSlides = ExperimentManager.NumberOfSlides;
 
-		this.Title = ExperimentManager.SlideTitle;
-		this.HasTitle = knockout.computed(() => this.Title() !== "");
+    this.SlideComponent = knockout.computed(() => {
+      if (this.SlideData()) {
+        return { name: this.SlideData().Name, params: this.SlideData() };
+      }
+    });
 
-		this._subscriptions.push(ExperimentManager.IsReady.subscribe(r =>
-		{
-			if (!r) return;
+    this.IsWaiting = knockout.computed(() => this.IsWaitingForNext());
 
-			this.LoadNextSlide();
-		}));
+    this.IsPreviousSlideVisible = knockout.computed(
+      () => ExperimentManager.GoToPreviousSlideEnabled() && !ExperimentManager.CloseSlidesEnabled(),
+    );
+    this.IsPreviousSlideEnabled = knockout.computed(
+      () => this.IsPreviousSlideVisible() && !this.IsLoadingSlide() && this.SlideIndex() !== 0 && !this.IsWaiting(),
+    );
+    this.IsNextSlideVisible = knockout.computed(() => {
+      return this.SlideNumber() !== this.NumberOfSlides();
+    });
+    this.IsNextSlideEnabled = knockout.computed(() => {
+      const enabled = this.IsNextSlideVisible() && !this.IsLoadingSlide() && !this.IsWaiting();
+      return enabled;
+    });
+    this.IsCloseExperimentVisible = knockout.computed(
+      () => ExperimentManager.IsExperimentCompleted() && ExperimentManager.CloseExperimentEnabled(),
+    );
+    this.IsCloseExperimentEnabled = knockout.computed(() => this.IsCloseExperimentVisible() && !this.IsWaiting());
 
-		this.IsHighlighted.subscribe(value =>
-		{
-			if (value) setTimeout(() => this.IsHighlighted(false), 3000); //TODO: add binding to listen to the event for animation complete instead of timeout
-		});
+    this.Title = ExperimentManager.SlideTitle;
+    this.HasTitle = knockout.computed(() => this.Title() !== '');
 
-		//this.AreAllQuestionsAnswered.subscribe(value => console.log(`AreAllQuestionsAnswered: ${value}`))
+    this._subscriptions.push(
+      ExperimentManager.IsReady.subscribe((r) => {
+        if (!r) return;
 
-		if (ExperimentManager.IsReady()) this.LoadNextSlide();
-	}
+        this.LoadNextSlide();
+      }),
+    );
 
-	public GoToNextSlide():void
-	{
-		this.IsWaitingForNext(true);
+    this.IsHighlighted.subscribe((value) => {
+      if (value) setTimeout(() => this.IsHighlighted(false), 3000); //TODO: add binding to listen to the event for animation complete instead of timeout
+    });
 
-		this.DoWhenDone(() => !this.IsLoadingSlide() && !this.SlideData().IsWorking(), () =>
-		{
-			//console.log('SlideShell.ts: GoToNextSlide Going to next slide?');
-			this.IsWaitingForNext(false);
+    //this.AreAllQuestionsAnswered.subscribe(value => console.log(`AreAllQuestionsAnswered: ${value}`))
 
-			if (this.AreAllQuestionsAnswered())
-			{
-				//console.log('SlideShell.ts: GoToNextSlide All questions are answered!');
-				this.LoadNextSlide();
-			}
-			else
-			{
-				//console.log('SlideShell.ts: GoToNextSlide NOT all questions are answered!');
-				this.SlideData().ScrollToFirstInvalidAnswer();
+    if (ExperimentManager.IsReady()) this.LoadNextSlide();
+  }
 
-				if (this.IsHighlighted())
-				{
-					this.IsHighlighted(false);
-					setTimeout(() => this.IsHighlighted(true), 50);
-				}
-				else
-					this.IsHighlighted(true);
-			}
-		});
-	}
+  public NextAction(): void {
+    if (this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING) {
+      if (this.AreAllQuestionsAnswered()) {
+        this.CurrentSlideStep(SlideStep.REVEALING);
+      } else {
+        //console.log('SlideShell.ts: GoToNextSlide NOT all questions are answered!');
+        this.SlideData().ScrollToFirstInvalidAnswer();
 
-	private LoadNextSlide():void
-	{
-		this.UnloadSlide(true);
+        if (this.IsHighlighted()) {
+          this.IsHighlighted(false);
+          setTimeout(() => this.IsHighlighted(true), 50);
+        } else this.IsHighlighted(true);
+      }
+    } else {
+      this.GoToNextSlide();
+    }
+  }
 
-		ExperimentManager.LoadNextSlide(this.MakeLoadSlideCallback());
-	}
+  public GoToNextSlide(): void {
+    this.IsWaitingForNext(true);
 
-	public GoToPreviousSlide():void
-	{
-		this.UnloadSlide(false);
+    this.DoWhenDone(
+      () => {
+        return !this.IsLoadingSlide() && !this.SlideData().IsWorking();
+      },
+      () => {
+        this.IsWaitingForNext(false);
 
-		ExperimentManager.LoadPreviousSlide(this.MakeLoadSlideCallback());
-	}
+        if (this.AreAllQuestionsAnswered()) {
+          //console.log('SlideShell.ts: GoToNextSlide All questions are answered!');
+          this.LoadNextSlide();
+        } else {
+          //console.log('SlideShell.ts: GoToNextSlide NOT all questions are answered!');
+          this.SlideData().ScrollToFirstInvalidAnswer();
 
-	public MakeLoadSlideCallback() : (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void
-	{
-		return (slideIndex, questions) => {
-			this.SlideData(new SlideModel("Slides/Default", slideIndex, this.AreAllQuestionsAnswered, questions));
-		};
-	}
+          if (this.IsHighlighted()) {
+            this.IsHighlighted(false);
+            setTimeout(() => this.IsHighlighted(true), 50);
+          } else this.IsHighlighted(true);
+        }
+      },
+    );
+  }
 
-	private DoWhenDone(check:() => boolean, action:() => void):void
-	{
-		if (check())
-		{
-			action();
-			return;
-		}
-		var sub = knockout.computed(check).subscribe(v =>
-		{
-			sub.dispose();
-			action();
-		});
-		this._subscriptions.push(sub);
-	}
+  private LoadNextSlide(): void {
+    this.UnloadSlide(true);
 
-	private UnloadSlide(complete:boolean):void
-	{
-		this.IsHighlighted(false);
+    ExperimentManager.LoadNextSlide(this.MakeLoadSlideCallback());
+  }
 
-		if (complete && this.SlideData() != null)
-		{
-			var oldSlide = this.SlideData();
-			this.SlideData().Complete(() => ExperimentManager.CloseSlide(oldSlide.Index));
-		}
+  public GoToPreviousSlide(): void {
+    this.UnloadSlide(false);
 
-        ExperimentManager.SlideTitle("");
+    ExperimentManager.LoadPreviousSlide(this.MakeLoadSlideCallback());
+  }
 
-        this.SlideData(null);
-	}
+  public MakeLoadSlideCallback(): (slideIndex: number, questions: CockpitPortal.IQuestion[]) => void {
+    return (slideIndex, questions) => {
+      this.SlideData(
+        new SlideModel(
+          'Slides/Default',
+          slideIndex,
+          this.AreAllQuestionsAnswered,
+          this.ShowFeedback,
+          this.CurrentSlideStep,
+          questions,
+        ),
+      );
+    };
+  }
 
-	public Close():void
-	{
-		ExperimentManager.Close();
-	}
+  private DoWhenDone(check: () => boolean, action: () => void): void {
+    if (check()) {
+      action();
+      return;
+    }
+    const sub = knockout.computed(check).subscribe((v) => {
+      sub.dispose();
+      action();
+    });
+    this._subscriptions.push(sub);
+  }
 
-	public dispose():void
-	{
-		this._subscriptions.forEach(s => s.dispose());
+  private UnloadSlide(complete: boolean): void {
+    this.IsHighlighted(false);
 
-	}
+    if (complete && this.SlideData() != null) {
+      const oldSlide = this.SlideData();
+      this.SlideData().Complete(() => ExperimentManager.CloseSlide(oldSlide.Index));
+    }
+
+    ExperimentManager.SlideTitle('');
+
+    this.SlideData(null);
+  }
+
+  public Close(): void {
+    ExperimentManager.Close();
+  }
+
+  public dispose(): void {
+    this._subscriptions.forEach((s) => s.dispose());
+  }
 }
+
+import template = require('Components/SlideShell/SlideShell.html');
+knockout.components.register('SlideShell', {
+  viewModel: SlideShell,
+  template: template.default,
+});
 
 export = SlideShell;

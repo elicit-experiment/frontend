@@ -1,13 +1,15 @@
-<!-- ko if: SourceType === 'youtube' -->
-<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
-<!-- /ko -->
-<!-- ko if: SourceType === 'html5' -->
-<video class="VideoPlayer" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">
-</video>
-<!-- /ko -->
-<div class="VideoControls">
-	<button type="button" class="btn btn-default" aria-label="Left Align" data-bind="click: TogglePlay">
-		<span class="glyphicon glyphicon-play" aria-hidden="true" data-bind="visible: !IsPlaying()"></span>
-		<span class="glyphicon glyphicon-stop" aria-hidden="true" data-bind="visible: IsPlaying()"></span>
-	</button>	
+<div class="VideoControls loading" data-bind="Element: PlayerControlsElement">
+	<button type="button" class="btn btn-default" aria-label="Left Align" data-bind="click: TogglePlay, Element: PlayButtonElement">
+		<i class="bi bi-play-circle" aria-hidden="true" data-bind="visible: !IsPlaying()"></i>
+		<i class="bi bi-stop-circle" aria-hidden="true" data-bind="visible: IsPlaying()"></i>
+	</button>
+</div>
+<div class="video-wrapper">
+	<!-- ko if: SourceType === 'youtube' -->
+	<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
+	<!-- /ko -->
+	<!-- ko if: SourceType === 'html5' -->
+	<video class="VideoPlayer" crossOrigin="anonymous" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">
+	</video>
+	<!-- /ko -->
 </div>

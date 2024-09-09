@@ -21,7 +21,7 @@ interface TaggleOptions
 	onBeforeTagAdd?:(event:Event, tag:string)=>boolean;
 }
 
-declare module "Taggle"
+declare module "taggle"
 {
 	export = Taggle;
 }

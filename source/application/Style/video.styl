@@ -1,13 +1,76 @@
 .VideoPlayer {
 	display: inline-block;
     pointer-events: none;
+	width: 100%;
 }
 
-.VideoControls {
-	margin: 5px;
+.VideoControls
+	display: flex
+	justify-items center
+	button
+		font-size: 3rem
+		margin: 5px auto
+		transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+		transform-origin: center center
+		transition-delay: 2s
+		transform: scale(1.0)
+
+.VideoControls:not(.loading)
+	button
+		animation-name: bounce-6;
+		animation-timing-function: ease;
+		animation-duration: 2s;
+		animation-iteration-count: 1;
+
+@keyframes bounce-6 {
+	0% {
+		transform: scale(1, 1) translateY(0);
+	}
+	10% {
+		transform: scale(1.1, .9) translateY(0);
+	}
+	30% {
+		transform: scale(.9, 1.1) translateY(+40px);
+	}
+	50% {
+		transform: scale(1.05, .95) translateY(0);
+	}
+	57% {
+		transform: scale(1, 1) translateY(+ 7px);
+	}
+	64% {
+		transform: scale(1, 1) translateY(0);
+	}
+	100% {
+		transform: scale(1, 1) translateY(0);
+	}
 }
+
+.VideoControls.loading
+	 button
+		 transform: scale(0.5)
 
 .VideoBlock
 	text-align center
 	div
 		display inline-block
+
+
+.video-wrapper
+	position: relative
+	padding-bottom: 43.25%
+	height: 0
+	margin-bottom: 1rem
+
+	video, iframe
+		position: absolute
+		top: 0
+		left: 0
+		width: 100%
+		height: 100%
+
+.stimulus-label
+
+.stimulus-container
+	width: 100%
+	text-align: center

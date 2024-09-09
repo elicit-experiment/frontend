@@ -1,19 +1,16 @@
-﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
+﻿import knockout = require('knockout');
+import QuestionBase = require('Components/Questions/QuestionBase');
+import QuestionModel = require('Models/Question');
 
-class Unsupported extends QuestionBase<any>
-{
-	constructor(question: QuestionModel)
-	{
-		super(question, false);
-		console.log("Unsupported question type: " + question.APIType);
-	}
+class Unsupported extends QuestionBase<any> {
+  constructor(question: QuestionModel) {
+    super(question, false);
+    console.warn('Unsupported question type: ' + question.APIType);
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "Unsupported", "Instrument", method, data);
-	}
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'Unsupported', 'Instrument', method, data);
+  }
 }
 
-export = Unsupported; 
+export = Unsupported;

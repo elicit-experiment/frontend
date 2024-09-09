@@ -2,6 +2,12 @@ body {
     min-width:600px!important;
 }
 
+#webgazer-calibration {
+    position: absolute;
+    display: block;
+    left: 0;
+    top: 0;
+}
 /* Video Feed Styling */
 #overlay {
     z-index: 1;
@@ -20,12 +26,16 @@ body {
     background-color: #222;
     color: #eee;
     left: -15px;
-    padding-left: 80px;
+    padding-left: 40px;
     padding-right: 40px;
+    display: flex;
 }
 #Accuracy {
     background-color: #222;
     padding-left: inherit;
+    display: flex;
+    justify-items: center;
+    align-items: center;
 }
 
 li {
@@ -35,15 +45,20 @@ li {
     padding-right: 20px;
 }
 
+.helpBtnContainer > .helpBtn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .helpBtn {
     padding: 15px;
     border: none;
     background: none;
     color: #777;
 }
-.helpBtn a {
-    background: none;
-    color: #777;
+.helpBtn > *  {
+    margin: 0 5px;
 }
 .helpBtn a:hover {
     color: black!important;
@@ -104,4 +119,7 @@ li {
 #Pt9{
     bottom:2vw;
     right:2vw;
+}
+
+.calibration-confirmation {
 }

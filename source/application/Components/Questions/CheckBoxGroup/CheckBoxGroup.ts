@@ -1,114 +1,119 @@
-﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
-import { shuffleInPlace } from "Utility/ShuffleInPlace";
+﻿import knockout = require('knockout');
+import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
+import QuestionModel = require('Models/Question');
 
-type ItemInfo = { Id: string; Label: string; IsEnabled: KnockoutComputed<boolean>; };
-type Item = { Label: string; Id: string; Selected: string };
+type AnswerType = { Selections: string[]; Correct: boolean };
 
-class CheckBoxGroup extends QuestionBase<{Selections:string[]}>
-{
-	private _minNoOfSelections: number;
-	private _maxNoOfSelections: number;
+class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
+  private readonly _minNoOfSelections: number;
+  private readonly _maxNoOfSelections: number;
 
-	public Id: string;
-	public HeaderLabel: string;
-	public AudioLabel: string;
-	public AudioInfo: AudioInfo = null;
-	public Items: ItemInfo[];
-	public RowedItems: ItemInfo[][];
-	public Answer: KnockoutObservableArray<string> = knockout.observableArray<string>();
-	public CanSelectMore: KnockoutComputed<boolean>;
-	public HasMedia: boolean = false;
-	public CanAnswer: KnockoutObservable<boolean>;
-	public AddFillerItem: KnockoutComputed<boolean>;
-	public AddOneFillerItem: KnockoutComputed<boolean>;
-	public AddHalfFillerItem: KnockoutComputed<boolean>;
+  public Answer: KnockoutObservableArray<string> = knockout.observableArray<string>();
 
-	public IsStimuliBlockVisible: boolean = true;
-    private _alignForStimuli: boolean = true;
+  public CanSelectMore: KnockoutComputed<boolean>;
 
-	constructor(question: QuestionModel)
-	{
-		super(question);
+  public ItemCorrectness: boolean[];
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
-		this._minNoOfSelections = parseInt(this.GetInstrument("MinNoOfSelections"));
-		this._maxNoOfSelections = parseInt(this.GetInstrument("MaxNoOfSelections"));
-		var randomizeOrder = this.GetInstrument("RandomizeOrder");
-		var alignForStimuli = this.GetInstrument("AlignForStimuli");
-		var randomizeOrder = this.GetInstrument("RandomizeOrder");
-        this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
-        this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
+  public FeedbackCorrect = knockout.observable<string>('');
+  public FeedbackIncorrect = knockout.observable<string>('');
 
-		var stimulus = this.GetStimulusInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+  protected readonly InstrumentTemplateName = 'CheckboxGroupButtons';
 
-			this.AudioInfo = new AudioInfo([{ Type: stimulus.Type, Source: stimulus.URI }]);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
+  constructor(question: QuestionModel) {
+    super(question);
 
-		this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
+    this.FeedbackCorrect(this.GetInstrument('FeedbackCorrect'));
+    this.FeedbackIncorrect(this.GetInstrument('FeedbackIncorrect'));
 
-		this.CanSelectMore = knockout.computed(() => this.Answer().length < this._maxNoOfSelections);
+    this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
+    this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
 
-		this.Items = this.GetItems<Item, ItemInfo>(v => this.CreateItemInfo(v));
-		if (randomizeOrder) {
-			this.Items = shuffleInPlace(this.Items)
-		}
-		this.AddEvent("Render", "", JSON.stringify(this.Items))
-		this.RowedItems = this.RowItems(this.Items, 4);
+    console.log(this._minNoOfSelections);
+    this.CanSelectMore = knockout.computed(() => {
+      //console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
+      return this.Answer().length < this._maxNoOfSelections;
+    });
+    this.SetItems(
+      this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)),
+    );
 
-		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
-		this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
-		this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
+    this.RevealAnswers.subscribe((reveal: boolean) => {
+      if (!reveal) return;
 
-		if (this.HasAnswer())
-		{
-			if (this.GetAnswer()["Selections"])
-				this.Answer.push.apply(this.Answer, this.GetAnswer().Selections);
-		}
-		else
-			this.SetAnswer({ Selections: [] });
-		
-		this.Answer.subscribe(v =>
-		{
-			this.AddEvent("Change", "Mouse/Left/Down", v.join(","));
-			this.SetAnswer({ Selections: v });
-		});
-	}
+      const firstIncorrectItemIndex = this.ItemCorrectness.findIndex((x: boolean) => !x);
+      if (firstIncorrectItemIndex === -1) return;
 
-	protected HasValidAnswer(answer: any): boolean
-	{
-		if (this._minNoOfSelections === 0) return true;
-		if (!answer.Selections) return false;
+      const firstIncorrectItem = this.Items[firstIncorrectItemIndex];
+      if (firstIncorrectItem) {
+        this.FeedbackText(this.FeedbackIncorrect());
+      } else {
+        this.FeedbackText(this.FeedbackCorrect());
+      }
+      //console.dir(this.ItemCorrectness);
 
-		return answer.Selections.length >= this._minNoOfSelections;
-	}
+      this.ItemCorrectness.forEach((correct, index) =>
+        this.GetAnswer().Selections.indexOf(this.Items[index].Id) !== -1 || !correct
+          ? this.Items[index].AnsweredCorrectly(correct)
+          : '',
+      );
+    });
 
-	private CreateItemInfo(data: Item):ItemInfo
-	{
-		if (data.Selected === "1")
-			this.Answer.push(data.Id);
+    if (this.HasAnswer()) {
+      if (this.GetAnswer()['Selections']) this.Answer.push.apply(this.Answer, this.GetAnswer().Selections);
+    } else this.SetAnswer({ Selections: [], Correct: false });
 
-		var info = {
-			Id: data.Id,
-			Label: this.GetFormatted(data.Label),
-			IsEnabled: knockout.computed(() => this.CanAnswer() && (this.Answer.indexOf(data.Id) !== -1 || this.CanSelectMore()))
-		};
+    this.Answer.subscribe((selectedIds) => {
+      this.AddEvent('Change', 'Mouse/Left/Down', selectedIds.join(','));
+      this.ItemCorrectness = this.Items.map((item) =>
+        selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
+      );
 
-		return info;
-	}
+      this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
+    });
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "CheckBoxGroup", "Instrument", method, data);
-	}
+  protected HasValidAnswer(answer: AnswerType): boolean {
+    if (this._minNoOfSelections === 0) return true;
+    if (!answer.Selections) return false;
+
+    return answer.Selections.length >= this._minNoOfSelections;
+  }
+
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'CheckBoxGroup', 'Instrument', method, data);
+  }
+
+  private CreateItemInfo(item: Item): ItemInfo {
+    if (item.Selected === '1') this.Answer.push(item.Id);
+
+    const AnsweredCorrectly = knockout.observable<boolean | null>(null);
+    return {
+      Id: item.Id,
+      Label: this.GetFormatted(item.Label),
+      IsEnabled: knockout.computed(() => {
+        // console.dir([this.CanAnswer(), this.Answer().indexOf(item.Id) !== -1, this.CanSelectMore()]);
+        const canAnswer = this.CanAnswer();
+        const alreadyAnswered = this.Answer().indexOf(item.Id) !== -1;
+        const canSelectMore = this.CanSelectMore();
+
+        return canAnswer && (canSelectMore || alreadyAnswered);
+      }),
+      Correct: item.Correct,
+      Feedback: item.Feedback,
+      AnsweredCorrectly,
+      CorrectnessClass: knockout.computed(() => {
+        if (AnsweredCorrectly() === null) return '';
+
+        return AnsweredCorrectly() ? 'correct' : 'incorrect';
+      }),
+    };
+  }
 }
+
+import template = require('Components/Questions/CheckBoxGroup/CheckBoxGroup.html');
+knockout.components.register('Questions/CheckBoxGroup', {
+  viewModel: CheckBoxGroup,
+  template: template.default,
+});
 
 export = CheckBoxGroup;

@@ -1,4 +1,5 @@
-﻿<div class="container" data-bind="if: Page() != null">
-	<div data-bind="component: {name: Page().Name, params: Page().Data}"></div>
-	<p class="text-muted" data-bind="visible: IsFooterVisible, html: FooterLabel"></p>
-</div>
+﻿<!-- ko if: Page() -->
+<div data-bind="component: {name: Page().Name, params: Page().Data}" class="shell-body"></div>
+<!-- /ko -->
+<p class="text-muted shell-footer" data-bind="visible: IsFooterVisible, html: FooterLabel"></p>
+

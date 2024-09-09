@@ -5,14 +5,22 @@
 		"outDir": "app",
         "target": "es5",
         "moduleResolution": "classic",
-        "typeRoots": [
-            "node_modules/@types"
-        ],
         "types": [ "youtube" ],
-        "lib": ["es2017", "dom"]
+        "lib": ["es2017", "dom", "es6"],
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "baseUrl": "./source/",
+        "paths": {
+            "Components/*": ["application/Components"],
+            "Managers/*": ["application/Managers"],
+            "Models/*": ["application/Models"],
+            "Images/*": ["application/Images"],
+            "Utility/*": ["application/Utility"],
+            "KnockoutBindings/*": ["application/KnockoutBindings"]
+        }
     },
     "include": [
-        "source/**/*"
+        "source/**/*.ts", "source/**/*.html", "source/**/*.json", "global.d.ts"
     ],
     "exclude": [
         "node_modules",

@@ -1,13 +1,22 @@
-﻿<div class="container-fluid">
-    <div class="row container-fluid">
-        <div class="row QuestionBlock">
-            <div class="row">
-				<label class="Freetext">
-					<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
+﻿<script type="text/html" id="Freetext">
+<div class="row QuestionBlock">
+	<div class="row">
+		<div class="freetext-container">
+			<label class="Freetext">
+				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
+				<!-- ko if: IsResizeable -->
+					<textarea type="textarea" class="form-control" data-bind="textInput: Answer, attr: GetResizableDimensions()"></textarea>
+				<!-- /ko -->
+
+				<!-- ko if: !IsResizeable -->
 					<input type="text" class="form-control" data-bind="textInput: Answer"/>
-					<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
-				</label>
-			</div>
-        </div>
-    </div>
+				<!-- /ko -->
+
+				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
+			</label>
+		</div>
+	</div>
 </div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>

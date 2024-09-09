@@ -1,149 +1,162 @@
-﻿import knockout = require("knockout");
-import SlideModel = require("Models/Slide");
-import QuestionModel = require("Models/Question");
-import ExperimentManager = require("Managers/Portal/Experiment");
-import CockpitPortal = require("Managers/Portal/Cockpit");
-import NameConventionLoader = require("Components/NameConventionLoader");
+﻿import knockout = require('knockout');
+import SlideModel = require('Models/Slide');
+import QuestionModel = require('Models/Question');
+import ExperimentManager = require('Managers/Portal/Experiment');
+import CockpitPortal = require('Managers/Portal/Cockpit');
+import { KoComponent } from '../../../Utility/KoDecorators';
 
-class Default
-{
-	private _slide: SlideModel;
-	private _uiLessQuestions: IQuestionViewModel[] = [];
-	private _activeAnsweSets: KnockoutObservable<number> = knockout.observable(0);
-	private _isWorking: KnockoutObservable<boolean> = knockout.observable(false);
+class Default {
+  private _slide: SlideModel;
+  private _uiLessQuestions: IQuestionViewModel[] = [];
+  private _activeAnsweSets: KnockoutObservable<number> = knockout.observable(0);
+  private _isWorking: KnockoutObservable<boolean> = knockout.observable(false);
 
-	private _loadingQuestions: KnockoutObservable<boolean> = knockout.observable(true);
+  private _loadingQuestions: KnockoutObservable<boolean> = knockout.observable(true);
 
-	public Questions: QuestionModel[] = [];
-	public HaveActiveAnswersSets:KnockoutComputed<boolean>;
+  public Questions: QuestionModel[] = [];
+  public HaveActiveAnswersSets: KnockoutComputed<boolean>;
 
-	constructor(slide: SlideModel)
-	{
-		this._slide = slide;
-		this._slide.CanGoToNextSlide(false);
-		this._loadingQuestions(true);
-		slide.SlideCompleted = callback => this.SlideCompleted(callback);
-		slide.ScrollToFirstInvalidAnswerCallback = () => this.ScrollToFirstInvalidAnswer();
+  constructor(slide: SlideModel) {
+    this._slide = slide;
+    this._slide.CanGoToNextSlide(false);
+    this._loadingQuestions(true);
+    slide.SlideCompleted = (callback) => this.SlideCompleted(callback);
+    slide.ScrollToFirstInvalidAnswerCallback = () => this.ScrollToFirstInvalidAnswer();
 
-		this.HaveActiveAnswersSets = knockout.computed(() => this._activeAnsweSets() !== 0);
-		slide.SetIsWorking(knockout.computed(() => this._isWorking() || this.HaveActiveAnswersSets()));
+    this.HaveActiveAnswersSets = knockout.computed(() => this._activeAnsweSets() !== 0);
+    slide.SetIsWorking(knockout.computed(() => this._isWorking() || this.HaveActiveAnswersSets()));
 
-		this.InitializeQuestions(slide.Questions);
-	}
+    this.InitializeQuestions(slide.Questions);
+  }
 
-	private InitializeQuestions(questions: CockpitPortal.IQuestion[]):void
-	{
-		this._slide.SetIsWorking(knockout.computed(() => true));
-		//console.log('Default.ts:InitializeQuestions');
-		var numberToLoad = questions.length;
-		var loaded = () => { if (--numberToLoad === 0) this.SlideLoaded(); }
+  private InitializeQuestions(questions: CockpitPortal.IQuestion[]): void {
+    this._slide.SetIsWorking(knockout.computed(() => true));
+    //console.log('Default.ts:InitializeQuestions');
+    let numberToLoad = questions.length;
+    const loaded = () => {
+      if (--numberToLoad === 0) this.SlideLoaded();
+    };
 
-		for (var i = 0; i < questions.length; i++)
-		{
-			var questionModel = new QuestionModel(questions[i], question => this.AnswerChanged(question), loaded);
-			questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
-			this.Questions.push(questionModel);
+    for (let i = 0; i < questions.length; i++) {
+      const questionModel = new QuestionModel(
+        questions[i],
+        this._slide.SlideCurrentStep,
+        (question) => this.AnswerChanged(question),
+        loaded,
+      );
+      questionModel.HasValidAnswer.subscribe(() => this.CheckIfAllQuestionsAreAnswered());
+      this._slide.SlideHasFeedbackToShow(this._slide.SlideHasFeedbackToShow() || questionModel.HasFeedbackToShow());
 
-			if (!questionModel.HasUIElement)
-				((m: QuestionModel) => require([NameConventionLoader.GetFilePath(questionModel.Type)],(vm: any) => this._uiLessQuestions.push(new vm(m))))(questionModel);
-		}
+      if (questionModel.HasFeedbackToShow()) {
+        this._slide.SlideHasFeedbackToShow.subscribe(
+          (feedbackToShow) => !feedbackToShow && questionModel.HasFeedbackToShow(feedbackToShow),
+        );
+      }
 
-		if (questions.length === 0) {
-			this.SlideLoaded();
-		}
-	}
+      this.Questions.push(questionModel);
 
-	private SlideLoaded(): void
-	{
-		console.log('Default.ts:SlideLoaded');
+      // The UI-less elements won't get created by knockout, so we have to create them ourselves
+      if (!questionModel.HasUIElement) {
+        knockout.components.get(questionModel.Type, (definition: KnockoutComponentTypes.Definition) => {
+          const question = definition.createViewModel(questionModel, {
+            element: document.getElementsByTagName('body')[0],
+          });
+          this._uiLessQuestions.push(question);
+        });
+      }
+    }
 
-		for (var i = 0; i < this._uiLessQuestions.length; i++)
-			this._uiLessQuestions[i].SlideLoaded();
+    if (questions.length === 0) {
+      this.SlideLoaded();
+    }
+  }
 
-		this._loadingQuestions(false);
-		this.CheckIfAllQuestionsAreAnswered();
-		this._slide.SetIsWorking(knockout.computed(() => false));
-	}
+  private SlideLoaded(): void {
+    console.log('Default.ts:SlideLoaded');
 
-	private SlideCompleted(completed: () => void):void
-	{
-		var waitForAnswerSaved = false;
+    for (let i = 0; i < this._uiLessQuestions.length; i++) this._uiLessQuestions[i].SlideLoaded();
 
-		for (var i = 0; i < this._uiLessQuestions.length; i++)
-		{
-			waitForAnswerSaved = this._uiLessQuestions[i].SlideCompleted() || waitForAnswerSaved;
-		}
+    this._loadingQuestions(false);
+    this.CheckIfAllQuestionsAreAnswered();
+    this._slide.SetIsWorking(knockout.computed(() => false));
+  }
 
-		if (waitForAnswerSaved)
-		{
-			var sub = this.HaveActiveAnswersSets.subscribe(v =>
-			{
-				if (!v)
-				{
-					sub.dispose();
-					completed();
-				}
-			});
-		} else
-			completed();
-	}
+  private SlideCompleted(completed: () => void): void {
+    let waitForAnswerSaved = false;
 
-	private ScrollToFirstInvalidAnswer():void
-	{
-		var question = this.GetFirstQuestionWithoutValidAnswer();
+    for (let i = 0; i < this._uiLessQuestions.length; i++) {
+      waitForAnswerSaved = this._uiLessQuestions[i].SlideCompleted() || waitForAnswerSaved;
+    }
 
-		if(question != null) question.ScrollTo(ExperimentManager.ScrollToInvalidAnswerDuration);
-	}
+    if (waitForAnswerSaved) {
+      const sub = this.HaveActiveAnswersSets.subscribe((v) => {
+        if (!v) {
+          sub.dispose();
+          completed();
+        }
+      });
+    } else completed();
+  }
 
-	private AnswerChanged(question: QuestionModel):void
-	{
-		if (question.HasValidAnswer())
-		{
-			this._activeAnsweSets(this._activeAnsweSets() + 1);
+  private ScrollToFirstInvalidAnswer(): void {
+    const question = this.GetFirstQuestionWithoutValidAnswer();
 
-			ExperimentManager.SaveQuestionAnswer(question.Id, question.Answer(), success =>
-			{
-				if (!success) question.HasValidAnswer(false);
+    if (question != null) question.ScrollTo(ExperimentManager.ScrollToInvalidAnswerDuration);
+  }
 
-				this._isWorking(true);
-				this._activeAnsweSets(this._activeAnsweSets() - 1);
-				this.CheckIfAllQuestionsAreAnswered();
-				this._isWorking(false);
-			});
-		}
+  private AnswerChanged(question: QuestionModel): void {
+    if (question.HasValidAnswer()) {
+      this._activeAnsweSets(this._activeAnsweSets() + 1);
 
-		this.CheckIfAllQuestionsAreAnswered();
-	}
+      ExperimentManager.SaveQuestionAnswer(question.Id, question.Answer(), (success) => {
+        if (!success) question.HasValidAnswer(false);
 
-	private GetFirstQuestionWithoutValidAnswer(): QuestionModel
-	{
-		//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer for ${this.Questions.length} questions`);
+        this._isWorking(true);
+        this._activeAnsweSets(this._activeAnsweSets() - 1);
+        this.CheckIfAllQuestionsAreAnswered();
+        this._isWorking(false);
+      });
+    }
 
-		for (var i = 0; i < this.Questions.length; i++)
-		{
-			//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${this.Questions[i].RequiresInput} Has Valid Answer ${this.Questions[i].HasValidAnswer()}`);
-			// This is Question.ts:HasValidAnswer(). NOT the HasValidAnswer of the question models
-			if (this.Questions[i].RequiresInput && !this.Questions[i].HasValidAnswer()) {
-				//console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
-				return this.Questions[i];
-			}
-		}
+    this.CheckIfAllQuestionsAreAnswered();
+  }
 
-		return null;
-	}
+  private GetFirstQuestionWithoutValidAnswer(): QuestionModel {
+    //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer for ${this.Questions.length} questions`);
 
-	private CheckIfAllQuestionsAreAnswered():void
-	{
-		const firstQUestionWithInvalidAnswer = this.GetFirstQuestionWithoutValidAnswer();
+    for (let i = 0; i < this.Questions.length; i++) {
+      //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${this.Questions[i].RequiresInput} Has Valid Answer ${this.Questions[i].HasValidAnswer()}`);
+      // This is Question.ts:HasValidAnswer(). NOT the HasValidAnswer of the question models
+      if (
+        this.Questions[i].RequiresInput &&
+        !this.Questions[i].HasValidAnswer() &&
+        !this.Questions[i].AllRequiredMediaHavePlayed()
+      ) {
+        //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
+        return this.Questions[i];
+      }
+    }
 
-		const allAnswered = !firstQUestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
+    return null;
+  }
 
-		//console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQUestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
+  private CheckIfAllQuestionsAreAnswered(): void {
+    const firstQuestionWithInvalidAnswer = this.GetFirstQuestionWithoutValidAnswer();
 
-		if (this._loadingQuestions()) return this._slide.CanGoToNextSlide(false);
+    const allAnswered = !firstQuestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
 
-		this._slide.CanGoToNextSlide(allAnswered);
-	}
+    // console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQuestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
+
+    if (this._loadingQuestions()) return this._slide.CanGoToNextSlide(false);
+
+    this._slide.CanGoToNextSlide(allAnswered);
+  }
 }
+
+import template = require('Components/Slides/Default/Default.html');
+knockout.components.register('Slides/Default', {
+  viewModel: Default,
+  template: template.default,
+});
 
 export = Default;

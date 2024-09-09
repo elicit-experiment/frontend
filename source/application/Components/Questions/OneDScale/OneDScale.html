@@ -1,17 +1,6 @@
-﻿<div class="container-fluid OneDScale">
-	<div class="row">
-		<div data-bind="css: IsStimuliBlockVisible ? 'col-xs-offset-2 col-xs-10' : 'col-xs-12'">
-			<h3 data-bind="html: HeaderLabel" class="QuestionHeader"></h3>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-2" data-bind="visible: IsStimuliBlockVisible">
-			<!-- ko if: HasMedia -->
-			<div data-bind="component: {name: 'Players/Audio', params: AudioInfo}"></div>
-			<p data-bind="html: AudioLabel"></p>
-			<!-- /ko -->
-		</div>
-		<div class="ScaleContainer" data-bind="css: {'col-xs-10': IsStimuliBlockVisible, 'col-xs-12': !IsStimuliBlockVisible}">
+﻿<script type="text/html" id="OneDScale">
+	<div class="OneDScale">
+		<div class="ScaleContainer">
 			<div class="XTicks X2" data-bind="foreach: X2Ticks, style: { height: X2Height() + 'px' }">
 				<p class="Tick" data-bind="html: Label, css:{MinPosition: IsMinPosition, MaxPosition: IsMaxPosition }, Height: {Value: $parent.X2Height, Max: true}, style: {left: RelativePosition * 100 + '%'}"></p>
 			</div>
@@ -29,4 +18,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+

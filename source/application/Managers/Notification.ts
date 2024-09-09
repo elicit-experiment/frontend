@@ -1,16 +1,13 @@
-﻿class Notification
-{
-	public Error(message:string):void
-	{
-		console.log("Error: " + message);
-	}
+﻿class Notification {
+  public Error(message: string): void {
+    console.log('Error: ' + message);
+  }
 
-	public Debug(message: string): void
-	{
-		console.log("Debug: " + message);
-	}
+  public Debug(message: string): void {
+    console.log('Debug: ' + message);
+  }
 }
 
-var instance = new Notification();
+const instance = new Notification();
 
 export = instance;

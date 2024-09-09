@@ -1,29 +1,34 @@
-﻿<div class="container-fluid">
-    <div class="row">
-        <div data-bind="css: IsStimuliBlockVisible ? 'col-xs-offset-2 col-xs-10' : 'col-xs-12'">
-            <h3 data-bind="html: HeaderLabel" class="QuestionHeader"></h3>
+﻿<script type="text/html" id="RadioButtonGroupButtons">
+    <div class="row QuestionBlock correctable-question">
+        <!-- ko if: ShowCorrectness -->
+        <div data-bind="css: `correctness-icon ${CorrectnessClass()}`, html: CorrectnessLabel">
         </div>
-    </div>
-    <div class="col-xs-2" data-bind="visible: IsStimuliBlockVisible">
-        <!-- ko if: HasMedia -->
-        <div data-bind="component: {name: 'Players/Audio', params: AudioInfo}"></div>
-        <p data-bind="html: AudioLabel"></p>
         <!-- /ko -->
-    </div>
-    <div class="row container-fluid"
-         data-bind="css: {'col-xs-10': IsStimuliBlockVisible, 'col-xs-12': !IsStimuliBlockVisible}">
-        <div class="row QuestionBlock" data-bind="foreach: RowedItems">
+
+        <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
             <div class="row" data-bind="foreach: $data">
-                <!-- ko if: $parentContext.$index() + $index() === 0 -->
-                <div class="col-xs-12"
+                <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
+                <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label class="col-xs-12 radio-button-group" data-bind="css: {disabled: !$parents[1].CanAnswer()}">
-                    <input type="radio"
-                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].CanAnswer"/>
+                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
+                    <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].IsAnswerable"
+                           type="radio"/>
                     <span data-bind="html: Label"></span>
                 </label>
             </div>
         </div>
+
+        <!-- ko if: ShowFeedback && FeedbackText -->
+        <div data-bind="css: `row feedback`">
+            <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
+                ⮕
+            </div>
+            <div data-bind="{html: FeedbackText, css: `col-xs-12`}">
+            </div>
+        </div>
+        <!-- /ko -->
     </div>
-</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>

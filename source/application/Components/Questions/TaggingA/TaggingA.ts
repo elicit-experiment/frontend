@@ -1,225 +1,185 @@
-﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
+﻿import knockout = require('knockout');
+import QuestionWithStimulusBase = require('Components/Questions/QuestionWithStimulusBase');
+import QuestionModel = require('Models/Question');
 
-type PredefinedTag = { Label:string; Id:string; Position:number };
-type TagData = {Id: string; Label: string;};
-type Tag = {Data:TagData, IsAdded:KnockoutObservable<boolean>, Toggle:()=>void};
+type PredefinedTag = { Label: string; Id: string; Position: number };
+type TagData = { Id: string; Label: string };
+type Tag = { Data: TagData; IsAdded: KnockoutObservable<boolean>; Toggle: () => void };
 
-class TaggingA extends QuestionBase<{Tags:TagData[]}>
-{
-	public Id: string;
-	public HeaderLabel: string;
-	public SelectionTagsLabel: string;
-	public UserTagsLabel: string;
-	public InputPlaceholder: string;
+class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
+  public SelectionTagsLabel: string;
+  public UserTagsLabel: string;
+  public InputPlaceholder: string;
+  public AnswerIsRequired = true;
 
-	public TextInput = knockout.observable("");
+  public TextInput = knockout.observable('');
 
-	public AudioLabel: string;
-	public AudioInfo: AudioInfo = null;
+  public SelectionItems = knockout.observableArray<Tag>();
+  public UserItems = knockout.observableArray<Tag>();
+  public AddedItems = knockout.observableArray<Tag>();
 
-	public SelectionItems = knockout.observableArray<Tag>();
-	public UserItems = knockout.observableArray<Tag>();
-	public AddedItems = knockout.observableArray<Tag>();
+  public HasSelectionItems: KnockoutComputed<boolean>;
+  public HasUserItems: KnockoutComputed<boolean>;
+  public HasAddedItems: KnockoutComputed<boolean>;
 
-	public HasSelectionItems:KnockoutComputed<boolean>;
-	public HasUserItems:KnockoutComputed<boolean>;
-	public HasAddedItems:KnockoutComputed<boolean>;
+  protected readonly InstrumentTemplateName = TaggingA.name;
 
-	public HasMedia: boolean = false;
-	public AnswerIsRequired: boolean = true;
+  constructor(question: QuestionModel) {
+    super(question);
 
-	constructor(question: QuestionModel)
-	{
-		super(question);
+    this.SelectionTagsLabel = this.GetInstrumentFormatted('SelectionTagBoxLabel');
+    this.UserTagsLabel = this.GetInstrumentFormatted('UserTagBoxLabel');
+    this.InputPlaceholder = this.GetInstrument('TextField');
+    this.AnswerIsRequired = this.GetInstrument('MinNoOfScalings') !== '0';
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
-		this.SelectionTagsLabel = this.GetInstrumentFormatted("SelectionTagBoxLabel");
-		this.UserTagsLabel = this.GetInstrumentFormatted("UserTagBoxLabel");
-		this.InputPlaceholder = this.GetInstrument("TextField");
+    this.SelectionItems.push(
+      ...this.CreateTags(
+        this.GetInstrument('SelectionTags').Item.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position),
+      ),
+    );
+    this.UserItems.push(
+      ...this.CreateTags(
+        this.GetInstrument('UserTags').Item.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position),
+      ),
+    );
 
-		let stimulus = this.GetInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+    this.HasSelectionItems = this.PureComputed(() => this.SelectionItems().some((t) => !t.IsAdded()));
+    this.HasUserItems = this.PureComputed(() => this.UserItems().some((t) => !t.IsAdded()));
+    this.HasAddedItems = this.PureComputed(() => this.AddedItems().length != 0);
 
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
+    this.InitializeAnswer();
+  }
 
-		this.SelectionItems.push(... this.CreateTags(this.GetInstrument("SelectionTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
-		this.UserItems.push(... this.CreateTags(this.GetInstrument("UserTags").Item.sort((a:PredefinedTag,b:PredefinedTag) => a.Position - b.Position)));
+  private InitializeAnswer(): void {
+    if (!this.HasAnswer()) return;
 
-		this.HasSelectionItems = this.PureComputed(()=> this.SelectionItems().some(t => !t.IsAdded()));
-		this.HasUserItems = this.PureComputed(()=> this.UserItems().some(t => !t.IsAdded()));
-		this.HasAddedItems = this.PureComputed(()=> this.AddedItems().length != 0);
+    const answer = this.GetAnswer();
 
-		this.InitializeAnswer();
-	}
+    if (!answer.Tags || answer.Tags.length == 0) return;
 
-	private InitializeAnswer():void
-	{
-		if(!this.HasAnswer()) return;
+    for (const tag of answer.Tags) {
+      if (tag.Id == null || tag.Id == '') {
+        this.AddedItems.push(this.CreateTag({ Id: null, Label: tag.Label, Position: null }, true));
+      } else {
+        const existingTag = this.GetTagById(tag.Id);
 
-		let answer = this.GetAnswer();
+        if (existingTag != null) {
+          existingTag.IsAdded(true);
+          this.AddedItems.push(existingTag);
+        }
+      }
+    }
+  }
 
-		if(!answer.Tags || answer.Tags.length == 0) return;
+  protected GetTagByLabel(label: string): Tag {
+    label = label.toLocaleLowerCase();
 
-		for(let tag of answer.Tags)
-		{
-			if(tag.Id == null || tag.Id == "")
-			{
-				this.AddedItems.push(this.CreateTag({Id: null, Label: tag.Label, Position: null}, true));
-			}
-			else
-			{
-				let existingTag = this.GetTagById(tag.Id);
+    for (const predefinedTag of this.SelectionItems()) {
+      if (predefinedTag.Data.Label.toLocaleLowerCase() == label) return predefinedTag;
+    }
+    for (const predefinedTag of this.UserItems()) {
+      if (predefinedTag.Data.Label.toLocaleLowerCase() == label) return predefinedTag;
+    }
+    for (const predefinedTag of this.AddedItems()) {
+      if (predefinedTag.Data.Label.toLocaleLowerCase() == label) return predefinedTag;
+    }
 
-				if(existingTag != null)
-				{
-					existingTag.IsAdded(true);
-					this.AddedItems.push(existingTag);
-				}
-			}
-		}
-	}
+    return null;
+  }
 
-	protected GetTagByLabel(label:string):Tag
-	{
-		label = label.toLocaleLowerCase();
+  protected IsTagAdded(label: string): boolean {
+    label = label.toLocaleLowerCase();
+    for (const tag of this.AddedItems()) {
+      if (tag.Data.Label.toLocaleLowerCase() == label) return true;
+    }
+    return false;
+  }
 
-		for(let predefinedTag of this.SelectionItems())
-		{
-			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
-				return predefinedTag
-		}
-		for(let predefinedTag of this.UserItems())
-		{
-			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
-				return predefinedTag
-		}
-		for(let predefinedTag of this.AddedItems())
-		{
-			if(predefinedTag.Data.Label.toLocaleLowerCase() == label)
-				return predefinedTag
-		}
+  protected GetTagById(id: string): Tag {
+    for (const predefinedTag of this.SelectionItems()) {
+      if (predefinedTag.Data.Id == id) return predefinedTag;
+    }
+    for (const predefinedTag of this.UserItems()) {
+      if (predefinedTag.Data.Id == id) return predefinedTag;
+    }
 
-		return null;
-	}
+    return null;
+  }
 
-	protected IsTagAdded(label:string):boolean
-	{
-		label = label.toLocaleLowerCase();
-		for(let tag of this.AddedItems())
-		{
-			if(tag.Data.Label.toLocaleLowerCase() == label)
-				return true;
-		}
-		return false;
-	}
+  public AddText(): void {
+    if (this.TextInput() == '' || this.IsTagAdded(this.TextInput())) return;
 
-	protected GetTagById(id:string):Tag
-	{
-		for(let predefinedTag of this.SelectionItems())
-		{
-			if(predefinedTag.Data.Id == id)
-				return predefinedTag
-		}
-		for(let predefinedTag of this.UserItems())
-		{
-			if(predefinedTag.Data.Id== id)
-				return predefinedTag
-		}
+    if (this.AddTagByLabel(this.TextInput())) this.TextInput('');
+  }
 
-		return null;
-	}
+  protected AddTagByLabel(label: string): boolean {
+    let tag = this.GetTagByLabel(label);
 
-	public AddText():void
-	{
-		if(this.TextInput() == "" || this.IsTagAdded(this.TextInput())) return;
+    if (tag == null) tag = this.CreateTag({ Id: null, Label: label, Position: null }, true);
 
-		if(this.AddTagByLabel(this.TextInput()))
-			this.TextInput("");
-	}
+    return this.AddTag(tag);
+  }
 
-	protected AddTagByLabel(label:string):boolean
-	{
-		let tag = this.GetTagByLabel(label);
+  protected AddTag(tag: Tag): boolean {
+    if (this.AddedItems.indexOf(tag) != -1) return false;
 
-		if(tag == null)
-			tag = this.CreateTag({Id: null, Label: label, Position: null}, true);
+    tag.IsAdded(true);
+    this.AddedItems.push(tag);
 
-		return this.AddTag(tag);
-	}
+    this.AddEvent('Change', 'Mouse/Left/Down', tag.Data.Label);
+    this.UpdateAnswer();
 
-	protected AddTag(tag:Tag):boolean
-	{
-		if(this.AddedItems.indexOf(tag) != -1) return false;
+    return true;
+  }
 
-		tag.IsAdded(true);
-		this.AddedItems.push(tag);
+  protected RemoveTag(tag: Tag): void {
+    if (this.AddedItems.indexOf(tag) == -1) return;
 
-		this.AddEvent("Change", "Mouse/Left/Down", tag.Data.Label);
-		this.UpdateAnswer();
+    tag.IsAdded(false);
+    this.AddedItems.remove(tag);
 
-		return true;
-	}
+    this.AddEvent('Change', 'Mouse/Left/Down', tag.Data.Label);
+    this.UpdateAnswer();
+  }
 
-	protected RemoveTag(tag:Tag):void
-	{
-		if(this.AddedItems.indexOf(tag) == -1) return;
+  private CreateTags(tags: PredefinedTag[]): Tag[] {
+    return tags.map((t) => this.CreateTag(t));
+  }
 
-		tag.IsAdded(false);
-		this.AddedItems.remove(tag);
+  private CreateTag(data: PredefinedTag, isAdded = false): Tag {
+    const tag: Tag = {
+      Data: { Id: data.Id, Label: data.Label },
+      Toggle: null,
+      IsAdded: knockout.observable(isAdded),
+    };
 
-		this.AddEvent("Change", "Mouse/Left/Down", tag.Data.Label);
-		this.UpdateAnswer();
-	}
+    tag.Toggle = () => this.ToggleTag(tag);
 
-	private CreateTags(tags:PredefinedTag[]):Tag[]
-	{
-		return tags.map(t => this.CreateTag(t));
-	}
+    return tag;
+  }
 
-	private CreateTag(data:PredefinedTag, isAdded = false):Tag
-	{
-		let tag:Tag = {
-			Data: {Id: data.Id, Label: data.Label},
-			Toggle: null,
-			IsAdded: knockout.observable(isAdded)
-		};
+  private ToggleTag(tag: Tag): void {
+    if (tag.IsAdded()) this.RemoveTag(tag);
+    else this.AddTag(tag);
+  }
 
-		tag.Toggle = () => this.ToggleTag(tag);
+  private UpdateAnswer(): void {
+    this.SetAnswer({ Tags: this.AddedItems().map((t) => ({ Id: t.Data.Id, Label: t.Data.Label })) });
+  }
 
-		return tag;
-	}
+  protected HasValidAnswer(answer: any): boolean {
+    return !this.AnswerIsRequired || (answer != undefined && answer.Tags != undefined && answer.Tags.length !== 0);
+  }
 
-	private ToggleTag(tag:Tag):void
-	{
-		if(tag.IsAdded())
-			this.RemoveTag(tag);
-		else
-			this.AddTag(tag);
-	}
-
-	private UpdateAnswer():void
-	{
-		this.SetAnswer( {Tags: this.AddedItems().map(t => ({Id: t.Data.Id, Label: t.Data.Label}))});
-	}
-
-	protected HasValidAnswer(answer: any): boolean
-	{
-		return !this.AnswerIsRequired || answer != undefined && answer.Tags != undefined && answer.Tags.length !== 0;
-	}
-
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "TaggingA", "Instrument", method, data);
-	}
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'TaggingA', 'Instrument', method, data);
+  }
 }
+
+import template = require('Components/Questions/TaggingA/TaggingA.html');
+knockout.components.register('Questions/TaggingA', {
+  viewModel: TaggingA,
+  template: template.default,
+});
 
 export = TaggingA;

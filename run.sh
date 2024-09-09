@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh
+
+rm -rf /var/www/frontend/public/*
 
 cp -R dist/* /var/www/frontend/public/
 

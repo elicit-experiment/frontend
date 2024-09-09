@@ -1,104 +1,92 @@
-﻿import knockout = require("knockout");
-import QuestionBase = require("Components/Questions/QuestionBase");
-import QuestionModel = require("Models/Question");
-import AudioInfo = require("Components/Players/Audio/AudioInfo");
-import { shuffleInPlace } from "Utility/ShuffleInPlace";
+﻿import knockout = require('knockout');
+import MultiselectQuestionBase, { Item, ItemInfo } from '../MultiselectQuestionBase';
+import QuestionModel = require('Models/Question');
 
-type ItemInfo = { Id: string; Label: string; };
-type Item = { Label: string; Id: string; Selected: string };
+type AnswerType = { Id: string; Correct: boolean };
 
-class RadioButtonGroup extends QuestionBase<{Id:string}>
-{
-    private _isOptional: boolean;
+class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
+  private _isOptional: boolean;
 
-    public Id: string;
-	public HeaderLabel: string;
-	public AudioLabel: string;
-	public AudioInfo: AudioInfo = null;
-	public Items: ItemInfo[];
-	public RowedItems: ItemInfo[][];
-	public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
-	public HasMedia: boolean = false;
-	public CanAnswer: KnockoutObservable<boolean>; 
-	public AddFillerItem:KnockoutComputed<boolean>;
-	public AddOneFillerItem:KnockoutComputed<boolean>;
-	public AddHalfFillerItem:KnockoutComputed<boolean>;
+  public Answer: KnockoutObservable<string> = knockout.observable<string>(null);
 
-    public IsStimuliBlockVisible: boolean = true;
+  public CorrectnessClass: KnockoutComputed<string>;
+  public CorrectnessLabel: KnockoutComputed<string>;
 
-    private _alignForStimuli: boolean = true;
-    private _questionsPerRow: number = 4;
+  public FeedbackText: KnockoutObservable<string> = knockout.observable<string>(null);
+  public IsAnswerable: KnockoutObservable<boolean>;
 
-    constructor(question: QuestionModel)
-	{
-		super(question);
+  protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
 
-		this.Id = this.Model.Id;
-		this.HeaderLabel = this.GetInstrumentFormatted("HeaderLabel");
+  constructor(question: QuestionModel) {
+    super(question);
 
-		var alignForStimuli = this.GetInstrument("AlignForStimuli");
-		var questionsPerRow = this.GetInstrument("QuestionsPerRow");
-		var randomizeOrder = this.GetInstrument("RandomizeOrder");
-        this._alignForStimuli = alignForStimuli === undefined || alignForStimuli === "1";
-        this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
-        this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
+    this._isOptional = parseInt(this.GetInstrument('IsOptional')) == 1;
 
-		var stimulus = this.GetInstrument("Stimulus");
-		if (stimulus != null)
-		{
-			this.AudioLabel = this.GetFormatted(stimulus.Label);
+    this.SetItems(
+      this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)),
+    );
 
-			this.AudioInfo = AudioInfo.Create(stimulus);
-			this.TrackAudioInfo("/Instrument/Stimulus", this.AudioInfo);
-			this.HasMedia = true;
-		}
+    this.AddEvent('Render', '', JSON.stringify(this.Items));
 
-        this._isOptional = parseInt(this.GetInstrument("IsOptional")) == 1;
+    this.RevealAnswers.subscribe((reveal: boolean) => {
+      if (!reveal) return;
 
-        this.CanAnswer = this.WhenAllAudioHavePlayed(this.AudioInfo, true);
+      const item = this.Items.find((item) => item.Id === this.GetAnswer().Id);
 
-		this.Items = this.GetItems<Item, ItemInfo>(item => this.ItemInfo(item));
-		if (randomizeOrder) {
-			this.Items = shuffleInPlace(this.Items)
-		}
-		this.AddEvent("Render", "", JSON.stringify(this.Items))
-		this.RowedItems = this.RowItems(this.Items, this._questionsPerRow);
+      this.FeedbackText(item.Feedback);
+    });
 
-		this.AddOneFillerItem = knockout.computed(() => this.Items.length === 2);
-		this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
-		this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
+    this.IsAnswerable = knockout.computed(() => {
+      const canAnswer = this.CanAnswer();
+      const hasAnswer = this.HasAnswer();
+      return canAnswer && (!this.AnswerOnce || !hasAnswer);
+    });
 
-		if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
-		this.Answer.subscribe(v =>
-		{
-			this.AddEvent("Change", "Mouse/Left/Down", v);
-			this.SetAnswer({ Id: v });
-		});
-	}
+    if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
+    this.Answer.subscribe((id) => {
+      const item = this.Items.find((item) => item.Id === id);
+      this.AddEvent('Change', 'Mouse/Left/Down', id);
+      this.SetAnswer({ Id: id, Correct: item.Correct });
+    });
+  }
 
-	protected HasValidAnswer(answer: any): boolean
-	{
-		if (this._isOptional) return true;
-		return answer.Id != undefined && answer.Id != null;
-	}
+  protected HasValidAnswer(answer: AnswerType): boolean {
+    const item = this.Items.find((item) => item.Id === answer.Id);
+    if (this.MustAnswerCorrectly && !item?.Correct) return false;
+    if (this._isOptional) return true;
+    return answer.Id != undefined;
+  }
 
-	public AddEvent(eventType:string, method:string = "None", data:string = "None"):void
-	{
-		super.AddRawEvent(eventType, "RadioButtonGroup", "Instrument", method, data);
-	}
+  public AddEvent(eventType: string, method = 'None', data = 'None'): void {
+    super.AddRawEvent(eventType, 'RadioButtonGroup', 'Instrument', method, data);
+  }
 
-	private ItemInfo(data: Item): ItemInfo
-	{
-		if (data.Selected === "1")
-			this.Answer(data.Id);
+  private ItemInfo(item: Item): ItemInfo {
+    if (item.Selected === '1') this.Answer(item.Id);
 
-		var info = {
-			Id: data.Id,
-			Label: this.GetFormatted(data.Label)
-		};
+    const AnsweredCorrectly = knockout.observable<boolean | null>(null);
+    return {
+      Id: item.Id,
+      Label: this.GetFormatted(item.Label),
+      IsEnabled: knockout.computed(
+          () => true,
+      ),
+      Correct: item.Correct,
+      Feedback: item.Feedback,
+      AnsweredCorrectly,
+      CorrectnessClass: knockout.computed(() => {
+        if (AnsweredCorrectly() === null) return '';
 
-		return info;
-	}
+        return AnsweredCorrectly() ? 'correct' : 'incorrect';
+      }),
+    };
+  }
 }
+
+import template = require('Components/Questions/RadioButtonGroup/RadioButtonGroup.html');
+knockout.components.register('Questions/RadioButtonGroup', {
+  viewModel: RadioButtonGroup,
+  template: template.default,
+});
 
 export = RadioButtonGroup;

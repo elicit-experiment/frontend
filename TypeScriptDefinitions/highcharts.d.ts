@@ -1138,7 +1138,7 @@ interface JQuery {
 
 declare var Highcharts: HighchartsStatic;
 
-declare module "Highcharts" {
+declare module "highcharts" {
     export = Highcharts;
 }
 

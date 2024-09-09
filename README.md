@@ -20,3 +20,8 @@ Run gulp tasks for the following (eg. `gulp serve`).
 * `compileTypeScript` - Build and copy over only the TypeScript files
 * `compileStylus` - Build and copy over only the styles
 * `copyHTML` - Only copy over the html files
+
+## New relic
+
+    "newrelic": "^5.6.3",
+

@@ -1,41 +1,38 @@
-﻿<div class="container-fluid TaggingA">
-	<div class="row">
-		<div class="AudioBlock" data-bind="if: HasMedia">
-			<div data-bind="component: {name: 'Players/Audio', params: AudioInfo}"></div>
-			<span data-bind="html: AudioLabel"></span>
-		</div>
-	</div>
-	<div class="row">
-		<h3 data-bind="html: HeaderLabel" class="QuestionHeader"></h3>
-	</div>
-	<div class="row container-fluid">
-		<div class="col-xs-7">
-			<form data-bind="submit: AddText">
-				<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
-			</form>
-			<ul data-bind="foreach: AddedItems, visible: HasAddedItems" class="TagList">
-				<li data-bind="click: Toggle">
-					<span class="badge" data-bind="text: Data.Label"></span>
-				</li>
-			</ul>
-		</div>
-		<div class="col-xs-5">
-			<div class="TagContainer" data-bind="visible: HasSelectionItems">
-				<p data-bind="html: SelectionTagsLabel"></p>
-				<ul data-bind="foreach: SelectionItems">
-					<li data-bind="click: Toggle, visible: !IsAdded()">
+﻿<script type="text/html" id="TaggingA">
+	<div class="TaggingA">
+		<div class="row container-fluid">
+			<div class="col-xs-7">
+				<form data-bind="submit: AddText">
+					<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
+				</form>
+				<ul data-bind="foreach: AddedItems, visible: HasAddedItems" class="TagList">
+					<li data-bind="click: Toggle">
 						<span class="badge" data-bind="text: Data.Label"></span>
 					</li>
 				</ul>
 			</div>
-			<div class="TagContainer" data-bind="visible: HasUserItems">
-				<p data-bind="html: UserTagsLabel"></p>
-				<ul data-bind="foreach: UserItems">
-					<li data-bind="click: Toggle, visible: !IsAdded()">
-						<span class="badge" data-bind="text: Data.Label"></span>
-					</li>
-				</ul>
+			<div class="col-xs-5" style="min-width:300px">
+				<div class="TagContainer" data-bind="visible: HasSelectionItems">
+					<p data-bind="html: SelectionTagsLabel"></p>
+					<ul data-bind="foreach: SelectionItems">
+						<li data-bind="click: Toggle, visible: !IsAdded()">
+							<span class="badge" data-bind="text: Data.Label"></span>
+						</li>
+					</ul>
+				</div>
+				<div class="TagContainer" data-bind="visible: HasUserItems">
+					<p data-bind="html: UserTagsLabel"></p>
+					<ul data-bind="foreach: UserItems">
+						<li data-bind="click: Toggle, visible: !IsAdded()">
+							<span class="badge" data-bind="text: Data.Label"></span>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+
+
