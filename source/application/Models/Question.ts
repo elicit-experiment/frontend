@@ -41,6 +41,9 @@ class Question {
       } else if (question.Type == 'NewComponent::FaceLandmark') {
         questionMap = QuestionMapGet('FaceLandmark');
         input = component;
+      } else if (question.Type == 'NewComponent::FaceLandmarkCalibration') {
+        questionMap = QuestionMapGet('FaceLandmarkCalibration');
+        input = component;
       } else if (question.Type == 'NewComponent') {
         const numStimuli = 'Stimuli' in component ? component.Stimuli.length : 0;
         const numInstruments = 'Instruments' in component ? component.Instruments.length : 0;
@@ -84,7 +87,7 @@ class Question {
           false,
         )
       : false;
-    console.dir(instrumentsHaveFeedback);
+
     this.HasFeedbackToShow(this.HasFeedbackToShow?.call(this) || instrumentsHaveFeedback);
     this._loadedCallback = questionLoadedCallback;
 

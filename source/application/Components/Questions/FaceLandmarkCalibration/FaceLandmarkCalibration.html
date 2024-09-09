@@ -1,0 +1,71 @@
+<div id="calibration-status">
+    <canvas id="plotting-canvas" width="500" height="500" style="cursor:crosshair;"></canvas>
+
+    <!-- Calibration points -->
+    <div class="calibrationDiv">
+        <input type="button" class="Calibration" id="Pt1"></input>
+        <input type="button" class="Calibration" id="Pt2"></input>
+        <input type="button" class="Calibration" id="Pt3"></input>
+        <input type="button" class="Calibration" id="Pt4"></input>
+        <input type="button" class="Calibration" id="Pt5"></input>
+        <input type="button" class="Calibration" id="Pt6"></input>
+        <input type="button" class="Calibration" id="Pt7"></input>
+        <input type="button" class="Calibration" id="Pt8"></input>
+        <input type="button" class="Calibration" id="Pt9"></input>
+    </div>
+
+    <!-- Modal -->
+    <div id="helpModal" class="modal hide fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="../../../Images/WebGazerCalibrationInstructions_lowres.png" width="100%" height="100%" alt="webgazer demo instructions"></img>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: HideHelpModal">Calibrate</button>
+                    <button type="button" class="btn btn-primary close-button" data-dismiss="modal" data-bind="click: HideHelpModal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="loadingModal" class="modal hide fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <p><h1>Loading Eye Tracker</h1></p>
+                        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="initialCalibrationModal" class="modal hide fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <p><h1>Initial Calibration</h1></p>
+                        <div id="initial-validation-value"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: StartDetailedCalibration">Calibrate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,5 +1,3 @@
-﻿import FaceLandmark from "Components/Questions/FaceLandmark/FaceLandmark";
-
 const _unsupported = 'Unsupported';
 let _map: { [key: string]: QuestionMap };
 
@@ -37,6 +35,7 @@ function Initialize() {
     SoloStimulus: new QuestionMap('Questions/SoloStimulus'),
     WebGazerCalibrate: new QuestionMap('Questions/WebGazerCalibrate'),
     FaceLandmark: new QuestionMap('Questions/FaceLandmark'),
+    FaceLandmarkCalibration: new QuestionMap('Questions/FaceLandmarkCalibration'),
   };
 
   _map[_unsupported] = new QuestionMap('Questions/Unsupported', false);
