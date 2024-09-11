@@ -1,4 +1,4 @@
-﻿import * as knockout from 'knockout';
+import * as knockout from 'knockout';
 import { IQuestionEvent } from 'Managers/Portal/Cockpit';
 import QuestionModel from 'Models/Question';
 import MediaInfo from 'Components/Players/MediaInfo';
@@ -22,7 +22,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     this._events = answer != null && answer.Events ? answer.Events : [];
 
     setTimeout(() => {
-      console.log(this.constructor.name + 'LOOADED')
+      console.log(this.constructor.name + ' -> LOADED');
       this.UpdateIsAnswerValid();
       this.Model.Loaded();
     }, 0); //Give descendant time to override HasValidAnswer
