@@ -1,9 +1,9 @@
 ﻿import * as knockout from 'knockout';
 import * as jQuery from 'jquery';
-import * as highcharts from 'highcharts';
 import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
 import QuestionModel from 'Models/Question';
 import AudioInfo from 'Components/Players/Audio/AudioInfo';
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
 
 namespace XHighcharts {
   interface SeriesOptions {
@@ -64,8 +64,8 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
           series: {
             point: {
               events: {
-                update: () => {
-                  this.UpdateAnswer();
+                update: (event) => {
+                  this.UpdateAnswer(event);
                   return true;
                 },
               },
@@ -119,14 +119,14 @@ class TwoDScaleK extends QuestionWithStimulusBase<{ Scalings: AnswerItem[] }> {
     return answer.Scalings.length == this.Items.length;
   }
 
-  private UpdateAnswer(): void {
+  private UpdateAnswer(_event: Highcharts.PointUpdateEventObject): void {
     this.SetAnswer({
       Scalings: this.Items.filter((i) => i.GraphData != null).map((i) => this.CreateAnswerItem(i)),
     });
   }
 
   private CreateAnswerItem(item: Item): AnswerItem {
-    const point = <Highcharts.Point>item.GraphData.point;
+    const point = <Highcharts.Point>((<any>item.GraphData).data[0] as { x: number; y: number });
 
     return { Id: item.Id, Position: point.x.toString() + ' ' + point.y.toString() };
   }

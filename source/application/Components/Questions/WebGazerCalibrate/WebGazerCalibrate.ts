@@ -324,13 +324,12 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       // notification for the measurement process
       Swal.fire({
         title: 'Calculating measurement',
-        html:
-          "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
+        html: "Please don't move your mouse & stare at the middle dot for the next 5 seconds. This will allow us to calculate the accuracy of our predictions.",
         allowEscapeKey: false,
         allowOutsideClick: false,
         showCancelButton: false,
-        // customClass: { container: 'calibration-confirmation' },
-        customClass: 'calibration-confirmation',
+        customClass: { container: 'calibration-confirmation' },
+        // customClass: 'calibration-confirmation',
       }).then(() => {
         // makes the variables true for 5 seconds & plots the points
         $(document).ready(() => {
