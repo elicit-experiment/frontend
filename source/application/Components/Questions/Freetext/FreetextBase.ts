@@ -51,6 +51,8 @@ class FreetextBase<T> extends QuestionWithStimulusBase<T> {
 
     if (this.HasAnswer()) this.Answer(this.LoadText(this.GetAnswer()));
 
+    this.AddEvent('Render', '', JSON.stringify({ label: this.Label }));
+
     this.Answer.extend({ rateLimit: { method: 'notifyWhenChangesStop', timeout: 200 } });
     this.Answer.subscribe((v) => this.UpdateAnswer(v));
   }
