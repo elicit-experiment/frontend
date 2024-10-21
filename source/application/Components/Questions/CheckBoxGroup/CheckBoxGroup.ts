@@ -33,9 +33,9 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       //console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
       return this.Answer().length < this._maxNoOfSelections;
     });
-    this.SetItems(
-      this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)),
-    );
+    this.SetItems(this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)));
+
+    this.AddEvent('Render', '', JSON.stringify(this.Items));
 
     this.RevealAnswers.subscribe((reveal: boolean) => {
       if (!reveal) return;
