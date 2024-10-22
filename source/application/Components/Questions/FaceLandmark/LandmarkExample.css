@@ -20,13 +20,14 @@ em {
     font-weight: bold;
 }
 
-video {
-    clear: both;
-    display: block;
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg);
-}
+/* too broad. if we need this to show the webcam view we need to make a more specific seleator */
+/*video {*/
+/*    clear: both;*/
+/*    display: block;*/
+/*    transform: rotateY(180deg);*/
+/*    -webkit-transform: rotateY(180deg);*/
+/*    -moz-transform: rotateY(180deg);*/
+/*}*/
 
 section {
     opacity: 1;
