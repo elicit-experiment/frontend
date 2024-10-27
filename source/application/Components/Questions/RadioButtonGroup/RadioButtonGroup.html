@@ -8,10 +8,10 @@
         <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
             <div class="row" data-bind="foreach: $data">
                 <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
-                <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
+                <div data-bind="css: `col-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
+                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), [`col-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
                     <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].IsAnswerable"
                            type="radio"/>
                     <span data-bind="html: Label"></span>
@@ -24,7 +24,7 @@
             <div data-bind="css: `correctness-icon ${CorrectnessClass()}`">
                 ⮕
             </div>
-            <div data-bind="{html: FeedbackText, css: `col-xs-12`}">
+            <div data-bind="{html: FeedbackText, css: `col-12`}">
             </div>
         </div>
         <!-- /ko -->

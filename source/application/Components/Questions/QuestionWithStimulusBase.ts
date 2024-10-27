@@ -4,8 +4,8 @@ import QuestionsBase from 'Components/Questions/QuestionBase';
 
 abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public IsStimuliBlockVisible = true;
-  public StimulusCssClass = 'col-xs-12';
-  public InstrumentCssClass = 'col-xs-12';
+  public StimulusCssClass = 'col-12';
+  public InstrumentCssClass = 'col-12';
 
   private _questionsPerRow = 4;
 
@@ -59,8 +59,8 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     if (this.IsColumnLayout && this.IsStimuliBlockVisible) {
       const instrumentCols = Math.ceil((this._columnWidthPercent * 12) / 100);
       const stimulusCols = 12 - instrumentCols;
-      this.StimulusCssClass = `col-xs-${stimulusCols}`;
-      this.InstrumentCssClass = `col-xs-${instrumentCols}`;
+      this.StimulusCssClass = `col-${stimulusCols}`;
+      this.InstrumentCssClass = `col-${instrumentCols}`;
     }
 
     // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
