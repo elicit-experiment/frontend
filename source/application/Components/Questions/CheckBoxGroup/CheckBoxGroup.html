@@ -3,10 +3,10 @@
         <div class="row" data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
             <div class="row" data-bind="foreach: $data">
                 <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
-                <div data-bind="css: `col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
+                <div data-bind="css: `col-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: {disabled: !($parents[1].CanAnswer() && IsEnabled()), [`col-xs-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group row': true}">
+                <label data-bind="css: {disabled: !($parents[1].CanAnswer() && IsEnabled()), [`col-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group row': true}">
                     <!-- ko if: $parents[1].ShowCorrectness -->
                     <div data-bind="css: `highlight-result-icon individual ${CorrectnessClass()}`">
                     </div>
@@ -24,10 +24,10 @@
         <!-- /ko -->
         <!-- ko if: ShowFeedback && FeedbackText -->
         <div data-bind="css: `row feedback ${CorrectnessClass()}`">
-            <div data-bind="css: `highlight-result-icon col-xs-2`">
+            <div data-bind="css: `highlight-result-icon col-2`">
                 ⮕
             </div>
-            <div data-bind="{html: FeedbackText, css: `col-xs-10`}">
+            <div data-bind="{html: FeedbackText, css: `col-10`}">
             </div>
         </div>
         <!-- /ko -->

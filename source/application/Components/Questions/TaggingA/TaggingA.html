@@ -1,7 +1,7 @@
 ﻿<script type="text/html" id="TaggingA">
 	<div class="TaggingA">
 		<div class="row container-fluid">
-			<div class="col-xs-7">
+			<div class="col-7">
 				<form data-bind="submit: AddText">
 					<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
 				</form>
@@ -11,7 +11,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="col-xs-5" style="min-width:300px">
+			<div class="col-5" style="min-width:300px">
 				<div class="TagContainer" data-bind="visible: HasSelectionItems">
 					<p data-bind="html: SelectionTagsLabel"></p>
 					<ul data-bind="foreach: SelectionItems">
