@@ -44,6 +44,7 @@ class FaceLandmarkCalibrationPage {
     const filesetResolver = await FilesetResolverClass.forVisionTasks(
       'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm',
     );
+    console.log('createFaceLandmarker');
     this.faceLandmarker = await FaceLandmarkerClass.createFromOptions(filesetResolver, {
       baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -55,43 +56,9 @@ class FaceLandmarkCalibrationPage {
     });
   }
 
-  // When an image is clicked, let's detect it and display results!
-  async handleClick(event) {
-    if (!this.faceLandmarker) {
-      console.log('Wait for faceLandmarker to load before clicking!');
-      return;
-    }
-
-    if (this.runningMode === 'VIDEO') {
-      this.runningMode = 'IMAGE';
-      await this.faceLandmarker.setOptions({ runningMode: this.runningMode });
-    }
-    // Remove all landmarks drawed before
-    const allCanvas = event.target.parentNode.getElementsByClassName('canvas');
-    for (let i = allCanvas.length - 1; i >= 0; i--) {
-      const n = allCanvas[i];
-      n.parentNode.removeChild(n);
-    }
-
-    // We can call faceLandmarker.detect as many times as we like with
-    // different image data each time. This returns a promise
-    // which we wait to complete and then call a function to
-    // print out the results of the prediction.
-    const _faceLandmarkerResult = this.faceLandmarker.detect(event.target);
-    const canvas = document.createElement('canvas') as HTMLCanvasElement;
-    canvas.setAttribute('class', 'canvas');
-    canvas.setAttribute('width', event.target.naturalWidth + 'px');
-    canvas.setAttribute('height', event.target.naturalHeight + 'px');
-    canvas.style.left = '0px';
-    canvas.style.top = '0px';
-    canvas.style.width = `${event.target.width}px`;
-    canvas.style.height = `${event.target.height}px`;
-
-    event.target.parentNode.appendChild(canvas);
-  }
-
   // Enable the live webcam view and start detection.
   enableCam(_event) {
+    console.log('enableCam');
     if (!this.faceLandmarker) {
       console.log('Wait! faceLandmarker not loaded yet.');
       return;
@@ -107,17 +74,27 @@ class FaceLandmarkCalibrationPage {
     }
 
     // Activate the webcam stream.
-    navigator.mediaDevices.getUserMedia(CONSTRAINTS).then((stream) => {
-      if (this.calibrationVideoEl) {
-        this.calibrationVideoEl.srcObject = stream;
-        this.calibrationVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
-      }
-      this.monitorVideoEl.srcObject = stream;
-      this.monitorVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
-      this.monitorVideoEl.play();
-
-      this.ShowCalibrationPoint();
-    });
+    $('.initialCalibrationVideoFeed').addClass('enabled');
+    navigator.mediaDevices
+      .getUserMedia(CONSTRAINTS)
+      .then((stream) => {
+        try {
+          console.dir('navigator.mediaDevices.getUserMedia');
+          if (this.calibrationVideoEl) {
+            this.calibrationVideoEl.srcObject = stream;
+            this.calibrationVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
+          }
+          this.monitorVideoEl.srcObject = stream;
+          this.monitorVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
+          this.monitorVideoEl.play();
+          this.ShowCalibrationPoint();
+        } catch (e) {
+          console.log('navigator.mediaDevices.getUserMedia error: ', e.message, e.name);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   async predictWebcam() {
@@ -128,6 +105,8 @@ class FaceLandmarkCalibrationPage {
         ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
         this.calibrationVideoEl.style.width = this.videoWidth + 'px';
         this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
+        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
+        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.height = this.videoWidth * ratio + 'px';
 
         if (this.canvasElement) {
           this.canvasElement.style.width = this.videoWidth + 'px';
@@ -151,17 +130,10 @@ class FaceLandmarkCalibrationPage {
     let results = undefined;
 
     const startTimeMs = performance.now();
-    //console.log(`startTimeMs: ${calibrationVideoTime}ms ${monitorVideoEl.currentTime}`);
-    //if (monitorVideoEl.currentTime - monitoringVideoTime > 1.0 / 30) {
     if (this.monitoringVideoTime !== this.monitorVideoEl.currentTime) {
       this.monitoringVideoTime = this.monitorVideoEl.currentTime;
       results = this.faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
     }
-    //if (calibrationVideoEl.currentTime - calibrationVideoTime > 1.0 / 30) {
-    // if (monitoringVideoTime !== calibrationVideoEl.currentTime) {
-    //   calibrationVideoTime = calibrationVideoEl.currentTime;
-    //   results = faceLandmarker.detectForVideo(calibrationVideoEl, startTimeMs);
-    // }
 
     if (results) {
       this.dataCallback(results);
@@ -174,24 +146,9 @@ class FaceLandmarkCalibrationPage {
     }
   }
 
-  public async runCalibration(dataCallback: (FaceLandmarkerResult) => void) {
+  public async runCalibration(DrawingUtils, dataCallback: (FaceLandmarkerResult) => void) {
+    console.log('runCalibration');
     this.dataCallback = dataCallback;
-
-    /********************************************************************
-     // Demo 1: Grab a bunch of images from the page and detection them
-     // upon click.
-     ********************************************************************/
-
-    // In this demo, we have put all our clickable images in divs with the
-    // CSS class 'detectionOnClick'. Lets get all the elements that have
-    // this class.
-    const imageContainers = document.getElementsByClassName('detectOnClick');
-
-    // Now let's go through all of these and add a click event listener.
-    Array.from(imageContainers).forEach((imageContainer) => {
-      // Add event listener to the child element which is the img element.
-      imageContainer.children[0].addEventListener('click', this.handleClick.bind(this));
-    });
 
     /********************************************************************
      // Demo 2: Continuously grab image from webcam stream and detect it.
@@ -208,11 +165,6 @@ class FaceLandmarkCalibrationPage {
     this.monitorVideoEl.style.visibility = 'hidden';
     document.body.appendChild(this.monitorVideoEl);
 
-    // const canvasElement2 = document.getElementById('output_canvas') as HTMLCanvasElement;
-    // const drawingContext2 = canvasElement2.getContext('2d');
-    // const drawingContext = this.canvasElement.getContext('2d');
-    //const drawingUtils = new DrawingUtils(drawingContext);
-
     // Check if webcam access is supported.
     function hasGetUserMedia() {
       return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -221,10 +173,8 @@ class FaceLandmarkCalibrationPage {
     // If webcam supported, add event listener to button for when user
     // wants to activate it.
     if (hasGetUserMedia()) {
-      // this.enableWebcamButton = document.getElementById('webcamButton') as HTMLButtonElement;
-      // this.enableWebcamButton.addEventListener('click', this.enableCam);
-
-      setTimeout((event) => this.enableCam(event), 0.3);
+      this.enableWebcamButton = document.getElementById('webcamButton') as HTMLButtonElement;
+      this.enableWebcamButton.addEventListener('click', this.enableCam.bind(this));
     } else {
       console.warn('getUserMedia() is not supported by your browser');
     }
@@ -247,5 +197,5 @@ export default async (
 
   return await faceLandmarkCalibrationPage
     .createFaceLandmarker(FaceLandmarkerClass, FilesetResolverClass, options)
-    .then(() => faceLandmarkCalibrationPage.runCalibration(dataCallback));
+    .then(() => faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback));
 };

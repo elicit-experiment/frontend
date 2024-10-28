@@ -69,7 +69,10 @@ type Calibration = {
 
 enum CALIBRATION_STATE {
   LOADING,
-  INITIAL_CALIBRATION,
+  INITIAL_CALIBRATION_STEP1,
+  INITIAL_CALIBRATION_STEP2,
+  INITIAL_CALIBRATION_STEP3,
+  INITIAL_CALIBRATION_STEP4,
   DETAIL_CALIBRATION,
 }
 
@@ -88,16 +91,21 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   public NoOfAttempts = 1;
   public MinCalibrationAccuracyPct: number;
   public CalibrationFailed: ko.Observable<boolean> = knockout.observable<boolean>(false);
+  public InitialCalibrationDuration: ko.Observable<number> = knockout.observable<number>(5);
 
   public AnswerIsRequired = true;
   public HasMedia = false;
   public CanAnswer: ko.Observable<boolean> = knockout.observable<boolean>(false);
   public Answer: ko.Observable<Calibration> = knockout.observable<Calibration>(null);
 
-  private _initialCalibrationModal: Modal = null;
+  private _initialCalibrationStep1Modal: Modal = null;
+  private _initialCalibrationStep2Modal: Modal = null;
+  private _initialCalibrationStep3Modal: Modal = null;
+  private _initialCalibrationStep4Modal: Modal = null;
   private _loadingModal: Modal = null;
 
   private oldestAcceptableVolume = knockout.observable<Date | null>(null);
+  DrawingUtils: any;
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'FaceLandmarkCalibration', 'FaceLandmarkCalibration', method, data);
@@ -110,12 +118,14 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
     this.config = question.Input as FaceLandmarkComponentConfig;
     this.includeLandmarks = NormalizeConfig(question.Input as FaceLandmarkComponentConfig)?.includeLandmarks;
-    console.dir(this.includeLandmarks);
     ValidateConfig(this.config);
 
     this.datapointAccumulator = new DatapointAccumulator();
 
-    this._initialCalibrationModal = new Modal(document.getElementById('initialCalibrationModal'));
+    this._initialCalibrationStep1Modal = new Modal(document.getElementById('initialCalibrationStep1Modal'));
+    this._initialCalibrationStep2Modal = new Modal(document.getElementById('initialCalibrationStep2Modal'));
+    this._initialCalibrationStep3Modal = new Modal(document.getElementById('initialCalibrationStep3Modal'));
+    this._initialCalibrationStep4Modal = new Modal(document.getElementById('initialCalibrationStep4Modal'));
     this._loadingModal = new Modal(document.getElementById('loadingModal'));
 
     this.hideSlideShellNavigationElements();
@@ -124,15 +134,33 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       switch (newState) {
         case CALIBRATION_STATE.LOADING:
           this._loadingModal.show();
-          this._initialCalibrationModal.hide();
+          this._initialCalibrationStep1Modal.hide();
           break;
-        case CALIBRATION_STATE.INITIAL_CALIBRATION:
+        case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1:
           this._loadingModal.hide();
-          this._initialCalibrationModal.show();
+          this._initialCalibrationStep1Modal.show();
+          break;
+        case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP2:
+          this._loadingModal.hide();
+          this._initialCalibrationStep1Modal.hide();
+          this._initialCalibrationStep2Modal.show();
+          break;
+        case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3:
+          this._loadingModal.hide();
+          this._initialCalibrationStep2Modal.hide();
+          this._initialCalibrationStep3Modal.show();
+          break;
+        case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP4:
+          this._loadingModal.hide();
+          this._initialCalibrationStep3Modal.hide();
+          this._initialCalibrationStep4Modal.show();
           break;
         default:
           this._loadingModal.hide();
-          this._initialCalibrationModal.hide();
+          this._initialCalibrationStep1Modal.hide();
+          this._initialCalibrationStep2Modal.hide();
+          this._initialCalibrationStep3Modal.hide();
+          this._initialCalibrationStep4Modal.hide();
       }
     });
 
@@ -147,8 +175,10 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
         outputFaceBlendshapes: this.config.Blendshapes || true,
       };
 
+      this.DrawingUtils = DrawingUtils;
+
       calibrate(FaceLandmarker, FilesetResolver, DrawingUtils, options, this.ReceiveDatapoint.bind(this)).then(() => {
-        this.currentState(CALIBRATION_STATE.INITIAL_CALIBRATION);
+        this.currentState(CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1);
       });
     });
 
@@ -156,6 +186,26 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       this.AddEvent('calibrated');
       this.SetAnswer(calibration);
     });
+  }
+
+  protected NextCalibrationStep(): void {
+    let nextStep: CALIBRATION_STATE = CALIBRATION_STATE.LOADING;
+    switch (this.currentState()) {
+      case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1:
+        nextStep = CALIBRATION_STATE.INITIAL_CALIBRATION_STEP2;
+        break;
+      case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP2:
+        nextStep = CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3;
+        break;
+      case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3:
+        nextStep = CALIBRATION_STATE.INITIAL_CALIBRATION_STEP4;
+        break;
+      case CALIBRATION_STATE.INITIAL_CALIBRATION_STEP4:
+      default:
+        return this.StartDetailedCalibration();
+    }
+
+    this.currentState(nextStep);
   }
 
   protected StartDetailedCalibration() {
@@ -170,11 +220,13 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   }
 
   protected ComputeAndUpdateInitialCalibration(dataPoint: FaceLandmarkerResult) {
-    const calibrationStatus = document.querySelector('#initial-validation-value') as HTMLDivElement;
+    // const calibrationStatus = document.querySelector('#initial-validation-status') as HTMLDivElement;
 
     if (dataPoint.faceLandmarks?.length == 0) {
       return;
     }
+
+    this.RenderFaceMeshOverlay(dataPoint);
 
     const faceOvalBounds = FaceLandmarker.FACE_LANDMARKS_FACE_OVAL.reduce((boundingBox: BoundingBox, connection) => {
       const firstFace = dataPoint.faceLandmarks[0];
@@ -186,26 +238,53 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     }, new BoundingBox());
 
     this.AddNewCalibrationVolume(faceOvalBounds.volume(), new Date());
-    let acceptable: string | number | null = this.secondsOfAcceptableVolume();
-    let calibrated = false;
+    const secondsAcceptableVolume = this.secondsOfAcceptableVolume();
+    const calibrated = secondsAcceptableVolume > MINIMUM_VOLUME_CALIBRATION_TIME;
+    const calibrationDurationPct = (secondsAcceptableVolume * 100.0) / MINIMUM_VOLUME_CALIBRATION_TIME;
+    const maxTime =
+      secondsAcceptableVolume > MINIMUM_VOLUME_CALIBRATION_TIME
+        ? MINIMUM_VOLUME_CALIBRATION_TIME
+        : secondsAcceptableVolume || 0;
 
-    if (acceptable) {
-      calibrated = acceptable > MINIMUM_VOLUME_CALIBRATION_TIME;
-      acceptable = acceptable.toFixed(1);
+    const circularProgress: SVGElement = document.querySelector(
+      '#initial-validation-status .circular-progress',
+    ) as SVGElement;
 
-      calibrationStatus.innerHTML =
-        `<span>Keep your face centered for 5 seconds.</span><br/>` +
-        `<div>` +
-        `<span style="margin-right: 10px;">${calibrated ? '🟢' : '🔴'}</span>` +
-        `<span>${acceptable}</span>` +
-        `<span>/</span>` +
-        `<span>${MINIMUM_VOLUME_CALIBRATION_TIME.toFixed(1)}s</span>` +
-        `</div>`;
-    } else {
-      calibrationStatus.innerHTML = `<span>Center your face front of the webcam.`;
+    circularProgress.style.setProperty('--progress', calibrationDurationPct.toFixed(0));
+    circularProgress.classList.toggle('complete', calibrated);
+    document.getElementById('number').textContent = maxTime.toFixed(0);
+    $('.lm-calibration-step3-container').toggleClass('lm-calibrated', this.secondsOfAcceptableVolume() > 0.2);
+
+    $('#initialCalibrationStep1Modal .calibrate-button').toggle(calibrated);
+
+    document.querySelector('#initialCalibrationStep3Modal .calibrate-button').classList.toggle('disabled', !calibrated);
+  }
+
+  protected RenderFaceMeshOverlay(faceLandmarkerResult: FaceLandmarkerResult) {
+    if (faceLandmarkerResult.faceLandmarks?.length == 0) {
+      return;
     }
 
-    $('#initialCalibrationModal .calibrate-button').toggle(calibrated);
+    const canvas = document.getElementById('output_canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const drawingUtils = new this.DrawingUtils(ctx);
+    for (const landmarks of faceLandmarkerResult.faceLandmarks) {
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
+        color: '#C0C0C070',
+        lineWidth: 1,
+      });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE, { color: '#FF3030' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW, { color: '#FF3030' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE, { color: '#30FF30' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW, { color: '#30FF30' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL, { color: '#E0E0E0' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, {
+        color: '#E0E0E0',
+      });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS, { color: '#FF3030' });
+      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS, { color: '#30FF30' });
+    }
   }
 
   protected AddNewCalibrationVolume(volume: number, timeStamp: Date) {
@@ -221,7 +300,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   }
 
   protected ReceiveDatapoint(dataPoint: FaceLandmarkerResult) {
-    if (this.currentState() == CALIBRATION_STATE.INITIAL_CALIBRATION) {
+    if (this.currentState() == CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3) {
       this.ComputeAndUpdateInitialCalibration(dataPoint);
     }
 
@@ -259,12 +338,12 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       $cal.prop('disabled', true); //disables the button
       this.PointCalibrate++;
     } else if (this.CalibrationPoints[id].length < CLICKS_NEEDED) {
-      //Gradually increase the opacity of calibration points when click to give some indication to user.
+      // Gradually increase the opacity of calibration points when click to give some indication to user.
       const opacity = (1.0 / CLICKS_NEEDED) * this.CalibrationPoints[id].length + 1.0 / CLICKS_NEEDED;
       $cal.css('opacity', opacity);
     }
 
-    //Show the middle calibration point after all other points have been clicked.
+    // Show the middle calibration point after all other points have been clicked.
     if (this.PointCalibrate == 8) {
       $('#Pt5').show();
     }
@@ -285,7 +364,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
   // sleep function because java doesn't have one, sourced from http://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
   private sleep(time: number) {
-    return new Promise<any>((resolve) => setTimeout(resolve, time));
+    return new Promise<never>((resolve) => setTimeout(resolve, time));
   }
 
   private RecalibrateOrProceed() {
@@ -321,13 +400,10 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   private CalibrationCompleted() {
     console.log('Calibration: calibration complete');
 
-    const calibrationStatus = knockout.contextFor(document.getElementById('calibration-status'));
+    // const calibrationStatus = knockout.contextFor(document.getElementById('calibration-status'));
     const slideShell = knockout.contextFor($('.panel').get(0)).$data;
 
     this.CanAnswer(true);
-
-    console.dir(calibrationStatus.$data);
-    console.dir(this);
 
     this.Answer({ calibrationPoints: this.CalibrationPoints });
 
@@ -347,9 +423,6 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
   private evaluateCalibration() {
     {
-      //this.stop_storing_points_variable(); // stop storing the prediction points
-      // const past50 = this.webgazerManager.webgazer.getStoredPoints(); // retrieve the stored points
-      // const precisionMeasurement = this.calculatePrecision(past50);
       const precisionMeasurement = 50.0;
       const accuracyLabel = '<a>Accuracy | ' + precisionMeasurement + '%</a>';
       document.getElementById('Accuracy').innerHTML = accuracyLabel; // Show the accuracy in the nav bar.
