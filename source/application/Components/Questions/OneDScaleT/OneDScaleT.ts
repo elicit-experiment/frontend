@@ -34,7 +34,7 @@ class OneDScaleT extends QuestionWithStimulusBase<{ Position: number; Time: numb
 
   public DefaultPosition: number;
 
-  protected readonly InstrumentTemplateName = OneDScaleT.name;
+  protected readonly InstrumentTemplateName = 'OneDScaleT';
 
   constructor(question: QuestionModel) {
     super(question);

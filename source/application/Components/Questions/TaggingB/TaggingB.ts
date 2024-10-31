@@ -1,5 +1,5 @@
 ﻿import * as knockout from 'knockout';
-import TaggingA from 'Components/Questions/TaggingA/TaggingA';
+import { TaggingBase } from 'Components/Questions/TaggingA/TaggingA';
 import Taggle from 'taggle';
 import QuestionModel from 'Models/Question';
 
@@ -7,9 +7,9 @@ type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
-class TaggingB extends TaggingA {
+class TaggingB extends TaggingBase {
   public TagBoxElement = knockout.observable<HTMLElement>();
-  protected readonly InstrumentTemplateName = TaggingB.name;
+  protected readonly InstrumentTemplateName = 'TaggingB';
 
   constructor(question: QuestionModel) {
     super(question);
@@ -61,7 +61,7 @@ class TaggingB extends TaggingA {
 
 import template from 'Components/Questions/TaggingB/TaggingB.html';
 knockout.components.register('Questions/TaggingB', {
-  viewModel: TaggingA,
+  viewModel: TaggingB,
   template,
 });
 

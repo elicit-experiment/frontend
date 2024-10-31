@@ -6,7 +6,7 @@ type PredefinedTag = { Label: string; Id: string; Position: number };
 type TagData = { Id: string; Label: string };
 type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
-class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
+export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public SelectionTagsLabel: string;
   public UserTagsLabel: string;
   public InputPlaceholder: string;
@@ -21,8 +21,6 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public HasSelectionItems: ko.Computed<boolean>;
   public HasUserItems: ko.Computed<boolean>;
   public HasAddedItems: ko.Computed<boolean>;
-
-  protected readonly InstrumentTemplateName = TaggingA.name;
 
   constructor(question: QuestionModel) {
     super(question);
@@ -174,6 +172,10 @@ class TaggingA extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'TaggingA', 'Instrument', method, data);
   }
+}
+
+class TaggingA extends TaggingBase {
+  protected readonly InstrumentTemplateName = 'TaggingA';
 }
 
 import template from 'Components/Questions/TaggingA/TaggingA.html';

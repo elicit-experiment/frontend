@@ -34,7 +34,7 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
 
   public DefaultPosition: number;
 
-  protected readonly InstrumentTemplateName = OneDScale.name;
+  protected readonly InstrumentTemplateName = 'OneDScale';
 
   constructor(question: QuestionModel) {
     super(question);
