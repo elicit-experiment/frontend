@@ -3,8 +3,14 @@
 		display inline-block
 		width 300px
 
-	.Block
-		display block
+	display: flex
+	flex-direction: column;
+	&.Horizontal
+		flex-direction: row;
+	.PadLeft
+		padding-left: 10px
+	.PadRight
+		padding-right: 10px
 
 .freetext-container
 	display: flex

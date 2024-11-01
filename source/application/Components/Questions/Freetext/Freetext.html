@@ -2,8 +2,8 @@
 <div class="row QuestionBlock">
 	<div class="row">
 		<div class="freetext-container">
-			<label class="Freetext">
-				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{Block: LabelPositionTop}"></span>
+			<label class="Freetext" data-bind="css:{Horizontal: LabelPositionLeft || LabelPositionRight}">
+				<span data-bind="html: Label, visible: LabelPositionLeft || LabelPositionTop, css:{PadRight: LabelPositionLeft}"></span>
 				<!-- ko if: IsResizeable -->
 					<textarea type="textarea" class="form-control" data-bind="textInput: Answer, attr: GetResizableDimensions()"></textarea>
 				<!-- /ko -->
@@ -12,7 +12,7 @@
 					<input type="text" class="form-control" data-bind="textInput: Answer"/>
 				<!-- /ko -->
 
-				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{Block: LabelPositionBottom}"></span>
+				<span data-bind="html: Label, visible: LabelPositionRight || LabelPositionBottom, css:{PadLeft: LabelPositionRight}"></span>
 			</label>
 		</div>
 	</div>
