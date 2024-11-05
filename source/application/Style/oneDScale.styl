@@ -1,4 +1,8 @@
 .OneDScale
+	.ScaleContainer
+		display: flex;
+		flex-direction: column;
+
 	.SliderContainer
 		position relative
 		display flex
@@ -16,12 +20,14 @@
 		.Tick
 			position absolute
 
-		&.X1 .Tick
-			top 0
-			margin-top 10px
-
-		&.X2 .Tick
-			bottom 0
+		//&.X1
+		//	.Tick
+		//		top 0
+		//		margin-top 10px
+		//
+		&.X2
+			.Tick
+				height: 26px;
 
 		.Tick:not(.MinPosition):not(.MaxPosition)
 			-webkit-transform translateX(-50%)
