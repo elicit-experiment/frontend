@@ -1,6 +1,9 @@
 ﻿<script type="text/html" id="OneDScale">
 	<div class="OneDScale">
 		<div class="ScaleContainer">
+			<div class="XLabel" data-bind="if: X1AxisLabel">
+				<p class="Label" data-bind="html: X1AxisLabel"></p>
+			</div>
 			<div class="XTicks X2" data-bind="foreach: X2Ticks, style: { height: X2Height() + 'px' }">
 				<p class="Tick" data-bind="html: Label, css:{MinPosition: IsMinPosition, MaxPosition: IsMaxPosition }, Height: {Value: $parent.X2Height, Max: true}, style: {left: RelativePosition * 100 + '%'}"></p>
 			</div>
@@ -15,6 +18,9 @@
 			</div>
 			<div class="XTicks X1" data-bind="foreach: X1Ticks, style: { height: X1Height() + 'px' }">
 				<p class="Tick" data-bind="html: Label, css:{MinPosition: IsMinPosition, MaxPosition: IsMaxPosition }, Height: {Value: $parent.X1Height, Max: true}, style: {left: RelativePosition * 100 + '%'}"></p>
+			</div>
+			<div class="XLabel" data-bind="if: X2AxisLabel">
+				<p class="Label" data-bind="html: X2AxisLabel"></p>
 			</div>
 		</div>
 	</div>

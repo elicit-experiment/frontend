@@ -20,6 +20,11 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
   public Y1Ticks: Tick[];
   public Y2Ticks: Tick[];
 
+  public X1AxisLabel: string;
+  public X2AxisLabel: string;
+  public Y1AxisLabel: string;
+  public Y2AxisLabel: string;
+
   public X1Height: ko.Observable<number> = knockout.observable(0);
   public X2Height: ko.Observable<number> = knockout.observable(0);
 
@@ -46,6 +51,13 @@ class OneDScale extends QuestionWithStimulusBase<{ Position: number }> {
     this.Y2Ticks = this.GetTicks('Y2AxisTicks');
     this.HasY1Ticks = this.Y1Ticks.length !== 0;
     this.HasY2Ticks = this.Y2Ticks.length !== 0;
+
+    this.X1AxisLabel = this.GetInstrument('X1AxisLabel');
+    this.Y1AxisLabel = this.GetInstrument('Y1AxisLabel');
+
+    // TODO: Render these, depending on a design that uses them.
+    this.X2AxisLabel = this.GetInstrument('X2AxisLabel');
+    this.Y2AxisLabel = this.GetInstrument('Y2AxisLabel');
 
     const defaultPos = this.GetInstrumentFormatted('Position');
     if (defaultPos) this.DefaultPosition = parseFloat(defaultPos);
