@@ -1,0 +1,147 @@
+
+.lm-calibration-modal {
+  h1 {
+    color: var(--header-blue);
+    font-size: 48px;
+    text-align: center;
+    font-style: unset;
+  }
+}
+
+.lm-calibration-step1-container {
+  background-color: white;
+  border: solid 6px #555
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  padding: 20px;
+  text-align: left;
+
+  > img {
+    height: 300px;
+    width: 100%;
+  }
+  > p {
+    padding: 5px;
+    margin-top: auto;
+  }
+
+  > ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    padding-top: 16px;
+    font-size: 24px;
+
+    > li {
+      padding-left: 8px;
+    }
+  }
+}
+
+.lm-calibration-step3-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > p {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+
+    span:nth-child(2) {
+     margin-left: 20px;
+    }
+  }
+
+  > img {
+    margin-top: 20px;
+  }
+
+  video {
+      clear: both;
+      display: block;
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+      -moz-transform: rotateY(180deg);
+  }
+  > .initialCalibrationVideoFeed {
+    border: solid 6px red;
+    border-radius: 15px;
+    padding: 3px;
+    width: 520px;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+
+    #webcamWithOverlay {
+      display:none;
+    }
+    #webcamButton {
+      display:block;
+    }
+
+    &.enabled {
+      #webcamWithOverlay {
+        display:block;
+      }
+      #webcamButton {
+        display:none;
+      }
+    }
+  }
+
+  &.lm-calibrated {
+    > .initialCalibrationVideoFeed {
+      border-color: green;
+    }
+  }
+}
+
+.circular-progress {
+  --size: 32px;
+  --half-size: calc(var(--size) / 2);
+  --stroke-width: 4px;
+  --radius: calc((var(--size) - var(--stroke-width)) / 2);
+  --circumference: calc(var(--radius) * pi * 2);
+  --dash: calc((var(--progress) * var(--circumference)) / 100);
+
+  &.complete {
+    .circular-progress-text {
+      fill: green;
+    }
+  }
+}
+
+.circular-progress-text {
+  font-weight: bold;
+  font-size: 18px;
+
+}
+.circular-progress circle {
+  cx: var(--half-size);
+  cy: var(--half-size);
+  r: var(--radius);
+  stroke-width: var(--stroke-width);
+  fill: none;
+  stroke-linecap: round;
+}
+
+.circular-progress circle.bg {
+  stroke: #daa;
+}
+
+.circular-progress circle.fg {
+  transform: rotate(-90deg);
+  transform-origin: var(--half-size) var(--half-size);
+  stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
+  transition: stroke-dasharray 0.3s linear 0s;
+  stroke: green;
+}
+
+@property --progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}

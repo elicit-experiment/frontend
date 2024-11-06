@@ -50,22 +50,121 @@
         </div>
     </div>
 
-    <div id="initialCalibrationModal" class="modal hide fade" role="dialog">
+    <div id="initialCalibrationStep1Modal" class="lm-calibration-modal modal hide fade modal-md" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
-                        <p><h1>Initial Calibration</h1></p>
-                        <div id="initial-validation-value"></div>
+                        <div class="lm-calibration-step1-container">
+                            <h1>Face-tracking</h1>
+                            <ul>
+                                <li>We will track your face movements during this experiment.</li>
+                                <li>We will not record any video of you, ONLY facial movements.</li>
+                                <li>Position yourself in front of the camera as shown below. Keep that position throughout the experiment.</li>
+                            </ul>
+                            <img src="../../../Images/step1-subimages.png" width="100%" height="100%" alt="Place your face in front of the camera"/>
+
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: StartDetailedCalibration">Calibrate</button>
+                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: NextCalibrationStep">Next</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="initialCalibrationStep2Modal" class="lm-calibration-modal modal hide fade modal-md" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <div class="lm-calibration-step1-container">
+                            <h1>Calibration</h1>
+                            <p>We will calibrate the face-tracker in 2 steps.</p>
+                            <ul>
+                                <li>Keep your face within the view for <span data-bind="text: InitialCalibrationDuration"></span> seconds.</li>
+                                <li>Click the mouse on each of the dots on the screen until they turn red, while looking at them with your eyes. </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: NextCalibrationStep">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="initialCalibrationStep3Modal" class="lm-calibration-modal modal hide fade modal-xl" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <div class="lm-calibration-step3-container">
+                            <h1>Calibration — Step 1</h1>
+                            <p><span> Keep your face centered for
+                                <span data-bind="text: InitialCalibrationDuration"></span>
+                                seconds.</span>
+                                <span id="initial-validation-status" style="float:right; justify-self: flex-end">
+                                    <svg width="32" height="32" viewBox="0 0 32 32" class="circular-progress">
+                                        <circle class="bg"></circle>
+                                        <circle class="fg"></circle>
+                                        <text id="number" x="50%" y="50%" dy="-1px" text-anchor="middle" dominant-baseline="central" class="circular-progress-text"></text>
+                                    </svg>
+                                </span>
+                            </p>
+
+                            <div class="initialCalibrationVideoFeed" style="width: 500px; height: 290px">
+                                <button id="webcamButton" class="btn btn-primary">
+                                    <span class="mdc-button__ripple"></span>
+                                    <span class="mdc-button__label">ENABLE WEBCAM</span>
+                                </button>
+                                <div id="webcamWithOverlay" style="position: relative; width: 500px; height: 290px">
+                                    <video id="webcam" style="position: absolute" autoplay playsinline></video>
+                                    <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0; top: 0;"></canvas>
+                                </div>
+                            </div>
+
+                            <img src="../../../Images/step3-subimages.png" width="50%" height="50%" alt="Place your face in front of the camera"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary calibrate-button disabled" data-dismiss="modal" data-bind="click: NextCalibrationStep">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="initialCalibrationStep4Modal" class="lm-calibration-modal modal hide fade modal-md" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <div class="lm-calibration-step3-container">
+                            <h1>Calibration — Step 2</h1>
+
+                            <img src="../../../Images/step4-subimages.png" width="50%" height="50%" alt="Place your face in front of the camera"/>
+
+                            <p>
+                                Click on the calibration dots 5 times while looking at the dots
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary calibrate-button" data-dismiss="modal" data-bind="click: NextCalibrationStep">Begin Calibration</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
