@@ -5,6 +5,15 @@
         </div>
         <!-- /ko -->
 
+        <!-- ko foreach: RowedItems -->
+        <!-- ko foreach: $data -->
+        <label data-bind="css: { disabled: false, 'radio-button-group': true }">
+            <input type="radio"/>
+            <!-- ko text: Label --><!-- /ko -->
+        </label>
+        <!-- /ko -->
+        <!-- /ko -->
+
         <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
             <div class="row" data-bind="foreach: $data">
                 <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
