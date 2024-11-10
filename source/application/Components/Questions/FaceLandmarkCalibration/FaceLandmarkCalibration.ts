@@ -16,7 +16,7 @@ import {
 
 const FLOAT_MAX_VALUE = 3.40282347e38; // largest positive number in float32
 
-const CLICKS_NEEDED = 1;
+const CLICKS_NEEDED = 5;
 
 class BoundingBox {
   x: Float32Array;
