@@ -20,11 +20,9 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   constructor(question: QuestionModel) {
     super(question);
 
-    this._isOptional = parseInt(this.GetInstrument('IsOptional')) == 1;
+    this._isOptional = this.GetInstrument('IsOptional') === true;
 
-    this.SetItems(
-      this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)),
-    );
+    this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 
@@ -45,16 +43,19 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
     if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
     this.Answer.subscribe((id) => {
       const item = this.Items.find((item) => item.Id === id);
+      if (!item) return;
+
       this.AddEvent('Change', 'Mouse/Left/Down', id);
       this.SetAnswer({ Id: id, Correct: item.Correct });
     });
   }
 
   protected HasValidAnswer(answer: AnswerType): boolean {
-    const item = this.Items.find((item) => item.Id === answer.Id);
+    // console.log(`HasValidAnswer is ${this.Answer()} ${answer.Id}`);
+    const item = this.Items.find((item) => item.Id === this.Answer());
     if (this.MustAnswerCorrectly && !item?.Correct) return false;
     if (this._isOptional) return true;
-    return answer.Id != undefined;
+    return this.Answer() != undefined;
   }
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
@@ -62,13 +63,14 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   }
 
   private ItemInfo(item: Item): ItemInfo {
-    if (item.Selected === '1') this.Answer(item.Id);
+    if (item.Selected === '1' && !this._isOptional) this.Answer(item.Id);
 
     const AnsweredCorrectly = knockout.observable<boolean | null>(null);
     return {
       Id: item.Id,
       Label: this.GetFormatted(item.Label),
-      IsEnabled: knockout.computed(() => true),
+      IsEnabled: knockout.computed(() => true), // RadioButtons are always enabled, unlike checkboxbuttons
+      Preselected: item.Selected === '1',
       Correct: item.Correct,
       Feedback: item.Feedback,
       AnsweredCorrectly,
@@ -78,6 +80,25 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
         return AnsweredCorrectly() ? 'correct' : 'incorrect';
       }),
     };
+  }
+
+  protected ApplyPreselectIfNeeded() {
+    this.Items.forEach((item: ItemInfo) => {
+      if (item.Preselected) {
+        if (this.Answer()) {
+          if (this.Answer() === item.Id) {
+            this.Answer(null);
+          } else {
+            return;
+          }
+        }
+
+        if (!this.Answer()) {
+          console.log(`ApplyPreselectIfNeeded[${this.Id}]: ${this.Answer()} ${item.Id} `);
+          this.Answer(item.Id);
+        }
+      }
+    });
   }
 }
 

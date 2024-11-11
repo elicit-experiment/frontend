@@ -92,7 +92,11 @@ class SlideShell {
   }
 
   public NextAction(): void {
-    if (this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING) {
+    if (this.CurrentSlideStep() == SlideStep.ANSWERING) {
+      this.CurrentSlideStep(SlideStep.ANSWERING_COMPLETED);
+    }
+
+    if (this.ShowFeedback() && this.CurrentSlideStep() == SlideStep.ANSWERING_COMPLETED) {
       if (this.AreAllQuestionsAnswered()) {
         this.CurrentSlideStep(SlideStep.REVEALING);
       } else {

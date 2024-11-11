@@ -98,6 +98,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
 
         return canAnswer && (canSelectMore || alreadyAnswered);
       }),
+      Preselected: item.Selected === '1',
       Correct: item.Correct,
       Feedback: item.Feedback,
       AnsweredCorrectly,

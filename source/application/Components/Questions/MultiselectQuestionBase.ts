@@ -8,12 +8,20 @@ export type ItemInfo = {
   Id: string;
   Label: string;
   IsEnabled: ko.Computed<boolean>;
+  Preselected: boolean;
   Correct: boolean;
   Feedback: string;
   AnsweredCorrectly: ko.Observable<boolean>;
   CorrectnessClass: ko.Computed<string>;
 };
-export type Item = { Label: string; Id: string; Selected: string; Correct: boolean; Feedback: string };
+export type Item = {
+  Label: string;
+  Id: string;
+  Selected: string;
+  PreSelected: string;
+  Correct: boolean;
+  Feedback: string;
+};
 
 export interface CorrectableAnswer {
   Correct: boolean;
@@ -27,6 +35,7 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   public AnswerOnce: boolean;
   public MustAnswerCorrectly: boolean;
   public ShowCorrectness: boolean;
+  public IsOptional: boolean;
   public RevealAnswers: ko.Observable<boolean> = knockout.observable<boolean>(false);
 
   public AddFillerItem: ko.Computed<boolean>;
@@ -44,6 +53,7 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
     this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
     this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
+    this.IsOptional = this.GetInstrument('IsOptional') === true;
 
     this.CorrectnessClass = knockout.computed(() => {
       if (!this.RevealAnswers()) return '';
@@ -67,6 +77,10 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     });
 
     this.Model.SlideStep.subscribe((newValue: SlideStep) => {
+      if (newValue === SlideStep.ANSWERING_COMPLETED) {
+        this.ApplyPreselectIfNeeded();
+      }
+
       if (newValue == SlideStep.REVEALING && this.ShowFeedback) {
         this.RevealAnswers(true);
       }
@@ -87,6 +101,10 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
 
     this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
   }
+
+  // We don't show the pre-selections when the instrument IsOptional, but if the user hasn't selected an option before they hit 'next',
+  // we need to select the pre-selections and send the change event.
+  protected ApplyPreselectIfNeeded() {}
 }
 
 export default MultiselectQuestionBase;
