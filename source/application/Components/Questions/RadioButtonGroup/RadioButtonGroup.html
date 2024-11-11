@@ -6,7 +6,7 @@
         <!-- /ko -->
 
         <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
-            <div class="row" data-bind="foreach: $data">
+            <!-- ko foreach: $data -->
                 <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
                 <div data-bind="css: `col-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
@@ -16,7 +16,7 @@
                            type="radio"/>
                     <span data-bind="html: Label"></span>
                 </label>
-            </div>
+            <!-- /ko -->
         </div>
 
         <!-- ko if: ShowFeedback && FeedbackText -->

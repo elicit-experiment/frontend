@@ -1,34 +1,31 @@
 
 label.radio-button-group {
   display: flex;
-  padding-left: 20px;
+  padding-left: 15px;
   cursor: inherit;
-  align-items: center;
+  align-items: flex-start;
   margin: auto;
 }
 
 label.checkbox-button-group,
 label.radio-button-group {
   display: flex;
-  align-items: center;
-  min-width: 200px;
+  align-items: flex-start;
   justify-content: flex-start;
   position: relative;
 }
 
 label.checkbox-button-group > input[type=checkbox],
 label.radio-button-group > input[type=radio] {
-  float: left;
-  width: 20px;
-  margin-left: -20px;
-  margin-top: 2px;
+  margin-right: 1rem;
+  margin-top: 0.4rem;
   padding: 0;
   -webkit-appearance: radio;
 }
 
 label.radio-button-group > span {
   display: inline-block;
-  margin: 0 0 0 10px;
+  margin: 0;
 }
 
 label.checkbox-button-group > span {

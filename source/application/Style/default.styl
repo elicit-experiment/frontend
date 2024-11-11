@@ -108,3 +108,46 @@ html, body {
     }
   }
 }
+:root {
+  --max-width-small: 575.98px;
+  --max-width-medium: 767.98px;
+  --max-width-large: 991.98px;
+  --max-width-xlarge: 1199.98px;
+  --max-width-xxlarge: 1399.98px;
+  --max-width-custom: 1000px;
+}
+
+body {
+  font-size: var(--font-size-medium);
+  padding: var(--padding-medium);
+}
+
+/* Extra small devices (phones, less than 576px) */
+@media (max-width: var(--max-width-small)) {
+  .slide-content {
+    width: 400px;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (max-width: var(--max-width-medium)) {
+  .slide-content {
+    width: 600px;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (max-width: var(--max-width-large)) {
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (max-width: var(--max-width-xlarge)) {
+}
+/* Extra large devices (large desktops, 1200px and up) */
+@media (max-width: var(--max-width-xxlarge)) {
+}
+
+.slide-content {
+  width: 800px;
+  margin: 0 auto;
+}
