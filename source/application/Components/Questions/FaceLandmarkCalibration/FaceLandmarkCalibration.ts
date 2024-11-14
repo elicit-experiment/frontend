@@ -186,6 +186,12 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       this.AddEvent('calibrated');
       this.SetAnswer(calibration);
     });
+
+    for (let i = 1; i < 10; i++) {
+      const pointId = `#Pt${i}`;
+      const calibrationPointElement = document.querySelector(pointId);
+      this.AddEvent('Render', '', JSON.stringify({ [pointId]: calibrationPointElement.getBoundingClientRect() }));
+    }
   }
 
   protected NextCalibrationStep(): void {
@@ -306,7 +312,9 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
     const transformedDataPoint = transformDatapoint(this.config, dataPoint, this.includeLandmarks);
 
-    this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+    if (transformedDataPoint) {
+      this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+    }
   }
 
   // Calibration times
@@ -325,6 +333,8 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       y: event.clientY,
       timeStamp: new Date().getTime(),
     };
+
+    this.AddEvent('Change', 'Mouse/Left/Down', JSON.stringify({ Id: id, ...calibrationPoint }));
 
     if (!this.CalibrationPoints[id]) {
       // initializes if not done

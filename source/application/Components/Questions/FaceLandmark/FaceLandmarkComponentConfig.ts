@@ -37,22 +37,37 @@ export function transformDatapoint(
   dataPoint: FaceLandmarkerResult,
   includeLandmarks: number[] | undefined,
 ): FaceLandmarkerResult {
+  if (config.FaceTransformation && !dataPoint.hasOwnProperty('facialTransformationMatrixes')) {
+    return null;
+  }
   if (!config.FaceTransformation && dataPoint.hasOwnProperty('facialTransformationMatrixes')) {
     delete dataPoint.facialTransformationMatrixes;
+  }
+  if (!(dataPoint.hasOwnProperty('faceBlendshapes') && dataPoint.faceBlendshapes)) {
+    return null;
   }
   if (!config.Blendshapes && dataPoint.hasOwnProperty('faceBlendshapes')) {
     delete dataPoint.faceBlendshapes;
   }
+  if (!(dataPoint.hasOwnProperty('faceLandmarks') && dataPoint.faceLandmarks)) {
+    return null;
+  }
   if (!config.Landmarks && dataPoint.hasOwnProperty('faceLandmarks')) {
     delete dataPoint.faceBlendshapes;
   }
-  if (config.StripZCoordinates) {
-    dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.z));
+
+  if (dataPoint.faceLandmarks) {
+    if (config.StripZCoordinates) {
+      dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.z));
+    }
+    dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.visibility));
   }
-  dataPoint.faceLandmarks.forEach((face) => face.forEach((landmarks) => delete landmarks.visibility));
-  dataPoint.faceBlendshapes.forEach((blendShape) =>
-    blendShape.categories.forEach((category) => delete category.displayName),
-  );
+
+  if (dataPoint.faceBlendshapes) {
+    dataPoint.faceBlendshapes.forEach((blendShape) =>
+      blendShape.categories.forEach((category) => delete category.displayName),
+    );
+  }
 
   if (config.IncludeBlandshapes || config.IncludeBlendshapes) {
     const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
