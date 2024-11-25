@@ -81,7 +81,6 @@ const MINIMUM_VOLUME = 0.15;
 
 class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   public config: FaceLandmarkComponentConfig;
-  public includeLandmarks?: number[];
   public datapointAccumulator: DatapointAccumulator;
   public currentState: knockout.Observable<CALIBRATION_STATE> = knockout.observable<CALIBRATION_STATE>();
   public PointCalibrate = 0;
@@ -116,8 +115,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     super(question, true);
     this.Id = this.Model.Id;
 
-    this.config = question.Input as FaceLandmarkComponentConfig;
-    this.includeLandmarks = NormalizeConfig(question.Input as FaceLandmarkComponentConfig)?.includeLandmarks;
+    this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
     ValidateConfig(this.config);
 
     this.datapointAccumulator = new DatapointAccumulator();
@@ -310,7 +308,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       this.ComputeAndUpdateInitialCalibration(dataPoint);
     }
 
-    const transformedDataPoint = transformDatapoint(this.config, dataPoint, this.includeLandmarks);
+    const transformedDataPoint = transformDatapoint(this.config, dataPoint);
 
     if (transformedDataPoint) {
       this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);

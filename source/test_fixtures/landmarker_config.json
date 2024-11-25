@@ -1,0 +1,11 @@
+{
+  "TrialType": "Calibration",
+  "type": "NewComponent::FaceLandmarkCalibration",
+  "NumberOfFaces": 2,
+  "Landmarks": true,
+  "Blendshapes": true,
+  "FaceTransformation": true,
+  "CalibrationDuration": 5,
+  "StripZCoordinates": true,
+  "IncludeLandmarks": "1,2,5,100,346"
+}

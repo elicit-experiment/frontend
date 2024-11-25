@@ -1,4 +1,4 @@
-import { FaceLandmarkerResult } from '@mediapipe/tasks-vision';
+import { FaceLandmarkerResult, NormalizedLandmark } from '@mediapipe/tasks-vision';
 
 export type FaceLandmarkComponentConfig = {
   NumberOfFaces?: number;
@@ -12,30 +12,34 @@ export type FaceLandmarkComponentConfig = {
   IncludeLandmarks?: string;
 };
 
-type NormalizedLandmarkComponentConfig = {
-  includeLandmarks: number[];
-};
+export interface NormalizedLandmarkComponentConfig extends FaceLandmarkComponentConfig {
+  IncludedLandmarkList?: number[];
+  IncludedBlendshapeList?: string[];
+}
 
 export function NormalizeConfig(config: FaceLandmarkComponentConfig): NormalizedLandmarkComponentConfig | null {
-  if (config.IncludeLandmarks) {
-    return {
-      includeLandmarks: config.IncludeLandmarks.split(',').map((str: string) => parseInt(str, 10)),
-    };
-  }
-
-  return null;
+  const blendshapes = config.IncludeBlendshapes || config.IncludeBlandshapes;
+  return {
+    ...config,
+    IncludedLandmarkList: config.IncludeLandmarks
+      ? config.IncludeLandmarks.split(',').map((str: string) => parseInt(str, 10))
+      : null,
+    // TODO: Deprecate Blandshapes
+    IncludedBlendshapeList: blendshapes ? blendshapes.split(',') : null,
+  };
 }
+
 export function ValidateConfig(config) {
   if (config.IncludeBlendshapes && config.IncludeLandmarks) {
     console.warn('Cannot include both Blendshapes and Landmarks. Ignoring IncludeBlendshapes');
     delete config.IncludeBlendshapes;
   }
+  return true;
 }
 
 export function transformDatapoint(
-  config: FaceLandmarkComponentConfig,
+  config: NormalizedLandmarkComponentConfig,
   dataPoint: FaceLandmarkerResult,
-  includeLandmarks: number[] | undefined,
 ): FaceLandmarkerResult {
   if (config.FaceTransformation && !dataPoint.hasOwnProperty('facialTransformationMatrixes')) {
     return null;
@@ -53,7 +57,7 @@ export function transformDatapoint(
     return null;
   }
   if (!config.Landmarks && dataPoint.hasOwnProperty('faceLandmarks')) {
-    delete dataPoint.faceBlendshapes;
+    delete dataPoint.faceLandmarks;
   }
 
   if (dataPoint.faceLandmarks) {
@@ -69,45 +73,67 @@ export function transformDatapoint(
     );
   }
 
-  if (config.IncludeBlandshapes || config.IncludeBlendshapes) {
-    const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
-      Object.fromEntries(faceBlendShape.categories.map((blendShape, index) => [blendShape.categoryName, index])),
-    );
+  let faceBlendshapes = null;
+  let faceLandmarks = null;
 
-    let indexRemapIndex = 0;
-    let faceLandmarks = [];
-    // TODO: Deprecate Blandshapes
-    const includeBlendshapes = (config.IncludeBlendshapes || config.IncludeBlandshapes).split(',');
-    dataPoint.faceBlendshapes = dataPoint.faceBlendshapes.map((faceBlendshape, faceIndex) => {
-      const blendShapeIndices = includeBlendshapes.map((blendShape) => blendShapeToIndex[faceIndex][blendShape]);
-      const categories = blendShapeIndices.map((index) => faceBlendshape.categories[index]);
-
-      Object.fromEntries(
-        categories.map((blendShape) => {
-          const oldIndex = blendShape.index;
-          faceLandmarks = faceLandmarks.concat(dataPoint.faceLandmarks[faceIndex][oldIndex]);
-          blendShape.index = indexRemapIndex;
-          return [oldIndex, indexRemapIndex++];
-        }),
+  if (config.Blendshapes) {
+    if (config.IncludedBlendshapeList && config.IncludedBlendshapeList.length > 0) {
+      const blendShapeToIndex = dataPoint.faceBlendshapes.map((faceBlendShape) =>
+        Object.fromEntries(faceBlendShape.categories.map((blendShape, index) => [blendShape.categoryName, index])),
       );
-      return {
-        ...faceBlendshape,
-        categories,
-      };
-    });
 
-    dataPoint.faceLandmarks = faceLandmarks;
+      faceBlendshapes = dataPoint.faceBlendshapes.map((faceBlendshape, faceIndex) => {
+        const blendShapeIndices = config.IncludedBlendshapeList.map(
+          (blendShape: string) => blendShapeToIndex[faceIndex][blendShape],
+        );
+        const categories = blendShapeIndices.map((index) => faceBlendshape.categories[index]);
+
+        return {
+          ...faceBlendshape,
+          categories,
+        };
+      });
+    } else {
+      faceBlendshapes = dataPoint.faceBlendshapes;
+    }
   }
 
-  if (config.IncludeLandmarks) {
-    let faceLandmarks = dataPoint.faceLandmarks.map((face) =>
-      includeLandmarks.map((faceLandmarkIndex: number) => ({
-        ...face[faceLandmarkIndex],
-        index: faceLandmarkIndex,
-      })),
-    );
-    dataPoint.faceLandmarks = faceLandmarks;
+  if (config.Landmarks) {
+    faceLandmarks = [];
+    let faceLandmarkFilter = [];
+
+    if (config.IncludedLandmarkList && config.IncludedLandmarkList.length > 0) {
+      faceLandmarkFilter = faceLandmarkFilter.concat(config.IncludedLandmarkList);
+    }
+
+    for (let faceIndex = 0; faceIndex < dataPoint.faceLandmarks.length; faceIndex++) {
+      let fullFaceLandmarkFilter = faceLandmarkFilter;
+      if (faceBlendshapes && faceBlendshapes[faceIndex]) {
+        fullFaceLandmarkFilter = faceLandmarkFilter.concat(
+          faceBlendshapes[faceIndex].categories.map((category) => category.index),
+        );
+      }
+
+      let faceLandmark: NormalizedLandmark[];
+      if (fullFaceLandmarkFilter.length > 0) {
+        fullFaceLandmarkFilter = [...new Set(fullFaceLandmarkFilter)].sort((a: number, b: number) => a - b);
+        const face = dataPoint.faceLandmarks[faceIndex];
+        faceLandmark = fullFaceLandmarkFilter.map((faceLandmarkIndex: number) => ({
+          ...face[faceLandmarkIndex],
+          index: faceLandmarkIndex,
+        }));
+      } else {
+        faceLandmark = dataPoint.faceLandmarks[faceIndex];
+      }
+
+      faceLandmarks.push(faceLandmark);
+    }
   }
 
-  return dataPoint;
+  const facialTransformationMatrixes = dataPoint.facialTransformationMatrixes;
+  return {
+    ...(faceLandmarks && { faceLandmarks }),
+    ...(faceBlendshapes && { faceBlendshapes }),
+    ...(facialTransformationMatrixes && { facialTransformationMatrixes }),
+  };
 }

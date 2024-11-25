@@ -11,11 +11,12 @@ import {
   ValidateConfig,
   NormalizeConfig,
   transformDatapoint,
+  NormalizedLandmarkComponentConfig,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 
 class DatapointAccumulator {
   public dataPoints: any[] = [];
-  public debouncer: number | null = null;
+  public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sessionGuid: string;
 
   constructor() {
@@ -55,8 +56,7 @@ class DatapointAccumulator {
 }
 
 class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
-  public config: FaceLandmarkComponentConfig;
-  public includeLandmarks?: number[];
+  public config: NormalizedLandmarkComponentConfig;
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'FaceLandmark', 'Instrument', method, data);
@@ -65,8 +65,7 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
   constructor(question: QuestionModel) {
     super(question, true);
 
-    this.config = question.Input as FaceLandmarkComponentConfig;
-    this.includeLandmarks = NormalizeConfig(question.Input as FaceLandmarkComponentConfig)?.includeLandmarks;
+    this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
     ValidateConfig(this.config);
 
     const datapointAccumulator = new DatapointAccumulator();
@@ -81,7 +80,7 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
       };
 
       demo(FaceLandmarker, FilesetResolver, DrawingUtils, options, (dataPoint: FaceLandmarkerResult) => {
-        const transformedDataPoint = transformDatapoint(this.config, dataPoint, this.includeLandmarks);
+        const transformedDataPoint = transformDatapoint(this.config, dataPoint);
 
         datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
       });
