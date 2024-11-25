@@ -33,7 +33,7 @@ export declare interface ElicitFaceLandmarkerResult {
 
 export class DatapointAccumulator {
   public dataPoints: ElicitFaceLandmarkerResult[] = [];
-  public debouncer: number | null = null;
+  public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sessionGuid: string;
 
   constructor() {
