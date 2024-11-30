@@ -6,7 +6,7 @@
 </div>
 <div class="video-wrapper">
 	<!-- ko if: SourceType === 'youtube' -->
-	<div class="VideoPlayer" id='player' data-bind="Element: YouTubePlayerElement"></div>
+	<div class="VideoPlayer" data-bind="Element: YouTubePlayerElement, attr: { id: PlayerElementId }"></div>
 	<!-- /ko -->
 	<!-- ko if: SourceType === 'html5' -->
 	<video class="VideoPlayer" crossOrigin="anonymous" controls preload="auto" data-bind="Element: PlayerElement, foreach: Sources">

@@ -26,7 +26,7 @@ class Video {
   public PlayTimestamp: ko.Computed<number>;
   public IsOptional: boolean;
   public SourceType: string;
-  public PlayerElementId: string;
+  public PlayerElementId: ko.Observable<string>;
 
   private _info: MediaInfo;
   private static _activePlayer: Video = null;
@@ -38,7 +38,7 @@ class Video {
     this.IsPlaying = this._info.IsPlaying;
     this.IsPlayed = this._info.IsPlayed;
 
-    this.PlayerElementId = `player${Video._playerCounter}`;
+    this.PlayerElementId = knockout.observable<string>(`player${Video._playerCounter}`);
     Video._playerCounter++;
 
     this.Sources = this._info.Sources;
@@ -169,10 +169,16 @@ class Video {
   private CreateYouTubePlayer() {
     // TODO: safer url to id mappings?
     const source = this.Sources[0];
-    const videoId = source.Source.replace('https://youtu.be', '');
+    const videoId = source.Source.replace('https://youtu.be/', '');
 
     let height: string | number = '100%'; //window.innerHeight * 0.65;
     let width: string | number = '100%'; //window.innerWidth * 0.80;
+
+    // console.log(
+    //   `Creating YouTube player for ${videoId} ${this.PlayerElementId()} ${source.Width}x${source.Height} ${
+    //     this.IsPausable
+    //   } ${this.IsReplayable} ${this.MaxReplayCount} ${this.IsOptional}`,
+    // );
 
     const playerStateName: { [index: string]: string } = {};
     // @ts-ignore
@@ -188,7 +194,7 @@ class Video {
       height = parseInt(source.Height);
     }
 
-    this._youTubePlayer = new YT.Player('player', {
+    this._youTubePlayer = new YT.Player(this.PlayerElementId(), {
       height,
       width,
       videoId: videoId,
@@ -211,7 +217,7 @@ class Video {
 
     // 4. The API will call this function when the video player is ready.
     function onPlayerReady(event: any) {
-      const player = document.getElementById('player');
+      const player = document.getElementById(self.PlayerElementId());
       const playerBBox = player.getBoundingClientRect();
       self._info.IsLayedOut(playerBBox);
     }
