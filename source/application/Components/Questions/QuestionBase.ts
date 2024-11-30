@@ -9,6 +9,9 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
   protected Model: QuestionModel;
   protected HasAnswer: ko.Computed<boolean>;
   private _events: IQuestionEvent[];
+  public StimulusCssClass = 'col-12';
+  public InstrumentCssClass = 'col-12';
+  public IsColumnLayout = false;
 
   constructor(question: QuestionModel, requiresInput = true) {
     super();
@@ -21,11 +24,24 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     const answer = this.Model.Answer();
     this._events = answer != null && answer.Events ? answer.Events : [];
 
+    this.configureLayout();
+
     setTimeout(() => {
       console.log(this.constructor.name + ' -> LOADED');
       this.UpdateIsAnswerValid();
       this.Model.Loaded();
     }, 0); //Give descendant time to override HasValidAnswer
+  }
+
+  private configureLayout() {
+    this.IsColumnLayout = this.Model.Layout?.Type === 'column';
+
+    if (this.IsColumnLayout) {
+      const stimulusCols = Math.ceil((this.Model.Layout.ColumnWidthPercent[0] * 12) / 100);
+      const instrumentCols = 12 - stimulusCols;
+      this.StimulusCssClass = `col-${stimulusCols}`;
+      this.InstrumentCssClass = `col-${instrumentCols}`;
+    }
   }
 
   protected UpdateIsAnswerValid(answer?: T): void {
