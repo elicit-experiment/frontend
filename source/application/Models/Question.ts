@@ -3,6 +3,11 @@ import { IOutput, IQuestion } from 'Managers/Portal/Cockpit';
 import { Get as QuestionMapGet } from 'Components/Questions/QuestionMap';
 import SlideStep from './SlideStep';
 
+type QuestionLayout = {
+  Type: 'row' | 'column';
+  ColumnWidthPercent: [number, number] | null;
+};
+
 class Question {
   public Id: string;
   public Type: string;
@@ -10,6 +15,7 @@ class Question {
   public HasUIElement: boolean;
   public Input: any[];
   public Component: any[];
+  public Layout: QuestionLayout;
   public Answer: ko.Observable<IOutput> = knockout.observable<IOutput>();
   public HasValidAnswer: ko.Observable<boolean> = knockout.observable(false);
   public SlideStep: ko.Observable<SlideStep>;
@@ -69,6 +75,20 @@ class Question {
           });
           questionMap = QuestionMapGet(type);
         }
+
+        let layout = component.Layout as QuestionLayout;
+        if (layout == null) {
+          // Old style layout definition lives on the instrument
+          const instrument = component.Instruments[0].Instrument;
+          const layoutType = instrument[Object.keys(instrument)[0]].Layout || 'row';
+
+          layout = { Type: layoutType, ColumnWidthPercent: null };
+          if (layoutType === 'column') {
+            const columnWidthPercent = instrument[Object.keys(instrument)[0]].ColumnWidthPercent;
+            layout.ColumnWidthPercent = [100 - columnWidthPercent, columnWidthPercent];
+          }
+        }
+        this.Layout = layout;
       }
       //console.dir(input);
       //console.dir(questionMap);

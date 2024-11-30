@@ -4,14 +4,10 @@ import QuestionsBase from 'Components/Questions/QuestionBase';
 
 abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public IsStimuliBlockVisible = true;
-  public StimulusCssClass = 'col-12';
-  public InstrumentCssClass = 'col-12';
 
   private _questionsPerRow = 4;
 
   protected _alignForStimuli = true;
-  protected _layout = 'row';
-  protected _columnWidthPercent = 100.0;
 
   public MediaLabel: string;
   public MediaInfo: MediaInfo = null;
@@ -20,7 +16,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public HeaderLabel: string;
   public HasMedia = false;
   public CanAnswer: ko.Observable<boolean> | ko.Computed<boolean>;
-  public IsColumnLayout = false;
+
   public QuestionsPerRow() {
     return this._questionsPerRow;
   }
@@ -34,16 +30,10 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     const alignForStimuli = this.GetInstrument('AlignForStimuli');
     this._alignForStimuli = !(alignForStimuli === undefined || alignForStimuli === '0');
 
-    const layout = this.GetInstrument('Layout');
-    this._layout = layout === 'row' ? 'row' : 'column';
-
-    this.IsColumnLayout = this._layout !== 'row';
+    this.IsColumnLayout = this.Model.Layout.Type === 'column';
 
     const questionsPerRow = this.GetInstrument('QuestionsPerRow');
     this._questionsPerRow = questionsPerRow === undefined ? 4 : questionsPerRow;
-
-    const columnWidthPercent = this.GetInstrument('ColumnWidthPercent') || '30';
-    this._columnWidthPercent = parseInt(columnWidthPercent || '100', 10);
 
     const stimulus = this.GetInstrument('Stimulus');
     if (stimulus != null) {
@@ -55,13 +45,6 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     }
 
     this.IsStimuliBlockVisible = this._alignForStimuli || this.HasMedia;
-
-    if (this.IsColumnLayout && this.IsStimuliBlockVisible) {
-      const instrumentCols = Math.ceil((this._columnWidthPercent * 12) / 100);
-      const stimulusCols = 12 - instrumentCols;
-      this.StimulusCssClass = `col-${stimulusCols}`;
-      this.InstrumentCssClass = `col-${instrumentCols}`;
-    }
 
     // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
 

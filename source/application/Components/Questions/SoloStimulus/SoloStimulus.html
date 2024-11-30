@@ -1,35 +1,15 @@
 <div class="container-fluid SoloStimulus">
 	<div class="row">
-		<div class="col-1">
-			<div class='video-calibration-point' data-bind="click: Calibrate"></div>
-		</div>
-		<div class="col-10">
-			<h3 class='calibration-instructions'>Click the red dots while looking at them to turn them green!	</h3>
-		</div>
-		<div class="col-1">
-			<div class='video-calibration-point' data-bind="click: Calibrate"></div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-1">
-		</div>
-		<div class="col-10">
+		<div data-bind="css: StimulusCssClass">
 			<!-- ko if: HasMedia -->
 			<h3 data-bind="html: MediaLabel"></h3>
-			<div class="SoloStimulusContainer" data-bind="component: {name: MediaComponentName, params: MediaInfo}"></div>
+			<div class="SoloStimulusContainer" data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
 			<!-- /ko -->
 		</div>
-		<div class="col-1">
+		<!-- ko if: IsColumnLayout -->
+		<div data-bind="css: InstrumentCssClass">
+
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-1">
-			<div class='video-calibration-point' data-bind="click: Calibrate"></div>
-		</div>
-		<div class="col-10">
-		</div>
-		<div class="col-1">
-			<div class='video-calibration-point' data-bind="click: Calibrate"></div>
-		</div>
+		<!-- /ko -->
 	</div>
 </div>
