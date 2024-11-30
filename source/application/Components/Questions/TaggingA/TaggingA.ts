@@ -2,8 +2,12 @@
 import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
 import QuestionModel from 'Models/Question';
 
-type PredefinedTag = { Label: string; Id: string; Position: number };
-type TagData = { Id: string; Label: string };
+enum TagKind {
+  User = 'user',
+  Common = 'common',
+}
+type PredefinedTag = { Label: string; Id: string; Position: number; Kind: TagKind };
+type TagData = { Id: string; Label: string; Kind: TagKind };
 type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
 export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
@@ -30,15 +34,19 @@ export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
     this.InputPlaceholder = this.GetInstrument('TextField');
     this.AnswerIsRequired = this.GetInstrument('MinNoOfScalings') !== '0';
 
+    const selectionTags = this.GetInstrument('SelectionTags').Item.map((tag: PredefinedTag) => ({
+      ...tag,
+      Kind: TagKind.Common,
+    }));
+    const userTags = this.GetInstrument('UserTags').Item.map((tag: PredefinedTag) => ({
+      ...tag,
+      Kind: TagKind.User,
+    }));
     this.SelectionItems.push(
-      ...this.CreateTags(
-        this.GetInstrument('SelectionTags').Item.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position),
-      ),
+      ...this.CreateTags(selectionTags.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position)),
     );
     this.UserItems.push(
-      ...this.CreateTags(
-        this.GetInstrument('UserTags').Item.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position),
-      ),
+      ...this.CreateTags(userTags.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position)),
     );
 
     this.HasSelectionItems = this.PureComputed(() => this.SelectionItems().some((t) => !t.IsAdded()));
@@ -57,7 +65,9 @@ export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
 
     for (const tag of answer.Tags) {
       if (tag.Id == null || tag.Id == '') {
-        this.AddedItems.push(this.CreateTag({ Id: null, Label: tag.Label, Position: null }, true));
+        this.AddedItems.push(
+          this.CreateTag({ Id: null, Label: tag.Label, Position: null, Kind: TagKind.Common }, true),
+        );
       } else {
         const existingTag = this.GetTagById(tag.Id);
 
@@ -113,7 +123,7 @@ export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   protected AddTagByLabel(label: string): boolean {
     let tag = this.GetTagByLabel(label);
 
-    if (tag == null) tag = this.CreateTag({ Id: null, Label: label, Position: null }, true);
+    if (tag == null) tag = this.CreateTag({ Id: null, Label: label, Position: null, Kind: TagKind.User }, true);
 
     return this.AddTag(tag);
   }
@@ -146,7 +156,7 @@ export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
 
   private CreateTag(data: PredefinedTag, isAdded = false): Tag {
     const tag: Tag = {
-      Data: { Id: data.Id, Label: data.Label },
+      Data: { Id: data.Id, Label: data.Label, Kind: data.Kind },
       Toggle: null,
       IsAdded: knockout.observable(isAdded),
     };
@@ -162,7 +172,9 @@ export class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagData[] }> {
   }
 
   private UpdateAnswer(): void {
-    this.SetAnswer({ Tags: this.AddedItems().map((t) => ({ Id: t.Data.Id, Label: t.Data.Label })) });
+    this.SetAnswer({
+      Tags: this.AddedItems().map((t) => ({ Id: t.Data.Id, Label: t.Data.Label, Kind: t.Data.Kind })),
+    });
   }
 
   protected HasValidAnswer(answer: any): boolean {

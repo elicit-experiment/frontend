@@ -7,7 +7,7 @@
 				</form>
 				<ul data-bind="foreach: AddedItems, visible: HasAddedItems" class="TagList">
 					<li data-bind="click: Toggle">
-						<span class="badge" data-bind="text: Data.Label"></span>
+						<span class="badge" data-bind="text: Data.Label, class: Data.Kind"></span>
 					</li>
 				</ul>
 			</div>
@@ -16,7 +16,7 @@
 					<p data-bind="html: SelectionTagsLabel"></p>
 					<ul data-bind="foreach: SelectionItems">
 						<li data-bind="click: Toggle, visible: !IsAdded()">
-							<span class="badge" data-bind="text: Data.Label"></span>
+							<span class="badge" data-bind="text: Data.Label, class: Data.Kind"></span>
 						</li>
 					</ul>
 				</div>
@@ -24,7 +24,7 @@
 					<p data-bind="html: UserTagsLabel"></p>
 					<ul data-bind="foreach: UserItems">
 						<li data-bind="click: Toggle, visible: !IsAdded()">
-							<span class="badge" data-bind="text: Data.Label"></span>
+							<span class="badge" data-bind="text: Data.Label, class: Data.Kind"></span>
 						</li>
 					</ul>
 				</div>
