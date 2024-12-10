@@ -19,8 +19,12 @@ export interface NormalizedLandmarkComponentConfig extends FaceLandmarkComponent
 
 export function NormalizeConfig(config: FaceLandmarkComponentConfig): NormalizedLandmarkComponentConfig | null {
   const blendshapes = config.IncludeBlendshapes || config.IncludeBlandshapes;
+  const Blendshapes = config.Blendshapes || blendshapes != null;
+  const Landmarks = config.Landmarks || config.IncludeLandmarks != null;
   return {
     ...config,
+    Blendshapes,
+    Landmarks,
     IncludedLandmarkList: config.IncludeLandmarks
       ? config.IncludeLandmarks.split(',').map((str: string) => parseInt(str, 10))
       : null,

@@ -14,6 +14,35 @@ import {
   transformDatapoint,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 
+// TODO: generalize this so that all Inputs have the correct type.
+export interface CalibrationInput {
+  Instruments: InstrumentElement[];
+}
+export interface InstrumentElement {
+  Instrument: InstrumentInstrument;
+}
+
+export interface InstrumentInstrument {
+  FaceLandmarkCalibration?: FaceLandmarkCalibrationInstrument;
+  Monitor?: MonitorInstrument;
+}
+
+export interface FaceLandmarkCalibrationInstrument {
+  NumberOfFaces: number;
+  Landmarks: boolean;
+  Blendshapes: boolean;
+  FaceTransformation: boolean;
+  CalibrationDuration: number;
+  StripZCoordinates: boolean;
+  IncludeBlendshapes: string;
+  IncludeLandmarks: string;
+}
+
+export interface MonitorInstrument {
+  MouseTracking?: boolean;
+  KeyboardTracking?: boolean;
+}
+
 const FLOAT_MAX_VALUE = 3.40282347e38; // largest positive number in float32
 
 const CLICKS_NEEDED = 5;
@@ -115,8 +144,20 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     super(question, true);
     this.Id = this.Model.Id;
 
-    this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
+    if ('TrialType' in question.Input) {
+      this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
+    } else {
+      const input: CalibrationInput = question.Input as unknown as CalibrationInput;
+      const instrumentConfiguration = input.Instruments.find(
+        (instrument) => instrument.Instrument.FaceLandmarkCalibration,
+      );
+      this.config = NormalizeConfig(
+        instrumentConfiguration.Instrument.FaceLandmarkCalibration as FaceLandmarkComponentConfig,
+      );
+    }
+
     ValidateConfig(this.config);
+    console.dir(this.config);
 
     this.datapointAccumulator = new DatapointAccumulator();
 

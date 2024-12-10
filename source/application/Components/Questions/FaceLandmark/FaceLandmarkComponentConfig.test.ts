@@ -38,6 +38,8 @@ describe('transformDatapoint', () => {
     const result = transformDatapoint(config, createResult());
     expect(result.faceBlendshapes).toBeUndefined();
     expect(result.faceLandmarks).toBeDefined();
+    expect(result.faceLandmarks.length).toBe(1);
+    expect(result.faceLandmarks[0].length).toBe(createResult().faceLandmarks[0].length);
   });
 
   test('Does not include Landmarks if not specified', () => {

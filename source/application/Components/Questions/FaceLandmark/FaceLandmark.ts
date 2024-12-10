@@ -67,6 +67,7 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
     ValidateConfig(this.config);
+    console.dir(this.config);
 
     const datapointAccumulator = new DatapointAccumulator();
 
