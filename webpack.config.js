@@ -180,7 +180,7 @@ module.exports = function (env) {
           directory: path.resolve(__dirname, './source/'),
           publicPath: '/',
         },
-        compress: true,
+        compress: process.env.NODE_ENV === 'production',
         port: 5504,
         // historyApiFallback: {
         //   index: 'default.html',
