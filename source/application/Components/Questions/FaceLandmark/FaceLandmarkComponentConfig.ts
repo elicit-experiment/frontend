@@ -108,29 +108,31 @@ export function transformDatapoint(
 
     if (config.IncludedLandmarkList && config.IncludedLandmarkList.length > 0) {
       faceLandmarkFilter = faceLandmarkFilter.concat(config.IncludedLandmarkList);
-    }
 
-    for (let faceIndex = 0; faceIndex < dataPoint.faceLandmarks.length; faceIndex++) {
-      let fullFaceLandmarkFilter = faceLandmarkFilter;
-      if (faceBlendshapes && faceBlendshapes[faceIndex]) {
-        fullFaceLandmarkFilter = faceLandmarkFilter.concat(
-          faceBlendshapes[faceIndex].categories.map((category) => category.index),
-        );
+      for (let faceIndex = 0; faceIndex < dataPoint.faceLandmarks.length; faceIndex++) {
+        let fullFaceLandmarkFilter = faceLandmarkFilter;
+        if (faceBlendshapes && faceBlendshapes[faceIndex]) {
+          fullFaceLandmarkFilter = faceLandmarkFilter.concat(
+            faceBlendshapes[faceIndex].categories.map((category) => category.index),
+          );
+        }
+
+        let faceLandmark: NormalizedLandmark[];
+        if (fullFaceLandmarkFilter.length > 0) {
+          fullFaceLandmarkFilter = [...new Set(fullFaceLandmarkFilter)].sort((a: number, b: number) => a - b);
+          const face = dataPoint.faceLandmarks[faceIndex];
+          faceLandmark = fullFaceLandmarkFilter.map((faceLandmarkIndex: number) => ({
+            ...face[faceLandmarkIndex],
+            index: faceLandmarkIndex,
+          }));
+        } else {
+          faceLandmark = dataPoint.faceLandmarks[faceIndex];
+        }
+
+        faceLandmarks.push(faceLandmark);
       }
-
-      let faceLandmark: NormalizedLandmark[];
-      if (fullFaceLandmarkFilter.length > 0) {
-        fullFaceLandmarkFilter = [...new Set(fullFaceLandmarkFilter)].sort((a: number, b: number) => a - b);
-        const face = dataPoint.faceLandmarks[faceIndex];
-        faceLandmark = fullFaceLandmarkFilter.map((faceLandmarkIndex: number) => ({
-          ...face[faceLandmarkIndex],
-          index: faceLandmarkIndex,
-        }));
-      } else {
-        faceLandmark = dataPoint.faceLandmarks[faceIndex];
-      }
-
-      faceLandmarks.push(faceLandmark);
+    } else {
+      faceLandmarks = dataPoint.faceLandmarks;
     }
   }
 

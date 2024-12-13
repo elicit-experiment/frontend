@@ -74,6 +74,24 @@ describe('transformDatapoint', () => {
     ]);
   });
 
+  test('Includes specified all landmarks', () => {
+    const config = NormalizeConfig({
+      NumberOfFaces: 2,
+      Landmarks: true,
+      Blendshapes: true,
+      FaceTransformation: true,
+      CalibrationDuration: 5,
+      StripZCoordinates: true,
+      IncludeLandmarks: '',
+      IncludeBlendshapes: '',
+    });
+    expect(ValidateConfig(config)).toBe(true);
+    const result = transformDatapoint(config, createResult());
+    expect(result.faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as any).index)).toEqual(
+      createResult().faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as any).index),
+    );
+  });
+
   test('Includes all blendshape landmarks if all blendshapes are selected', () => {
     const config = NormalizeConfig({
       NumberOfFaces: 2,
