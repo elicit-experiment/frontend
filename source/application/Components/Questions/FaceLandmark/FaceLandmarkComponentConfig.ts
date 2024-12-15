@@ -17,6 +17,10 @@ export interface NormalizedLandmarkComponentConfig extends FaceLandmarkComponent
   IncludedBlendshapeList?: string[];
 }
 
+export interface IndexedNormalizedLandmark extends NormalizedLandmark {
+  index: number;
+}
+
 export function NormalizeConfig(config: FaceLandmarkComponentConfig): NormalizedLandmarkComponentConfig | null {
   const blendshapes = config.IncludeBlendshapes || config.IncludeBlandshapes;
   const Blendshapes = config.Blendshapes || blendshapes != null;
@@ -132,7 +136,9 @@ export function transformDatapoint(
         faceLandmarks.push(faceLandmark);
       }
     } else {
-      faceLandmarks = dataPoint.faceLandmarks;
+      faceLandmarks = dataPoint.faceLandmarks.map((faceLandmark) => {
+        return faceLandmark.map((landmark, faceLandmarkIndex: number) => ({ ...landmark, index: faceLandmarkIndex }));
+      });
     }
   }
 

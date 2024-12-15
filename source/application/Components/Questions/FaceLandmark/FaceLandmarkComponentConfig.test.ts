@@ -1,5 +1,6 @@
 import {
   FaceLandmarkComponentConfig,
+  IndexedNormalizedLandmark,
   NormalizeConfig,
   transformDatapoint,
   ValidateConfig,
@@ -87,9 +88,15 @@ describe('transformDatapoint', () => {
     });
     expect(ValidateConfig(config)).toBe(true);
     const result = transformDatapoint(config, createResult());
-    expect(result.faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as any).index)).toEqual(
-      createResult().faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as any).index),
+    expect(result.faceLandmarks[0].map((landmark: NormalizedLandmark) => landmark.x)).toEqual(
+      createResult().faceLandmarks[0].map((landmark: NormalizedLandmark) => landmark.x),
     );
+    expect(result.faceLandmarks[0].map((landmark: NormalizedLandmark) => landmark.y)).toEqual(
+      createResult().faceLandmarks[0].map((landmark: NormalizedLandmark) => landmark.y),
+    );
+    expect(
+      result.faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as IndexedNormalizedLandmark).index),
+    ).toEqual([...Array(result.faceLandmarks[0].length).keys()]);
   });
 
   test('Includes all blendshape landmarks if all blendshapes are selected', () => {
