@@ -8,6 +8,8 @@ type QuestionLayout = {
   ColumnWidthPercent: [number, number] | null;
 };
 
+const DEFAULT_LAYOUT: QuestionLayout = { Type: 'row', ColumnWidthPercent: null };
+
 class Question {
   public Id: string;
   public Type: string;
@@ -77,7 +79,7 @@ class Question {
         }
 
         let layout = component.Layout as QuestionLayout;
-        if (layout == null) {
+        if (layout == null && numInstruments > 0) {
           // Old style layout definition lives on the instrument
           const instrument = component.Instruments[0].Instrument;
           const layoutType = instrument[Object.keys(instrument)[0]].Layout || 'row';
@@ -88,7 +90,7 @@ class Question {
             layout.ColumnWidthPercent = [100 - columnWidthPercent, columnWidthPercent];
           }
         }
-        this.Layout = layout;
+        this.Layout = layout || DEFAULT_LAYOUT;
       }
       //console.dir(input);
       //console.dir(questionMap);
