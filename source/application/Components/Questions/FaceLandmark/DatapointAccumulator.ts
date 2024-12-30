@@ -1,4 +1,4 @@
-import { postTimeSeriesAsJson } from 'Utility/TimeSeries';
+import { postTimeSeriesAsJson, postTimeSeriesRawAsJson } from 'Utility/TimeSeries';
 import PortalClient from 'PortalClient';
 import { Classifications, NormalizedLandmark } from '@mediapipe/tasks-vision';
 
@@ -55,14 +55,7 @@ export class DatapointAccumulator {
     this.dataPoints = [];
     this.debouncer = null;
 
-    postTimeSeriesAsJson(
-      {
-        sessionGUID: this.sessionGuid,
-        seriesType: 'face_landmark',
-        data: sendDataPoints,
-      },
-      'face_landmark',
-    )
+    postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, sendDataPoints)
       .then(() => 1)
       .catch((err) => console.error(err));
 
