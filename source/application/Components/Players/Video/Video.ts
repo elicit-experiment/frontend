@@ -29,9 +29,12 @@ class Video {
   public PlayerElementId: ko.Observable<string>;
 
   private _info: MediaInfo;
+  private _youTubePlayer: YT.Player;
+
   private static _activePlayer: Video = null;
   private static _playerCounter = 0;
-  private _youTubePlayer: YT.Player;
+  private static _isYouTubeLoaded = false;
+  private static _youTubeInitList: Array<CallableFunction> = [];
 
   constructor(info: MediaInfo) {
     this._info = info;
@@ -53,7 +56,7 @@ class Video {
       this.InitializeHTML5VideoPlayer(e);
     });
 
-    const sub2 = this.YouTubePlayerElement.subscribe((e) => {
+    const sub2 = this.YouTubePlayerElement.subscribe((_e) => {
       sub2.dispose();
       const callback = this.CreateYouTubePlayer.bind(this);
       Video.OnYouTubeInit(callback);
@@ -74,12 +77,9 @@ class Video {
     });
   }
 
-  private static _isYouTubeLoaded = false;
-  private static _youTubeInitList: Array<CallableFunction> = [];
-
   private static OnYouTubeInit(cb: CallableFunction): void {
     if (Video._isYouTubeLoaded) {
-      cb();
+      window.setTimeout(cb, 100);
       return;
     }
 
@@ -194,10 +194,10 @@ class Video {
       height = parseInt(source.Height);
     }
 
-    this._youTubePlayer = new YT.Player(this.PlayerElementId(), {
+    const youTubePlayerConfig = {
       height,
       width,
-      videoId: videoId,
+      videoId,
       playerVars: {
         autoplay: 0,
         controls: 0,
@@ -211,7 +211,9 @@ class Video {
         onReady: onPlayerReady,
         onStateChange: onPlayerStateChange,
       },
-    });
+    };
+    // console.dir(youTubePlayerConfig);
+    this._youTubePlayer = new YT.Player(this.PlayerElementId(), youTubePlayerConfig);
 
     const self = this;
 
