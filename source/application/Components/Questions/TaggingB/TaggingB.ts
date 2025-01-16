@@ -1,11 +1,7 @@
 ﻿import * as knockout from 'knockout';
-import { TaggingBase } from 'Components/Questions/TaggingA/TaggingA';
+import TaggingBase from 'Components/Questions/Base/TaggingBase';
 import Taggle from 'taggle';
 import QuestionModel from 'Models/Question';
-
-type PredefinedTag = { Label: string; Id: string; Position: number };
-type TagData = { Id: string; Label: string };
-type Tag = { Data: TagData; IsAdded: ko.Observable<boolean>; Toggle: () => void };
 
 class TaggingB extends TaggingBase {
   public TagBoxElement = knockout.observable<HTMLElement>();
