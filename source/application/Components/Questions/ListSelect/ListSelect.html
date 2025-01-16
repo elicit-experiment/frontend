@@ -1,0 +1,32 @@
+﻿<script type="text/html" id="ListSelect">
+	<div class="ListSelect">
+		<!-- ko if: !UserInputBoxInside -->
+		<form data-bind="submit: AddText">
+			<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
+		</form>
+		<!-- /ko -->
+
+		<div class="TagContainer row container-fluid">
+			<p data-bind="html: SelectionTagsLabel"></p>
+			<ul class="TagList">
+				<!-- ko foreach: SelectionItems -->
+				<li data-bind="click: Toggle, visible: !IsAdded()">
+					<span class="badge" data-bind="text: Data.Label, class: Data.Kind"></span>
+				</li>
+				<!-- /ko -->
+				<!-- ko if: UserInputBoxInside -->
+				<li>
+					<form data-bind="submit: AddText" class="col-12">
+						<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
+					</form>
+				</li>
+				<!-- /ko -->
+			</ul>
+		</div>
+	</div>
+	</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+
+

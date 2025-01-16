@@ -27,6 +27,7 @@ function Initialize() {
     TextBlock: new QuestionMap('Questions/TextBlock'),
     LikertScale: new QuestionMap('Questions/LikertScale'),
     KacPS: new QuestionMap('Questions/KAcPS'),
+    ListSelect: new QuestionMap('Questions/ListSelect'),
     TaggingA: new QuestionMap('Questions/TaggingA'),
     TaggingB: new QuestionMap('Questions/TaggingB'),
     AudioInformationRetrieval: new QuestionMap('Questions/AudioInformationRetrieval'),

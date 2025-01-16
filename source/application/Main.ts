@@ -41,6 +41,7 @@ import OneDScale from 'Components/Questions/OneDScale/OneDScale';
 import LikertScale from 'Components/Questions/LikertScale/LikertScale';
 import OneDScaleT from 'Components/Questions/OneDScaleT/OneDScaleT';
 import SoloStimulus from 'Components/Questions/SoloStimulus/SoloStimulus';
+import ListSelect from 'Components/Questions/ListSelect/ListSelect';
 import TaggingA from 'Components/Questions/TaggingA/TaggingA';
 import TaggingB from 'Components/Questions/TaggingB/TaggingB';
 import TextBlock from 'Components/Questions/TextBlock/TextBlock';
@@ -90,6 +91,7 @@ knockout.applyBindings({
     LikertScale,
     Monitor,
     SoloStimulus,
+    ListSelect,
     TaggingA,
     TaggingB,
     TextBlock,
