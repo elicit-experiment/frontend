@@ -124,14 +124,20 @@ class Default {
     //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer for ${this.Questions.length} questions`);
 
     for (let i = 0; i < this.Questions.length; i++) {
-      //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${this.Questions[i].RequiresInput} Has Valid Answer ${this.Questions[i].HasValidAnswer()}`);
+      // console.log(
+      //   `Default.ts: GetFirstQuestionWithoutValidAnswer ${i}: RequiresInput ${
+      //     this.Questions[i].RequiresInput
+      //   } Has Valid Answer ${this.Questions[i].HasValidAnswer()} All required media played: ${this.Questions[
+      //     i
+      //   ].AllRequiredMediaHavePlayed()}`,
+      // );
+
       // This is Question.ts:HasValidAnswer(). NOT the HasValidAnswer of the question models
       if (
         this.Questions[i].RequiresInput &&
-        !this.Questions[i].HasValidAnswer() &&
-        !this.Questions[i].AllRequiredMediaHavePlayed()
+        (!this.Questions[i].HasValidAnswer() || !this.Questions[i].AllRequiredMediaHavePlayed())
       ) {
-        //console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
+        // console.log(`Default.ts: GetFirstQuestionWithoutValidAnswer Question ${i} is invalid`);
         return this.Questions[i];
       }
     }
@@ -144,7 +150,9 @@ class Default {
 
     const allAnswered = !firstQuestionWithInvalidAnswer && !this.HaveActiveAnswersSets();
 
-    // console.log(`Default.ts: CheckIfAllQuestionsAreAnswered loading questions? ${this._loadingQuestions()} ${firstQuestionWithInvalidAnswer} ${this.HaveActiveAnswersSets()} => ${allAnswered}`);
+    // console.log(
+    //   `Default.ts: CheckIfAllQuestionsAreAnswered loading questions? loading: ${this._loadingQuestions()} first invalid answer: ${firstQuestionWithInvalidAnswer} active answer sets: ${this.HaveActiveAnswersSets()} => all answered ${allAnswered}`,
+    // );
 
     if (this._loadingQuestions()) return this._slide.CanGoToNextSlide(false);
 

@@ -21,8 +21,8 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     return this._questionsPerRow;
   }
 
-  constructor(question: QuestionModel) {
-    super(question);
+  constructor(question: QuestionModel, requiresInput = true) {
+    super(question, requiresInput);
 
     this.Id = this.Model.Id;
     this.HeaderLabel = this.GetInstrumentFormatted('HeaderLabel');

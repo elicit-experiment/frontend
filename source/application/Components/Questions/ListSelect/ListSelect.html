@@ -1,0 +1,53 @@
+﻿<script type="text/html" id="ListSelect">
+	<div class="ListSelect">
+		<!-- ko if: UserInputBoxOutside -->
+		<form data-bind="submit: AddText">
+			<input class="form-control" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
+		</form>
+		<!-- /ko -->
+
+		<div class="TagContainer row container-fluid">
+			<p data-bind="html: SelectionTagsLabel"></p>
+			<ul class="TagList">
+				<!-- ko foreach: PredefinedItems -->
+				<li data-bind="click: Toggle, visible: !IsAdded(), class: CssClass()">
+					<span class="badge" data-bind="text: Data.Label"></span>
+				</li>
+				<!-- /ko -->
+				<!-- ko foreach: AddedItems -->
+				<li data-bind="click: Toggle, visible: $parent.HasAddedItems, class: CssClass()" class="Tag">
+					<span class="badge" data-bind="text: Data.Label"></span>
+					<button data-bind="click: Remove">
+						<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+						<svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#323232" stroke-width="2"/>
+							<path d="M9 9L15 15" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M15 9L9 15" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</button>
+				</li>
+				<!-- /ko -->
+				<!-- ko if: UserInputBoxInside -->
+				<li class="AddTagFormContainer">
+					<form data-bind="submit: AddText" class="col-12 AddTagForm">
+						<input class="AddTagInput" type="text" data-bind="textInput: TextInput, attr: {placeholder: InputPlaceholder}" />
+					</form>
+					<div class="InputError" data-bind="visible: HasTagInputError()">
+						<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" width="28px" height="100%"
+							 viewBox="0 0 10.0 10.0" overflow="visible" enable-background="new 0 0 10.0 10.0" xml:space="preserve">
+							<polygon points="10,10 0,5 10,0 "/>
+						</svg>
+						<span data-bind="text: TagInputErrorText"></span>
+					</div>
+
+				</li>
+				<!-- /ko -->
+			</>
+		</div>
+	</div>
+	</div>
+</script>
+
+<div data-bind="template: {name: 'StimulusInstrumentLayout'}"></div>
+
+
