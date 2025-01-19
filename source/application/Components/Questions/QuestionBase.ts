@@ -162,6 +162,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     entityType = 'Unknown',
     method = 'None',
     data = 'None',
+    triggerAnswerUpdate = true,
   ): void {
     const event = {
       Id: id === null ? 'None' : id,
@@ -173,6 +174,8 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     };
 
     this._events.push(event);
+
+    if (!triggerAnswerUpdate) return;
 
     this.TriggerAnswerUpdate();
   }
