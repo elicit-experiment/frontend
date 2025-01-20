@@ -8,7 +8,10 @@
 
 	.TagContainer {
 		overflow-y: hidden; /* Important for smooth transitions */
-
+		display: flex;
+		flex-direction: column;
+		align-content: center
+	;
 		> .TagList {
 			width: auto;
 			max-width: none;
@@ -18,17 +21,19 @@
 
 			list-style: none;
 			padding: 0;
-			margin: 0;
+			margin: 0 auto;
 			transition: transform 0.3s ease-in-out; /* Smooth vertical transition */
 
 			position: relative;
 			li {
 				.badge {
+					--bs-badge-color: var(--bs-black);
 					width: 100%;
-
+					background-color: transparent;
+					color: inherit;
 				}
 				&.selected > .badge {
-					background-color: aquamarine;
+					background-color: rgba(var(--bs-link-hover-color-rgb), 0.2);
 				}
 			}
 		}

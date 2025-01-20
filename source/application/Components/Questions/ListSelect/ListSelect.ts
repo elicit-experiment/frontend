@@ -58,6 +58,7 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
   public HasPredefinedItems: ko.Computed<boolean>;
   public HasAddedItems: ko.Computed<boolean>;
   public HasTagInputError: ko.Computed<boolean>;
+  public HasSelectionTagsLabel: ko.Computed<boolean>;
 
   private _clearErrorTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private _clearErrorTimeout = 5000;
@@ -86,6 +87,9 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     this.HasPredefinedItems = this.PureComputed(() => this.PredefinedItems().some((t) => !t.IsAdded()));
     this.HasAddedItems = this.PureComputed(() => this.AddedItems().length != 0);
     this.HasTagInputError = this.PureComputed(() => this.TagInputErrorText() && this.TagInputErrorText() !== '');
+    this.HasSelectionTagsLabel = this.PureComputed(
+      () => this.SelectionTagsLabel != null && this.SelectionTagsLabel !== '',
+    );
 
     this.InitializeAnswer();
   }

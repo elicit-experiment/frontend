@@ -7,7 +7,9 @@
 		<!-- /ko -->
 
 		<div class="TagContainer row container-fluid">
+			<!-- ko if: HasSelectionTagsLabel -->
 			<p data-bind="html: SelectionTagsLabel"></p>
+			<!-- /ko -->
 			<ul class="TagList">
 				<!-- ko foreach: PredefinedItems -->
 				<li data-bind="click: Toggle, visible: !IsAdded(), class: CssClass()">
