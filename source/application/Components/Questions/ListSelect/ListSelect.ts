@@ -7,7 +7,7 @@ enum TagKind {
   Common = 'common',
 }
 type PredefinedTag = { Label: string; Id: string; Position: number; Kind: TagKind };
-type TagData = { Id: string; Label: string; Kind: TagKind; Selected: boolean };
+type TagData = { Id: string | null; Label: string; Kind: TagKind; Selected: boolean };
 type Tag = {
   Data: TagData;
   IsAdded: ko.Observable<boolean>;
@@ -18,12 +18,7 @@ type Tag = {
 };
 
 type ListSelectAnswer = {
-  Tags: {
-    Id: string | null;
-    Label: string;
-    Kind: string; // You can use an enum if there are predefined kinds, e.g., "User", "Common", etc.
-    Selected: boolean;
-  }[];
+  Tags: TagData[];
   Events: {
     Id: string;
     Type: string; // You can use an enum for predefined event types, e.g., "Completed", "Change", etc.
@@ -60,6 +55,10 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
   public HasTagInputError: ko.Computed<boolean>;
   public HasSelectionTagsLabel: ko.Computed<boolean>;
 
+  public NumSelected: ko.Computed<number>;
+  public AllowMoreSelections: ko.Computed<boolean>;
+  public ListCssClass: ko.Computed<string>;
+
   private _clearErrorTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private _clearErrorTimeout = 5000;
 
@@ -90,6 +89,15 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     this.HasSelectionTagsLabel = this.PureComputed(
       () => this.SelectionTagsLabel != null && this.SelectionTagsLabel !== '',
     );
+    this.NumSelected = this.PureComputed(() => this.GetAnswer()?.Tags?.filter((t) => t.Selected).length || 0);
+
+    this.AllowMoreSelections = knockout.computed(() => {
+      if (this.MaxNoOfSelections == null) return true;
+
+      return this.NumSelected() < this.MaxNoOfSelections;
+    });
+
+    this.ListCssClass = knockout.computed(() => (this.AllowMoreSelections() ? 'list-select' : 'list-select-disabled'));
 
     this.InitializeAnswer();
   }
@@ -208,6 +216,9 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
   }
 
   private ToggleTag(tag: Tag): void {
+    console.dir(tag.IsSelected());
+    if (!tag.IsSelected() && !this.AllowMoreSelections()) return;
+
     tag.Data.Selected = !tag.Data.Selected;
     tag.IsSelected(tag.Data.Selected);
     this.AddRawEvent('Change', 'Mouse/Left/Down', tag.Data.Label, 'None', 'None', false);

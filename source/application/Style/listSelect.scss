@@ -37,6 +37,10 @@
 				}
 			}
 		}
+
+		> .TagList.list-select-disabled > li .badge {
+			color: var(--bs-gray-500);
+		}
 	}
 
 	.TagList > li {
