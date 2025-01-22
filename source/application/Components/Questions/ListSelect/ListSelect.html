@@ -1,14 +1,15 @@
 ﻿<script type="text/html" id="ListSelect">
 	<div class="ListSelect">
-		<!-- ko if: UserInputBoxOutside -->
-		<form data-bind="submit: AddText">
-			<input class="form-control" type="text" data-bind="textInput: TextInput, attr: { placeholder: InputPlaceholder }, enable: AllowMoreSelections" />
-		</form>
-		<!-- /ko -->
-
-		<div class="TagContainer row container-fluid">
+		<div class="TagContainer">
 			<!-- ko if: HasSelectionTagsLabel -->
 			<p data-bind="html: SelectionTagsLabel"></p>
+			<!-- /ko -->
+			<!-- ko if: UserInputBoxOutside -->
+			<form data-bind="submit: AddText">
+				<label>
+					<input class="AddTagInput" type="text" data-bind="textInput: TextInput, attr: { placeholder: InputPlaceholder }, enable: AllowMoreSelections" />
+				</label>
+			</form>
 			<!-- /ko -->
 			<ul class="TagList" data-bind="class: ListCssClass()">
 				<!-- ko foreach: PredefinedItems -->
@@ -32,7 +33,9 @@
 				<!-- ko if: UserInputBoxInside -->
 				<li class="AddTagFormContainer">
 					<form data-bind="submit: AddText" class="col-12 AddTagForm">
-						<input class="AddTagInput" type="text" data-bind="textInput: TextInput, attr: { placeholder: InputPlaceholder }, enable: AllowMoreSelections" />
+						<label>
+							<input class="AddTagInput" type="text" data-bind="textInput: TextInput, attr: { placeholder: InputPlaceholder }, enable: AllowMoreSelections" />
+						</label>
 					</form>
 					<div class="InputError" data-bind="visible: HasTagInputError()">
 						<svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" width="28px" height="100%"
@@ -41,12 +44,10 @@
 						</svg>
 						<span data-bind="text: TagInputErrorText"></span>
 					</div>
-
 				</li>
 				<!-- /ko -->
-			</>
+			</ul>
 		</div>
-	</div>
 	</div>
 </script>
 

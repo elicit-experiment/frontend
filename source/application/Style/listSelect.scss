@@ -91,10 +91,18 @@
 		padding: 0;
 	}
 
-	.TagList li input.form-control {
+	.TagContainer > form {
+		margin-bottom: 10px;
+	}
+
+	form {
+		margin: 0 auto;
+	}
+
+	input.form-control {
 		border: none;
 		padding: 0.5em 0.8em;
-		width: 100%;
+		width: unset;
 		box-sizing: border-box;
 	}
 
@@ -135,15 +143,20 @@
 		}
 
 		.AddTagInput {
-			border-radius: 6px;
-			border-color: grey;
 			padding: 2px 10px;
+			margin-top: 2px;
 
-			&:focus-visible {
-				color: green;
-				border-color: green;
-				outline: green
-			}
+		}
+	}
+
+	.AddTagInput {
+		border: var(--bs-border-width) solid var(--bs-black);
+		border-radius: 6px;
+
+		&:focus-visible {
+			color: green;
+			border-color: green;
+			outline: green
 		}
 	}
 }
