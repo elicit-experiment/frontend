@@ -220,9 +220,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
     const requiredMedia: MediaInfo[] = media.filter((medium) => !medium.IsOptional());
 
-    if (requiredMedia.length === 0) {
-      return knockout.computed(() => true);
-    }
+    // console.log(`WhenAllMediaHavePlayed ${requiredMedia.length}`);
 
     let numberOfPlays = 0;
 
@@ -238,7 +236,11 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
     this.Model.AllRequiredMediaHavePlayed(numberOfPlays === (<MediaInfo[]>requiredMedia).length);
 
-    return knockout.computed(() => this.HasAnswer() || this.Model.AllRequiredMediaHavePlayed());
+    if (requiredMedia.length === 0) {
+      return knockout.computed(() => true);
+    } else {
+      return knockout.computed(() => this.HasAnswer() || this.Model.AllRequiredMediaHavePlayed());
+    }
   }
 
   public SlideLoaded(): void {}
