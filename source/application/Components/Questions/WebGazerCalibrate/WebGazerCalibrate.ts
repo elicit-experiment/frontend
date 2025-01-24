@@ -88,6 +88,9 @@ class WebGazerCalibrate extends QuestionBase<{ CalibrationAccuracy: number }> {
       this.HideWebGazerVideo();
       this.showPanelElements();
     });
+
+    // No Media to play, but we can't progress without calling this, which will set AllMediaHavePlayed to true.
+    this.WhenAllMediaHavePlayed([], true);
   }
 
   private hidePanelElements() {

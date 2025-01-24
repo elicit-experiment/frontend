@@ -231,6 +231,9 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       const calibrationPointElement = document.querySelector(pointId);
       this.AddEvent('Render', '', JSON.stringify({ [pointId]: calibrationPointElement.getBoundingClientRect() }));
     }
+
+    // No Media to play, but we can't progress without calling this, which will set AllMediaHavePlayed to true.
+    this.WhenAllMediaHavePlayed([], true);
   }
 
   protected NextCalibrationStep(): void {
