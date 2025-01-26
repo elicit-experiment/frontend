@@ -54,19 +54,18 @@ export class DatapointAccumulator {
   }
 
   debouncerCallback() {
-    const now = new Date().getTime();
     const interval = 1000 / DatapointAccumulator.DATAPOINTS_PER_SECOND;
 
     // Filter data points to respect the DATAPOINTS_PER_SECOND limit
     const limitedDataPoints: ElicitFaceLandmarkerResult[] = [];
-    while (this.dataPoints.length > 0 && limitedDataPoints.length < DatapointAccumulator.DATAPOINTS_PER_SECOND) {
-      const candidate = this.dataPoints.pop(); // Always take the most recent point
+    while (this.dataPoints.length > 0) {
+      const candidate = this.dataPoints.shift(); // Always take the most recent point
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (now - this.lastSendTimestamp >= interval) {
-        this.lastSendTimestamp = now;
-        limitedDataPoints.unshift(candidate); // Add to the limited list
+      if (candidate.timeStamp - this.lastSendTimestamp >= interval) {
+        this.lastSendTimestamp = candidate.timeStamp;
+        limitedDataPoints.push(candidate); // Add to the limited list
       } else {
         continue; // Skip old data points that don't fit within the rate limit
       }
@@ -84,7 +83,7 @@ export class DatapointAccumulator {
     }
   }
 
-  private async sendDataPoints(dataPoints: ElicitFaceLandmarkerResult[]) {
+  async sendDataPoints(dataPoints: ElicitFaceLandmarkerResult[]) {
     try {
       await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints);
     } catch (err) {

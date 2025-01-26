@@ -154,6 +154,7 @@ module.exports = function (env) {
         plugins: [new TsconfigPathsPlugin()],
         extensions: ['.ts', '.js'],
         alias: {
+          Source: path.resolve(__dirname, 'source/'),
           Components: path.resolve(__dirname, 'source/application/Components/'),
           Managers: path.resolve(__dirname, 'source/application/Managers'),
           Models: path.resolve(__dirname, 'source/application/Models'),

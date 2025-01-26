@@ -8,7 +8,7 @@
     "lint": "eslint 'source/**/*.{js,ts}' --quiet --fix",
     "clean": "rm -rf dist/*",
     "build": "webpack --config webpack.config.js --mode production",
-    "serve": "webpack-dev-server --config webpack.config.js --mode development",
+    "serve": "webpack-dev-server --config webpack.config.js --mode development --port 5504",
     "serve_static": "node static_server.js",
     "test": "jest --watch"
   },

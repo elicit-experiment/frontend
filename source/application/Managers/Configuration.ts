@@ -1,6 +1,16 @@
-﻿import ConfigurationFile from '../../configuration.json';
+﻿import * as configuration from 'Source/configuration.json';
 
-const configurationData = JSON.parse(ConfigurationFile);
+type ConfigPaths = {
+  PortalPath: string;
+  ElicitLandingPath: string;
+  LarmPortalPath: string;
+  WayfPath: string;
+};
+
+// Handle build-time differences between Jest and Webpack environments
+const configurationData = (typeof configuration.default === 'string'
+  ? JSON.parse(configuration.default)
+  : configuration) as unknown as ConfigPaths;
 
 class Configuration {
   public PortalPath: string = configurationData.PortalPath;
