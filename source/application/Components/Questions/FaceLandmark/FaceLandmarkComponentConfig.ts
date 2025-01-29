@@ -10,6 +10,7 @@ export type FaceLandmarkComponentConfig = {
   IncludeBlandshapes?: string; // TODO: Deprecate Blandshapes
   IncludeBlendshapes?: string;
   IncludeLandmarks?: string;
+  MaximumSendRateHz?: number;
 };
 
 export interface NormalizedLandmarkComponentConfig extends FaceLandmarkComponentConfig {
@@ -25,6 +26,7 @@ export function NormalizeConfig(config: FaceLandmarkComponentConfig): Normalized
   const blendshapes = config.IncludeBlendshapes || config.IncludeBlandshapes;
   const Blendshapes = config.Blendshapes || blendshapes != null;
   const Landmarks = config.Landmarks || config.IncludeLandmarks != null;
+  const MaximumSendRateHz = config.MaximumSendRateHz || 5;
   return {
     ...config,
     Blendshapes,
@@ -34,6 +36,7 @@ export function NormalizeConfig(config: FaceLandmarkComponentConfig): Normalized
       : null,
     // TODO: Deprecate Blandshapes
     IncludedBlendshapeList: blendshapes ? blendshapes.split(',') : null,
+    MaximumSendRateHz,
   };
 }
 

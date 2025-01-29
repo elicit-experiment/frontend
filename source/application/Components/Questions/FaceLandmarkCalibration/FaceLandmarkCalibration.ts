@@ -36,6 +36,7 @@ export interface FaceLandmarkCalibrationInstrument {
   StripZCoordinates: boolean;
   IncludeBlendshapes: string;
   IncludeLandmarks: string;
+  MaximumSendRateHz: number;
 }
 
 export interface MonitorInstrument {
@@ -159,7 +160,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     ValidateConfig(this.config);
     console.dir(this.config);
 
-    this.datapointAccumulator = new DatapointAccumulator();
+    this.datapointAccumulator = new DatapointAccumulator(this.config.MaximumSendRateHz);
 
     this._initialCalibrationStep1Modal = new Modal(document.getElementById('initialCalibrationStep1Modal'));
     this._initialCalibrationStep2Modal = new Modal(document.getElementById('initialCalibrationStep2Modal'));

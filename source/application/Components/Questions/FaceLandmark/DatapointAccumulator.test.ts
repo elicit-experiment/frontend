@@ -24,7 +24,7 @@ describe('DatapointAccumulator', () => {
   let accumulator: DatapointAccumulator;
 
   beforeEach(() => {
-    accumulator = new DatapointAccumulator();
+    accumulator = new DatapointAccumulator(5);
     jest.spyOn(accumulator, 'sendDataPoints').mockImplementation(async () => {
       // Mock implementation of sendDataPoints does nothing
     });

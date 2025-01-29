@@ -36,9 +36,10 @@ export class DatapointAccumulator {
   public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sessionGuid: string;
   private lastSendTimestamp = 0;
-  private static readonly DATAPOINTS_PER_SECOND = 5; // Configurable rate limit — can be adjusted as needed
+  private maximumSendRateHz = 5; // Configurable rate limit — can be adjusted as needed
 
-  constructor() {
+  constructor(maximumSendRateHz: number) {
+    this.maximumSendRateHz = maximumSendRateHz;
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
   }
@@ -54,9 +55,9 @@ export class DatapointAccumulator {
   }
 
   debouncerCallback() {
-    const interval = 1000 / DatapointAccumulator.DATAPOINTS_PER_SECOND;
+    const interval = 1000 / this.maximumSendRateHz;
 
-    // Filter data points to respect the DATAPOINTS_PER_SECOND limit
+    // Filter data points to respect the maximumSendRateHz limit
     const limitedDataPoints: ElicitFaceLandmarkerResult[] = [];
     while (this.dataPoints.length > 0) {
       const candidate = this.dataPoints.shift(); // Always take the most recent point

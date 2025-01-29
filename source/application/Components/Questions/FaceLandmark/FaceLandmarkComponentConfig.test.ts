@@ -1,5 +1,4 @@
 import {
-  FaceLandmarkComponentConfig,
   IndexedNormalizedLandmark,
   NormalizeConfig,
   transformDatapoint,
@@ -8,8 +7,6 @@ import {
 import { FaceLandmarkerResult, NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { describe, test, expect } from '@jest/globals';
 import * as faceLandmarkerResult from '../../../../test_fixtures/landmarker_result.json';
-import * as faceLandmarkerConfig from '../../../../test_fixtures/landmarker_config.json';
-import { log, error } from 'console';
 
 function createResult(): FaceLandmarkerResult {
   return JSON.parse(JSON.stringify(faceLandmarkerResult)) as FaceLandmarkerResult;
