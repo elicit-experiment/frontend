@@ -163,6 +163,11 @@ class FaceLandmarkCalibrationPage {
       String(((CONSTRAINTS.video as MediaTrackConstraints).height as ConstrainULongRange).ideal),
     );
     this.monitorVideoEl.style.visibility = 'hidden';
+    this.monitorVideoEl.style.position = 'absolute';
+    this.monitorVideoEl.style.zIndex = '-1';
+    this.monitorVideoEl.style.top = '0';
+    this.monitorVideoEl.style.left = '0';
+
     document.body.appendChild(this.monitorVideoEl);
 
     // Check if webcam access is supported.
