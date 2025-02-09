@@ -110,6 +110,7 @@ class MouseTrackingManager extends DisposableComponent {
     }
 
     const seriesType = 'mouse';
+    const seriesSummaryType = 'mouse_summary';
 
     const postMouseTsv = () =>
       new Promise((resolve, reject) => {
@@ -186,7 +187,7 @@ class MouseTrackingManager extends DisposableComponent {
           .then(() => {
             console.log(`upload ${batchTimeStamp} ${batchMessage} success`);
             dataPoint.value = JSON.stringify(dataPointValue);
-            ExperimentManager.SendSlideDataPoint(seriesType, dataPoint, (err) => {
+            ExperimentManager.SendSlideDataPoint(seriesSummaryType, dataPoint, (err) => {
               if (!err) {
                 console.error('datapoint error');
               }
@@ -197,7 +198,7 @@ class MouseTrackingManager extends DisposableComponent {
             console.error(`upload ${batchTimeStamp} ${batchMessage} upload failed due to ${err}`);
             dataPointValue.status = err.toString();
             dataPoint.value = JSON.stringify(dataPointValue);
-            ExperimentManager.SendSlideDataPoint(seriesType, dataPoint, (err) => {
+            ExperimentManager.SendSlideDataPoint(seriesSummaryType, dataPoint, (err) => {
               if (!err) {
                 console.error('datapoint error');
               }
