@@ -1,8 +1,8 @@
 <div class="container-fluid SoloStimulus">
 	<div class="row">
-		<div data-bind="css: StimulusCssClass">
+		<div class="stimulus-container" data-bind="css: StimulusCssClass">
 			<!-- ko if: HasMedia -->
-			<h3 data-bind="html: MediaLabel"></h3>
+			<h3 class="stimulus-label" data-bind="html: MediaLabel"></h3>
 			<div class="SoloStimulusContainer" data-bind="component: {name: MediaInfo.ComponentName(), params: MediaInfo}"></div>
 			<!-- /ko -->
 		</div>
