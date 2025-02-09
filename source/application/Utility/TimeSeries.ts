@@ -8,7 +8,7 @@ function postTimeSeriesAsFile(tsv: string, seriesType: string, sessionGuid: stri
     const formData = new FormData();
     formData.append('seriesType', seriesType);
     formData.append('sessionGUID', sessionGuid);
-    formData.append('file', new Blob([tsv]), 'file');
+    formData.append('file', new Blob([tsv], { type: 'text/tab-separated-values' }), `#{seriesType}.tsv`);
 
     fetch(url.href, {
       method: 'POST',
