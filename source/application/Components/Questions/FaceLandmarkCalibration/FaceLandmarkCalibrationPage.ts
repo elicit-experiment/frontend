@@ -1,4 +1,5 @@
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
+import { getFaceLandmarkerManager } from 'Managers/FaceLandmarkerManager';
 
 const CONSTRAINTS: MediaStreamConstraints = {
   audio: false,
@@ -10,8 +11,6 @@ const CONSTRAINTS: MediaStreamConstraints = {
 };
 
 class FaceLandmarkCalibrationPage {
-  public faceLandmarker: FaceLandmarker;
-  public runningMode: 'IMAGE' | 'VIDEO' = 'IMAGE';
   public videoWidth = 480;
 
   public webcamRunning = false;
@@ -33,33 +32,10 @@ class FaceLandmarkCalibrationPage {
     this.monitorVideoEl = document.createElement('video');
   }
 
-  // Before we can use FaceLandmarker class we must wait for it to finish
-  // loading. Machine Learning models can be large and take a moment to
-  // get everything needed to run.
-  async createFaceLandmarker(
-    FaceLandmarkerClass: typeof FaceLandmarker,
-    FilesetResolverClass: typeof FilesetResolver,
-    options: FaceLandmarkerOptions,
-  ) {
-    const filesetResolver = await FilesetResolverClass.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm',
-    );
-    console.log('createFaceLandmarker');
-    this.faceLandmarker = await FaceLandmarkerClass.createFromOptions(filesetResolver, {
-      baseOptions: {
-        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-        delegate: 'GPU',
-      },
-      outputFaceBlendshapes: true,
-      runningMode: this.runningMode,
-      ...options,
-    });
-  }
-
   // Enable the live webcam view and start detection.
   enableCam(_event) {
     console.log('enableCam');
-    if (!this.faceLandmarker) {
+    if (!getFaceLandmarkerManager().faceLandmarker) {
       console.log('Wait! faceLandmarker not loaded yet.');
       return;
     }
@@ -121,9 +97,11 @@ class FaceLandmarkCalibrationPage {
       this.videoConfigured = true;
 
       // Now let's start detecting the stream.
-      if (this.runningMode === 'IMAGE') {
-        this.runningMode = 'VIDEO';
-        await this.faceLandmarker.setOptions({ runningMode: this.runningMode });
+      if (getFaceLandmarkerManager().runningMode === 'IMAGE') {
+        getFaceLandmarkerManager().runningMode = 'VIDEO';
+        await getFaceLandmarkerManager().faceLandmarker.setOptions({
+          runningMode: getFaceLandmarkerManager().runningMode,
+        });
       }
     }
 
@@ -132,7 +110,7 @@ class FaceLandmarkCalibrationPage {
     const startTimeMs = performance.now();
     if (this.monitoringVideoTime !== this.monitorVideoEl.currentTime) {
       this.monitoringVideoTime = this.monitorVideoEl.currentTime;
-      results = this.faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
+      results = getFaceLandmarkerManager().faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
     }
 
     if (results) {
@@ -191,16 +169,8 @@ class FaceLandmarkCalibrationPage {
   }
 }
 
-export default async (
-  FaceLandmarkerClass: typeof FaceLandmarker,
-  FilesetResolverClass: typeof FilesetResolver,
-  DrawingUtils: any,
-  options: FaceLandmarkerOptions,
-  dataCallback: (FaceLandmarkerResult) => void,
-) => {
+export default (DrawingUtils: any, dataCallback: (FaceLandmarkerResult) => void) => {
   const faceLandmarkCalibrationPage: FaceLandmarkCalibrationPage = new FaceLandmarkCalibrationPage();
 
-  return await faceLandmarkCalibrationPage
-    .createFaceLandmarker(FaceLandmarkerClass, FilesetResolverClass, options)
-    .then(() => faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback));
+  faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback);
 };

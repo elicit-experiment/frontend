@@ -25,6 +25,13 @@ type AccumulatableRecord = AccumulatableBaseRecord & {
   timeStamp: number;
 };
 
+export enum ProgressKind {
+  POSTED = 'POSTED',
+  ACKNOWLEDGED = 'ACKNOWLEDGED',
+}
+
+export type ProgressCallback = (kind: ProgressKind, count: number) => void;
+
 export declare interface ElicitFaceLandmarkerResult {
   /** Detected face landmarks in normalized image coordinates. */
   faceLandmarks: ElicitLandmark[][];
@@ -41,11 +48,13 @@ export class DatapointAccumulator {
   public sessionGuid: string;
   private lastSendTimestamp = 0;
   private maximumSendRateHz = 5; // Configurable rate limit — can be adjusted as needed
+  private progressCallback: ProgressCallback | null = null;
 
-  constructor(maximumSendRateHz: number) {
+  constructor(maximumSendRateHz: number, progressCallback: ProgressCallback | null) {
     this.maximumSendRateHz = maximumSendRateHz;
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+    this.progressCallback = progressCallback;
   }
 
   accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
@@ -90,7 +99,9 @@ export class DatapointAccumulator {
 
   async sendDataPoints(dataPoints: AccumulatableRecord[]) {
     try {
+      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length);
       await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints);
+      if (this.progressCallback) this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length);
     } catch (err) {
       console.error(err);
     }

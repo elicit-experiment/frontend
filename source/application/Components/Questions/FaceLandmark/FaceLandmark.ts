@@ -72,6 +72,8 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     const datapointAccumulator = new DatapointAccumulator();
 
+    throw new Error('FaceLandmark not implemented');
+
     import('@mediapipe/tasks-vision').then((visionImport) => {
       const { FaceLandmarker, FilesetResolver, DrawingUtils } = visionImport;
 

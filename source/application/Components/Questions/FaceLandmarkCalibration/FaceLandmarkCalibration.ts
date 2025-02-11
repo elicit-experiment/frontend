@@ -3,17 +3,15 @@ import QuestionBase from 'Components/Questions/QuestionBase';
 import QuestionModel from 'Models/Question';
 import calibrate from './FaceLandmarkCalibrationPage';
 import template from 'Components/Questions/FaceLandmarkCalibration/FaceLandmarkCalibration.html';
-import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult } from '@mediapipe/tasks-vision';
-import { DatapointAccumulator } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { FaceLandmarker, FaceLandmarkerResult } from '@mediapipe/tasks-vision';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 import { Modal } from 'bootstrap';
 import {
   FaceLandmarkComponentConfig,
   NormalizeConfig,
   ValidateConfig,
-  transformDatapoint,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
-import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
+import { FaceLandmarkerState, getFaceLandmarkerManager } from 'Managers/FaceLandmarkerManager';
 
 // TODO: generalize this so that all Inputs have the correct type.
 export interface CalibrationInput {
@@ -111,8 +109,6 @@ const MINIMUM_VOLUME_CALIBRATION_TIME = 5.0;
 const MINIMUM_VOLUME = 0.15;
 
 class FaceLandmarkCalibration extends QuestionBase<Calibration> {
-  public config: FaceLandmarkComponentConfig;
-  public datapointAccumulator: DatapointAccumulator;
   public currentState: knockout.Observable<CALIBRATION_STATE> = knockout.observable<CALIBRATION_STATE>();
   public PointCalibrate = 0;
   public CalibrationPoints: CalibrationPoint = {};
@@ -135,7 +131,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   private _loadingModal: Modal = null;
 
   private oldestAcceptableVolume = knockout.observable<Date | null>(null);
-  DrawingUtils: any;
+  DrawingUtilsClass: any;
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'FaceLandmarkCalibration', 'FaceLandmarkCalibration', method, data);
@@ -146,22 +142,21 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     super(question, true);
     this.Id = this.Model.Id;
 
+    let config: FaceLandmarkComponentConfig;
     if ('TrialType' in question.Input) {
-      this.config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
+      config = NormalizeConfig(question.Input as FaceLandmarkComponentConfig);
     } else {
       const input: CalibrationInput = question.Input as unknown as CalibrationInput;
       const instrumentConfiguration = input.Instruments.find(
         (instrument) => instrument.Instrument.FaceLandmarkCalibration,
       );
-      this.config = NormalizeConfig(
+      config = NormalizeConfig(
         instrumentConfiguration.Instrument.FaceLandmarkCalibration as FaceLandmarkComponentConfig,
       );
     }
 
-    ValidateConfig(this.config);
-    console.dir(this.config);
-
-    this.datapointAccumulator = new DatapointAccumulator(this.config.MaximumSendRateHz);
+    ValidateConfig(config);
+    console.dir(config);
 
     this._initialCalibrationStep1Modal = new Modal(document.getElementById('initialCalibrationStep1Modal'));
     this._initialCalibrationStep2Modal = new Modal(document.getElementById('initialCalibrationStep2Modal'));
@@ -207,25 +202,21 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
     this.currentState(CALIBRATION_STATE.LOADING);
 
-    import('@mediapipe/tasks-vision').then((visionImport) => {
-      const { FaceLandmarker, FilesetResolver, DrawingUtils } = visionImport;
+    getFaceLandmarkerManager()
+      .Init(config)
+      .then((visionImport) => {
+        this.DrawingUtilsClass = visionImport.DrawingUtils;
 
-      const options: FaceLandmarkerOptions = {
-        numFaces: this.config.NumberOfFaces || 1,
-        outputFacialTransformationMatrixes: this.config.FaceTransformation || false,
-        outputFaceBlendshapes: this.config.Blendshapes || true,
-      };
-
-      this.DrawingUtils = DrawingUtils;
-
-      calibrate(FaceLandmarker, FilesetResolver, DrawingUtils, options, this.ReceiveDatapoint.bind(this)).then(() => {
+        calibrate(this.DrawingUtilsClass, this.ReceiveDatapoint.bind(this));
         this.currentState(CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1);
+        getFaceLandmarkerManager().StartTracking();
+        getFaceLandmarkerManager().SetState(FaceLandmarkerState.Calibrating);
       });
-    });
 
     this.Answer.subscribe((calibration: Calibration) => {
       this.AddEvent('calibrated');
       this.SetAnswer(calibration);
+      getFaceLandmarkerManager().SetState(FaceLandmarkerState.Running);
     });
 
     for (let i = 1; i < 10; i++) {
@@ -265,7 +256,8 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     $('.Calibration').on('click', (event) => this.HandleCalibrationClick(event));
   }
 
-  protected HasValidAnswer(_answer: any): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected HasValidAnswer(_answer: unknown): boolean {
     return true;
   }
 
@@ -318,7 +310,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     const canvas = document.getElementById('output_canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const drawingUtils = new this.DrawingUtils(ctx);
+    const drawingUtils = new this.DrawingUtilsClass(ctx);
     for (const landmarks of faceLandmarkerResult.faceLandmarks) {
       drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
         color: '#C0C0C070',
@@ -360,10 +352,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     //   this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
     // }
 
-    const compressedDataPoint = compressDatapoint(this.config, dataPoint);
-    if (compressedDataPoint) {
-      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
-    }
+    getFaceLandmarkerManager().queueForSend(dataPoint);
   }
 
   // Calibration times
