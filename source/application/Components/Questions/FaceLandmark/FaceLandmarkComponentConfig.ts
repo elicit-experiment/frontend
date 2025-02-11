@@ -48,6 +48,7 @@ export function ValidateConfig(config) {
   return true;
 }
 
+// Transform the datapoint, within the same media pipe types, according to the configuration.
 export function transformDatapoint(
   config: NormalizedLandmarkComponentConfig,
   dataPoint: FaceLandmarkerResult,

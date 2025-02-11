@@ -13,6 +13,7 @@ import {
   ValidateConfig,
   transformDatapoint,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
+import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 
 // TODO: generalize this so that all Inputs have the correct type.
 export interface CalibrationInput {
@@ -353,10 +354,15 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       this.ComputeAndUpdateInitialCalibration(dataPoint);
     }
 
-    const transformedDataPoint = transformDatapoint(this.config, dataPoint);
+    // const transformedDataPoint = transformDatapoint(this.config, dataPoint);
+    //
+    // if (transformedDataPoint) {
+    //   this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+    // }
 
-    if (transformedDataPoint) {
-      this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+    const compressedDataPoint = compressDatapoint(this.config, dataPoint);
+    if (compressedDataPoint) {
+      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
     }
   }
 

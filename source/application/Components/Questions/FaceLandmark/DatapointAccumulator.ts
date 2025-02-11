@@ -20,6 +20,10 @@ type ElicitNormalizedLandmark = {
 };
 
 type ElicitLandmark = NormalizedLandmark | ElicitNormalizedLandmark;
+type AccumulatableBaseRecord = Record<string, unknown>;
+type AccumulatableRecord = AccumulatableBaseRecord & {
+  timeStamp: number;
+};
 
 export declare interface ElicitFaceLandmarkerResult {
   /** Detected face landmarks in normalized image coordinates. */
@@ -32,7 +36,7 @@ export declare interface ElicitFaceLandmarkerResult {
 }
 
 export class DatapointAccumulator {
-  public dataPoints: ElicitFaceLandmarkerResult[] = [];
+  public dataPoints: AccumulatableRecord[] = [];
   public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sessionGuid: string;
   private lastSendTimestamp = 0;
@@ -44,7 +48,7 @@ export class DatapointAccumulator {
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
   }
 
-  accumulateAndDebounce(dataPoint: ElicitFaceLandmarkerResult) {
+  accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
     // Push new data point with timestamp
     this.dataPoints.push({ timeStamp: new Date().getTime(), ...dataPoint });
 
@@ -58,7 +62,7 @@ export class DatapointAccumulator {
     const interval = 1000 / this.maximumSendRateHz;
 
     // Filter data points to respect the maximumSendRateHz limit
-    const limitedDataPoints: ElicitFaceLandmarkerResult[] = [];
+    const limitedDataPoints: AccumulatableRecord[] = [];
     while (this.dataPoints.length > 0) {
       const candidate = this.dataPoints.shift(); // Always take the most recent point
       if (!candidate) break;
@@ -84,7 +88,7 @@ export class DatapointAccumulator {
     }
   }
 
-  async sendDataPoints(dataPoints: ElicitFaceLandmarkerResult[]) {
+  async sendDataPoints(dataPoints: AccumulatableRecord[]) {
     try {
       await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints);
     } catch (err) {

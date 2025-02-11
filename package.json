@@ -30,6 +30,7 @@
     "highcharts": "^11.4.8",
     "jquery": "^3.5.1",
     "knockout": "^3.4.1",
+    "msgpack-lite": "^0.1.26",
     "path-browserify": "^1.0.1",
     "prettier": "^2.2.1",
     "promise": "^8.0.3",

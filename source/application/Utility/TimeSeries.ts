@@ -109,4 +109,43 @@ function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: 
   });
 }
 
-export { postTimeSeriesAsFile, postTimeSeriesAsJson, postTimeSeriesRawAsJson };
+function postTimeSeriesRawAsMsgPack(seriesType: string, sessionGuid: string, body: Array<object>) {
+  const jsonString = body.map((row) => JSON.stringify(row)).join('\n'); // NDJSON
+
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const readableStream = blob.stream();
+
+  const compressedReadableStream = readableStream.pipeThrough(new CompressionStream('gzip'));
+  const url = new URL(`/v6/time_series/${seriesType}/file_raw`, Configuration.PortalPath);
+
+  return new Promise(async (resolve, reject) => {
+    console.log(`TimeSeries: Sending points to ${url.href}`);
+    const compressedResponse = new Response(compressedReadableStream);
+    const timeSeriesBlob = await compressedResponse.blob();
+    fetch(url.href, {
+      method: 'POST',
+      //credentials: 'include', // include the sessionGUID cookie
+      mode: 'cors', // no-cors, cors, *same-origin
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Content-Encoding': 'gzip',
+        'X-CHAOS-SESSION-GUID': sessionGuid,
+      },
+      credentials: 'include',
+      body: timeSeriesBlob,
+    })
+      .then((rawResponse) => {
+        if (rawResponse.ok) {
+          return rawResponse;
+        } else {
+          throw Error(`Request rejected with status ${rawResponse.status}`);
+        }
+      })
+      .then((rawResponse) => rawResponse.json())
+      .then((json) => resolve(json))
+      .catch((err) => reject(err));
+  });
+}
+
+export { postTimeSeriesAsFile, postTimeSeriesAsJson, postTimeSeriesRawAsJson, postTimeSeriesRawAsMsgPack };
