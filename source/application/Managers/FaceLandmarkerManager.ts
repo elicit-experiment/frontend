@@ -196,6 +196,10 @@ class FaceLandmarkerManager extends DisposableComponent {
       }
     });
     this.currentSummaryPeriodStart = new Date();
+
+    Object.keys(this.currentSummaryPeriodCounts).forEach((key) => {
+      this.currentSummaryPeriodCounts[key as keyof typeof this.currentSummaryPeriodCounts] = 0;
+    });
   }
 
   public SetState(newState: FaceLandmarkerState) {
