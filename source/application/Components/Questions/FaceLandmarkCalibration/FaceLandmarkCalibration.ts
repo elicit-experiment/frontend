@@ -416,6 +416,20 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   }
 
   private RecalibrateOrProceed() {
+    let xShiftPct = Math.floor(Math.random() * 50) - 25; // Random value between 0-100
+    const yShiftPct = Math.floor(Math.random() * 300) - 150; // Random value between 0-100
+
+    // avoid the center of the screen
+    if (xShiftPct < 0) {
+      xShiftPct -= 25;
+    } else {
+      xShiftPct += 25;
+    }
+
+    const swalContainerStyle = document.createElement('style');
+    swalContainerStyle.innerHTML = `.swal2-modal { transform: translate(${xShiftPct}%, ${yShiftPct}%) !important; }`;
+    document.head.appendChild(swalContainerStyle);
+
     const swalConfig = {
       title: '',
       html: `Calibration Complete`,
@@ -431,10 +445,6 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
         this.ClearCanvas();
         this.CalibrationCompleted();
       } else {
-        // TODO: I cannot figure out how to clear the webgazer calibration and restart it.
-        // It fails to begin() after end() is called.  See WebgazerManager#ClearCalibration.
-        // So the best that seems possible is this gross hack.
-
         // delete the session GUID so we don't kill the experiment because of USER reload
         document.cookie = 'session_guid=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
 
