@@ -41,6 +41,8 @@ class FaceLandmarkerManager extends DisposableComponent {
   public state = FaceLandmarkerState.NotStarted;
   public webcamRunning = false;
 
+  public videoRatio: number | null = null;
+
   private constructor() {
     super();
 
@@ -134,6 +136,7 @@ class FaceLandmarkerManager extends DisposableComponent {
   public End() {
     this.SetState(FaceLandmarkerState.Running);
     this.clearSummaryTimer();
+    this.stopWebcam();
   }
 
   public queueForSend(dataPoint: FaceLandmarkerResult) {

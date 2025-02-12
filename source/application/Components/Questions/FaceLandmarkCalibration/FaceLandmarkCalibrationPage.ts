@@ -1,4 +1,4 @@
-import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
+import { FaceLandmarkerResult } from '@mediapipe/tasks-vision';
 import { getFaceLandmarkerManager } from 'Managers/FaceLandmarkerManager';
 
 const CONSTRAINTS: MediaStreamConstraints = {
@@ -53,17 +53,18 @@ class FaceLandmarkCalibrationPage {
     $('.initialCalibrationVideoFeed').addClass('enabled');
     navigator.mediaDevices
       .getUserMedia(CONSTRAINTS)
-      .then((stream) => {
+      .then(async (stream) => {
         try {
           console.dir('navigator.mediaDevices.getUserMedia');
           if (this.calibrationVideoEl) {
-            this.calibrationVideoEl.srcObject = stream;
-            this.calibrationVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
+            const ratio = await this.configureCalibrationVideoElement(stream);
+            console.log(`navigator.mediaDevices.getUserMedia: ${ratio}`);
           }
-          this.monitorVideoEl.srcObject = stream;
-          this.monitorVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
-          this.monitorVideoEl.play();
+          await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
+
+          // kick off the prediction loop
+          this.predictWebcam();
         } catch (e) {
           console.log('navigator.mediaDevices.getUserMedia error: ', e.message, e.name);
         }
@@ -73,36 +74,74 @@ class FaceLandmarkCalibrationPage {
       });
   }
 
+  private configureCalibrationVideoElement(stream: MediaStream) {
+    this.calibrationVideoEl.srcObject = stream;
+    const setRatioFromCalibrationVideo = new Promise((resolve, reject) => {
+      this.calibrationVideoEl.addEventListener(
+        'loadeddata',
+        () => {
+          let ratio = 1.0;
+
+          if (this.calibrationVideoEl) {
+            ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
+            getFaceLandmarkerManager().videoRatio = ratio;
+            this.calibrationVideoEl.style.width = this.videoWidth + 'px';
+            this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
+            (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
+            (this.calibrationVideoEl.parentNode as HTMLDivElement).style.height = this.videoWidth * ratio + 'px';
+
+            if (this.canvasElement) {
+              this.canvasElement.style.width = this.videoWidth + 'px';
+              this.canvasElement.style.height = this.videoWidth * ratio + 'px';
+              this.canvasElement.width = this.calibrationVideoEl.videoWidth;
+              this.canvasElement.height = this.calibrationVideoEl.videoHeight;
+            }
+            resolve(ratio);
+          } else {
+            reject("Can't get video ratio");
+          }
+        },
+        { once: true },
+      );
+    });
+    return setRatioFromCalibrationVideo;
+  }
+
+  private configureMonitorVideoElement(stream: MediaStream) {
+    this.monitorVideoEl.srcObject = stream;
+    const loadedVideoDataPromise = new Promise((resolve, reject) => {
+      this.monitorVideoEl.addEventListener('loadeddata', async () => {
+        if (!getFaceLandmarkerManager().videoRatio) {
+          return reject("Can't get video ratio");
+        }
+
+        this.monitorVideoEl.style.width = this.videoWidth + 'px';
+        this.monitorVideoEl.style.height = this.videoWidth * getFaceLandmarkerManager().videoRatio + 'px';
+
+        this.videoConfigured = true;
+
+        console.log('video configured');
+
+        // Now let's start detecting the stream.
+        if (getFaceLandmarkerManager().runningMode === 'IMAGE') {
+          getFaceLandmarkerManager().runningMode = 'VIDEO';
+          await getFaceLandmarkerManager().faceLandmarker.setOptions({
+            runningMode: getFaceLandmarkerManager().runningMode,
+          });
+        }
+
+        resolve(this.videoConfigured);
+      });
+    });
+
+    this.monitorVideoEl.play();
+
+    return loadedVideoDataPromise;
+  }
+
   async predictWebcam() {
     if (!this.videoConfigured) {
-      let ratio = 1.0;
-
-      if (this.calibrationVideoEl) {
-        ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
-        this.calibrationVideoEl.style.width = this.videoWidth + 'px';
-        this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
-        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
-        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.height = this.videoWidth * ratio + 'px';
-
-        if (this.canvasElement) {
-          this.canvasElement.style.width = this.videoWidth + 'px';
-          this.canvasElement.style.height = this.videoWidth * ratio + 'px';
-          this.canvasElement.width = this.calibrationVideoEl.videoWidth;
-          this.canvasElement.height = this.calibrationVideoEl.videoHeight;
-        }
-      }
-      this.monitorVideoEl.style.width = this.videoWidth + 'px';
-      this.monitorVideoEl.style.height = this.videoWidth * ratio + 'px';
-
-      this.videoConfigured = true;
-
-      // Now let's start detecting the stream.
-      if (getFaceLandmarkerManager().runningMode === 'IMAGE') {
-        getFaceLandmarkerManager().runningMode = 'VIDEO';
-        await getFaceLandmarkerManager().faceLandmarker.setOptions({
-          runningMode: getFaceLandmarkerManager().runningMode,
-        });
-      }
+      throw new Error('No video configured!');
     }
 
     let results = undefined;
