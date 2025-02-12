@@ -20,6 +20,22 @@ type ElicitNormalizedLandmark = {
 };
 
 type ElicitLandmark = NormalizedLandmark | ElicitNormalizedLandmark;
+type AccumulatableBaseRecord = Record<string, unknown>;
+type AccumulatableRecord = AccumulatableBaseRecord & {
+  t: number;
+};
+
+export enum ProgressKind {
+  POSTED = 'POSTED',
+  ACKNOWLEDGED = 'ACKNOWLEDGED',
+}
+
+export type ProgressCallback = (
+  kind: ProgressKind,
+  count: number,
+  totalBytes: number,
+  totalCompressedBytes: number,
+) => void;
 
 export declare interface ElicitFaceLandmarkerResult {
   /** Detected face landmarks in normalized image coordinates. */
@@ -28,25 +44,27 @@ export declare interface ElicitFaceLandmarkerResult {
   faceBlendshapes: Classifications[];
   /** Optional facial transformation matrix. */
   facialTransformationMatrixes: Matrix[];
-  timeStamp?: number;
+  t?: number;
 }
 
 export class DatapointAccumulator {
-  public dataPoints: ElicitFaceLandmarkerResult[] = [];
+  public dataPoints: AccumulatableRecord[] = [];
   public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sessionGuid: string;
   private lastSendTimestamp = 0;
   private maximumSendRateHz = 5; // Configurable rate limit — can be adjusted as needed
+  private progressCallback: ProgressCallback | null = null;
 
-  constructor(maximumSendRateHz: number) {
+  constructor(maximumSendRateHz: number, progressCallback: ProgressCallback | null) {
     this.maximumSendRateHz = maximumSendRateHz;
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+    this.progressCallback = progressCallback;
   }
 
-  accumulateAndDebounce(dataPoint: ElicitFaceLandmarkerResult) {
+  accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
     // Push new data point with timestamp
-    this.dataPoints.push({ timeStamp: new Date().getTime(), ...dataPoint });
+    this.dataPoints.push({ t: new Date().getTime(), ...dataPoint });
 
     // Initiate the debouncing process if not already running
     if (this.debouncer == null) {
@@ -58,14 +76,14 @@ export class DatapointAccumulator {
     const interval = 1000 / this.maximumSendRateHz;
 
     // Filter data points to respect the maximumSendRateHz limit
-    const limitedDataPoints: ElicitFaceLandmarkerResult[] = [];
+    const limitedDataPoints: AccumulatableRecord[] = [];
     while (this.dataPoints.length > 0) {
       const candidate = this.dataPoints.shift(); // Always take the most recent point
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (candidate.timeStamp - this.lastSendTimestamp >= interval) {
-        this.lastSendTimestamp = candidate.timeStamp;
+      if (candidate.t - this.lastSendTimestamp >= interval) {
+        this.lastSendTimestamp = candidate.t;
         limitedDataPoints.push(candidate); // Add to the limited list
       } else {
         continue; // Skip old data points that don't fit within the rate limit
@@ -84,9 +102,15 @@ export class DatapointAccumulator {
     }
   }
 
-  async sendDataPoints(dataPoints: ElicitFaceLandmarkerResult[]) {
+  async sendDataPoints(dataPoints: AccumulatableRecord[]) {
     try {
-      await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints);
+      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length, 0, 0);
+      const resp = (await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints)) as {
+        rawBytes: number;
+        compressedBytes: number;
+      };
+      if (this.progressCallback)
+        this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length, resp.rawBytes, resp.compressedBytes);
     } catch (err) {
       console.error(err);
     }

@@ -13,6 +13,7 @@ import {
   transformDatapoint,
   NormalizedLandmarkComponentConfig,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
+import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 
 class DatapointAccumulator {
   public dataPoints: any[] = [];
@@ -71,6 +72,8 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
 
     const datapointAccumulator = new DatapointAccumulator();
 
+    throw new Error('FaceLandmark not implemented');
+
     import('@mediapipe/tasks-vision').then((visionImport) => {
       const { FaceLandmarker, FilesetResolver, DrawingUtils } = visionImport;
 
@@ -81,9 +84,11 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
       };
 
       demo(FaceLandmarker, FilesetResolver, DrawingUtils, options, (dataPoint: FaceLandmarkerResult) => {
-        const transformedDataPoint = transformDatapoint(this.config, dataPoint);
+        // const transformedDataPoint = transformDatapoint(this.config, dataPoint);
+        // datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
 
-        datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+        const compressedDataPoint = compressDatapoint(this.config, dataPoint);
+        datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
       });
     });
   }

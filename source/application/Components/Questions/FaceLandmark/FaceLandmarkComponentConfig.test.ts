@@ -130,7 +130,8 @@ describe('transformDatapoint', () => {
       'eyeLookInRight',
       'eyeLookInLeft',
     ]);
-    expect(result.faceLandmarks[0].map((landmark: NormalizedLandmark) => (landmark as any).index)).toEqual([13, 14]);
+    const landmarkIndices = result.faceBlendshapes[0].categories.map((landmark) => (landmark as any).index);
+    expect(new Set(landmarkIndices)).toEqual(new Set([13, 14]));
   });
 
   test('Includes specified Blendshapes and FaceLandmarks', () => {

@@ -1,4 +1,5 @@
-import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
+import { FaceLandmarkerResult } from '@mediapipe/tasks-vision';
+import { getFaceLandmarkerManager } from 'Managers/FaceLandmarkerManager';
 
 const CONSTRAINTS: MediaStreamConstraints = {
   audio: false,
@@ -9,12 +10,10 @@ const CONSTRAINTS: MediaStreamConstraints = {
   },
 };
 
+// TODO: more of this should be moved to FaceLandmarkManager
 class FaceLandmarkCalibrationPage {
-  public faceLandmarker: FaceLandmarker;
-  public runningMode: 'IMAGE' | 'VIDEO' = 'IMAGE';
   public videoWidth = 480;
 
-  public webcamRunning = false;
   // let calibrationVideoTime = -1;
   public monitoringVideoTime = -1;
   public results: FaceLandmarkerResult | undefined = undefined;
@@ -33,43 +32,20 @@ class FaceLandmarkCalibrationPage {
     this.monitorVideoEl = document.createElement('video');
   }
 
-  // Before we can use FaceLandmarker class we must wait for it to finish
-  // loading. Machine Learning models can be large and take a moment to
-  // get everything needed to run.
-  async createFaceLandmarker(
-    FaceLandmarkerClass: typeof FaceLandmarker,
-    FilesetResolverClass: typeof FilesetResolver,
-    options: FaceLandmarkerOptions,
-  ) {
-    const filesetResolver = await FilesetResolverClass.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm',
-    );
-    console.log('createFaceLandmarker');
-    this.faceLandmarker = await FaceLandmarkerClass.createFromOptions(filesetResolver, {
-      baseOptions: {
-        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-        delegate: 'GPU',
-      },
-      outputFaceBlendshapes: true,
-      runningMode: this.runningMode,
-      ...options,
-    });
-  }
-
   // Enable the live webcam view and start detection.
   enableCam(_event) {
     console.log('enableCam');
-    if (!this.faceLandmarker) {
+    if (!getFaceLandmarkerManager().faceLandmarker) {
       console.log('Wait! faceLandmarker not loaded yet.');
       return;
     }
 
-    if (this.webcamRunning === true) {
-      this.webcamRunning = false;
+    if (getFaceLandmarkerManager().webcamIsRunning()) {
+      getFaceLandmarkerManager().stopWebcam();
       this.videoConfigured = false;
       // this.enableWebcamButton.innerText = 'ENABLE PREDICTIONS';
     } else {
-      this.webcamRunning = true;
+      getFaceLandmarkerManager().startWebcam();
       // this.enableWebcamButton.innerText = 'DISABLE PREDICTIONS';
     }
 
@@ -77,17 +53,18 @@ class FaceLandmarkCalibrationPage {
     $('.initialCalibrationVideoFeed').addClass('enabled');
     navigator.mediaDevices
       .getUserMedia(CONSTRAINTS)
-      .then((stream) => {
+      .then(async (stream) => {
         try {
           console.dir('navigator.mediaDevices.getUserMedia');
           if (this.calibrationVideoEl) {
-            this.calibrationVideoEl.srcObject = stream;
-            this.calibrationVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
+            const ratio = await this.configureCalibrationVideoElement(stream);
+            console.log(`navigator.mediaDevices.getUserMedia: ${ratio}`);
           }
-          this.monitorVideoEl.srcObject = stream;
-          this.monitorVideoEl.addEventListener('loadeddata', this.predictWebcam.bind(this));
-          this.monitorVideoEl.play();
+          await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
+
+          // kick off the prediction loop
+          this.predictWebcam();
         } catch (e) {
           console.log('navigator.mediaDevices.getUserMedia error: ', e.message, e.name);
         }
@@ -97,34 +74,74 @@ class FaceLandmarkCalibrationPage {
       });
   }
 
+  private configureCalibrationVideoElement(stream: MediaStream) {
+    this.calibrationVideoEl.srcObject = stream;
+    const setRatioFromCalibrationVideo = new Promise((resolve, reject) => {
+      this.calibrationVideoEl.addEventListener(
+        'loadeddata',
+        () => {
+          let ratio = 1.0;
+
+          if (this.calibrationVideoEl) {
+            ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
+            getFaceLandmarkerManager().videoRatio = ratio;
+            this.calibrationVideoEl.style.width = this.videoWidth + 'px';
+            this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
+            (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
+            (this.calibrationVideoEl.parentNode as HTMLDivElement).style.height = this.videoWidth * ratio + 'px';
+
+            if (this.canvasElement) {
+              this.canvasElement.style.width = this.videoWidth + 'px';
+              this.canvasElement.style.height = this.videoWidth * ratio + 'px';
+              this.canvasElement.width = this.calibrationVideoEl.videoWidth;
+              this.canvasElement.height = this.calibrationVideoEl.videoHeight;
+            }
+            resolve(ratio);
+          } else {
+            reject("Can't get video ratio");
+          }
+        },
+        { once: true },
+      );
+    });
+    return setRatioFromCalibrationVideo;
+  }
+
+  private configureMonitorVideoElement(stream: MediaStream) {
+    this.monitorVideoEl.srcObject = stream;
+    const loadedVideoDataPromise = new Promise((resolve, reject) => {
+      this.monitorVideoEl.addEventListener('loadeddata', async () => {
+        if (!getFaceLandmarkerManager().videoRatio) {
+          return reject("Can't get video ratio");
+        }
+
+        this.monitorVideoEl.style.width = this.videoWidth + 'px';
+        this.monitorVideoEl.style.height = this.videoWidth * getFaceLandmarkerManager().videoRatio + 'px';
+
+        this.videoConfigured = true;
+
+        console.log('video configured');
+
+        // Now let's start detecting the stream.
+        if (getFaceLandmarkerManager().runningMode === 'IMAGE') {
+          getFaceLandmarkerManager().runningMode = 'VIDEO';
+          await getFaceLandmarkerManager().faceLandmarker.setOptions({
+            runningMode: getFaceLandmarkerManager().runningMode,
+          });
+        }
+
+        resolve(this.videoConfigured);
+      });
+    });
+
+    this.monitorVideoEl.play();
+
+    return loadedVideoDataPromise;
+  }
+
   async predictWebcam() {
     if (!this.videoConfigured) {
-      let ratio = 1.0;
-
-      if (this.calibrationVideoEl) {
-        ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
-        this.calibrationVideoEl.style.width = this.videoWidth + 'px';
-        this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
-        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
-        (this.calibrationVideoEl.parentNode as HTMLDivElement).style.height = this.videoWidth * ratio + 'px';
-
-        if (this.canvasElement) {
-          this.canvasElement.style.width = this.videoWidth + 'px';
-          this.canvasElement.style.height = this.videoWidth * ratio + 'px';
-          this.canvasElement.width = this.calibrationVideoEl.videoWidth;
-          this.canvasElement.height = this.calibrationVideoEl.videoHeight;
-        }
-      }
-      this.monitorVideoEl.style.width = this.videoWidth + 'px';
-      this.monitorVideoEl.style.height = this.videoWidth * ratio + 'px';
-
-      this.videoConfigured = true;
-
-      // Now let's start detecting the stream.
-      if (this.runningMode === 'IMAGE') {
-        this.runningMode = 'VIDEO';
-        await this.faceLandmarker.setOptions({ runningMode: this.runningMode });
-      }
+      throw new Error('No video configured!');
     }
 
     let results = undefined;
@@ -132,7 +149,7 @@ class FaceLandmarkCalibrationPage {
     const startTimeMs = performance.now();
     if (this.monitoringVideoTime !== this.monitorVideoEl.currentTime) {
       this.monitoringVideoTime = this.monitorVideoEl.currentTime;
-      results = this.faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
+      results = getFaceLandmarkerManager().faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
     }
 
     if (results) {
@@ -140,8 +157,7 @@ class FaceLandmarkCalibrationPage {
     }
 
     // Call this function again to keep predicting when the browser is ready.
-    //console.dir(webcamRunning);
-    if (this.webcamRunning === true) {
+    if (getFaceLandmarkerManager().webcamIsRunning()) {
       window.requestAnimationFrame(this.predictWebcam.bind(this));
     }
   }
@@ -191,16 +207,8 @@ class FaceLandmarkCalibrationPage {
   }
 }
 
-export default async (
-  FaceLandmarkerClass: typeof FaceLandmarker,
-  FilesetResolverClass: typeof FilesetResolver,
-  DrawingUtils: any,
-  options: FaceLandmarkerOptions,
-  dataCallback: (FaceLandmarkerResult) => void,
-) => {
+export default (DrawingUtils: any, dataCallback: (FaceLandmarkerResult) => void) => {
   const faceLandmarkCalibrationPage: FaceLandmarkCalibrationPage = new FaceLandmarkCalibrationPage();
 
-  return await faceLandmarkCalibrationPage
-    .createFaceLandmarker(FaceLandmarkerClass, FilesetResolverClass, options)
-    .then(() => faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback));
+  faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback);
 };
