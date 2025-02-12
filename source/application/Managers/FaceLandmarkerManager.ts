@@ -31,8 +31,15 @@ class FaceLandmarkerManager extends DisposableComponent {
   private currentSummaryPeriodCounts = {
     queued: 0,
     posted: 0,
-    acknowleged: 0,
+    posted_bytes: 0,
+    posted_compressed_bytes: 0,
+    acknowledged: 0,
+    acknowledged_bytes: 0,
+    acknowledged_compressed_bytes: 0,
   };
+
+  public state = FaceLandmarkerState.NotStarted;
+  public webcamRunning = false;
 
   private constructor() {
     super();
@@ -54,16 +61,24 @@ class FaceLandmarkerManager extends DisposableComponent {
     return FaceLandmarkerManager._instance;
   }
 
-  public state = FaceLandmarkerState.NotStarted;
-
   public Init(config: FaceLandmarkComponentConfig): Promise<typeof import('@mediapipe/tasks-vision')> {
     this.config = config;
     this.state = FaceLandmarkerState.NotStarted;
 
-    this.datapointAccumulator = new DatapointAccumulator(this.config.MaximumSendRateHz, (kind, count) => {
-      if (kind === ProgressKind.POSTED) this.currentSummaryPeriodCounts.posted += count;
-      if (kind === ProgressKind.ACKNOWLEDGED) this.currentSummaryPeriodCounts.acknowleged += count;
-    });
+    this.datapointAccumulator = new DatapointAccumulator(
+      this.config.MaximumSendRateHz,
+      (kind, count, totalBytes, totalCompressedBytes) => {
+        if (kind === ProgressKind.POSTED) {
+          this.currentSummaryPeriodCounts.posted += count;
+          this.currentSummaryPeriodCounts.posted_bytes += totalBytes;
+        }
+        if (kind === ProgressKind.ACKNOWLEDGED) {
+          this.currentSummaryPeriodCounts.acknowledged += count;
+          this.currentSummaryPeriodCounts.acknowledged_bytes += totalBytes;
+          this.currentSummaryPeriodCounts.acknowledged_compressed_bytes += totalCompressedBytes;
+        }
+      },
+    );
 
     return new Promise((resolve, reject) => {
       import('@mediapipe/tasks-vision')
@@ -103,9 +118,21 @@ class FaceLandmarkerManager extends DisposableComponent {
     });
   }
 
+  // TODO: this should be derived from the state, rather than being an independent variable.
+  public webcamIsRunning() {
+    return this.webcamRunning;
+  }
+  public startWebcam() {
+    this.webcamRunning = true;
+  }
+  public stopWebcam() {
+    this.webcamRunning = false;
+  }
+
   public Start() {}
 
   public End() {
+    this.SetState(FaceLandmarkerState.Running);
     this.clearSummaryTimer();
   }
 
@@ -143,13 +170,14 @@ class FaceLandmarkerManager extends DisposableComponent {
   }
 
   public SendSummary() {
-    console.log('FaceLandmarkerManager: Send Summary');
+    // console.log('FaceLandmarkerManager: Send Summary');
     const summaryData = {
       start: this.currentSummaryPeriodStart,
+      t: Date.now(),
       currentState: this.state,
       ...this.currentSummaryPeriodCounts,
     };
-    console.dir(summaryData);
+    // console.dir(summaryData);
 
     const dataPoint = {
       kind: 'face_landmark',

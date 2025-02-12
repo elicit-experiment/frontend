@@ -41,13 +41,13 @@ describe('DatapointAccumulator', () => {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      timeStamp: 1000,
+      t: 1000,
     };
     const mockDataPoint2 = {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      timeStamp: 2000,
+      t: 2000,
     };
 
     // Push mock data points
@@ -65,14 +65,14 @@ describe('DatapointAccumulator', () => {
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
     expect(accumulator.sendDataPoints).toHaveBeenCalledWith([
-      expect.objectContaining({ timeStamp: 1000 }), // MockDataPoint1
-      expect.objectContaining({ timeStamp: 2000 }), // MockDataPoint2
+      expect.objectContaining({ t: 1000 }), // MockDataPoint1
+      expect.objectContaining({ t: 2000 }), // MockDataPoint2
     ]);
   });
 
   test('should reset debouncer after callback and restart if there are remaining data points', () => {
     // Mock data points
-    const mockDataPoint = { faceLandmarks: [], faceBlendshapes: [], facialTransformationMatrixes: [], timeStamp: 1000 };
+    const mockDataPoint = { faceLandmarks: [], faceBlendshapes: [], facialTransformationMatrixes: [], t: 1000 };
 
     // Add a single point
     accumulator.accumulateAndDebounce(mockDataPoint);
@@ -102,19 +102,19 @@ describe('DatapointAccumulator', () => {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      timeStamp: 1000,
+      t: 1000,
     };
     const mockDataPoint2 = {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      timeStamp: 1005,
+      t: 1005,
     }; // Close timestamp — skipped
     const mockDataPoint3 = {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      timeStamp: 2000,
+      t: 2000,
     }; // Wider gap — included
 
     accumulator.dataPoints.push(mockDataPoint1, mockDataPoint2, mockDataPoint3);

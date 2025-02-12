@@ -1,5 +1,6 @@
 import { Classifications, FaceLandmarkerResult, NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { NormalizedLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
+import { quantize, unquantize } from 'Components/Questions/FaceLandmark/Quantize';
 
 export declare type CompressedNormalizedLandmark = {
   p: number[];
@@ -109,8 +110,8 @@ export function compressDatapoint(
       (landmarks): CompressedNormalizedLandmark => ({
         z: !config.StripZCoordinates,
         p: landmarks.reduce((acc, val) => {
-          const point = [val.x, val.y];
-          !config.StripZCoordinates && point.push(val.z);
+          const point = [quantize(val.x), quantize(val.y)];
+          !config.StripZCoordinates && point.push(quantize(val.z));
           return acc.concat(point);
         }, Array<number>()),
       }),
@@ -125,7 +126,7 @@ export function compressDatapoint(
   if (config.Blendshapes && dataPoint.hasOwnProperty('faceBlendshapes')) {
     resultBlendshapes = dataPoint.faceBlendshapes.map(
       (classifications): CompressedClassifications => ({
-        s: classifications.categories.map((category) => category.score),
+        s: classifications.categories.map((category) => quantize(category.score)),
         i: classifications.categories.map((category) => category.index),
         c: classifications.categories.map((category) => BLENDSHAPE_CATEGORY_INDICES[category.categoryName]),
       }),
@@ -161,13 +162,13 @@ export function uncompressDatapoint(compressed: CompressedFaceLandmarkerResult):
     const pointSize = hasZ ? 3 : 2;
     for (let i = 0; i < compressed.p.length / pointSize; i++) {
       const landmark: NormalizedLandmark = {
-        x: compressed.p[i * pointSize],
-        y: compressed.p[i * pointSize + 1],
+        x: unquantize(compressed.p[i * pointSize]),
+        y: unquantize(compressed.p[i * pointSize + 1]),
         z: null,
         visibility: 0,
       };
       if (hasZ) {
-        landmark.z = compressed.p[i * pointSize + 2];
+        landmark.z = unquantize(compressed.p[i * pointSize + 2]);
       }
 
       landmarks.push(landmark);
@@ -186,7 +187,7 @@ export function uncompressDatapoint(compressed: CompressedFaceLandmarkerResult):
     blendshape.categories = [];
     for (let i = 0; i < classification.c.length; i++) {
       blendshape.categories.push({
-        score: classification.s[i],
+        score: unquantize(classification.s[i]),
         index: classification.i[i],
         categoryName: BLENDSHAPE_CATEGORY_NAMES[classification.c[i]],
         displayName: '',

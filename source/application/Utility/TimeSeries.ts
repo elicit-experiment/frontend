@@ -72,7 +72,8 @@ function postTimeSeriesAsJson(body: any, seriesType: string) {
 }
 
 function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: Array<object>) {
-  const jsonString = body.map((row) => JSON.stringify(row)).join('\n'); // NDJSON
+  const jsonString = body.map((row) => JSON.stringify(row)).join('\n') + '\n'; // NDJSON
+  const rawBytes = jsonString.length;
 
   const blob = new Blob([jsonString], { type: 'application/json' });
   const readableStream = blob.stream();
@@ -84,6 +85,8 @@ function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: 
     console.log(`TimeSeries: Sending points to ${url.href}`);
     const compressedResponse = new Response(compressedReadableStream);
     const timeSeriesBlob = await compressedResponse.blob();
+    const compressedBytes = timeSeriesBlob.size;
+
     fetch(url.href, {
       method: 'POST',
       //credentials: 'include', // include the sessionGUID cookie
@@ -105,7 +108,9 @@ function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: 
         }
       })
       .then((rawResponse) => rawResponse.json())
-      .then((json) => resolve(json))
+      .then((json) => {
+        resolve({ ...json, rawBytes, compressedBytes });
+      })
       .catch((err) => reject(err));
   });
 }

@@ -10,10 +10,10 @@ const CONSTRAINTS: MediaStreamConstraints = {
   },
 };
 
+// TODO: more of this should be moved to FaceLandmarkManager
 class FaceLandmarkCalibrationPage {
   public videoWidth = 480;
 
-  public webcamRunning = false;
   // let calibrationVideoTime = -1;
   public monitoringVideoTime = -1;
   public results: FaceLandmarkerResult | undefined = undefined;
@@ -40,12 +40,12 @@ class FaceLandmarkCalibrationPage {
       return;
     }
 
-    if (this.webcamRunning === true) {
-      this.webcamRunning = false;
+    if (getFaceLandmarkerManager().webcamIsRunning()) {
+      getFaceLandmarkerManager().stopWebcam();
       this.videoConfigured = false;
       // this.enableWebcamButton.innerText = 'ENABLE PREDICTIONS';
     } else {
-      this.webcamRunning = true;
+      getFaceLandmarkerManager().startWebcam();
       // this.enableWebcamButton.innerText = 'DISABLE PREDICTIONS';
     }
 
@@ -118,8 +118,7 @@ class FaceLandmarkCalibrationPage {
     }
 
     // Call this function again to keep predicting when the browser is ready.
-    //console.dir(webcamRunning);
-    if (this.webcamRunning === true) {
+    if (getFaceLandmarkerManager().webcamIsRunning()) {
       window.requestAnimationFrame(this.predictWebcam.bind(this));
     }
   }

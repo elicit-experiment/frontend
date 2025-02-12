@@ -22,7 +22,7 @@ type ElicitNormalizedLandmark = {
 type ElicitLandmark = NormalizedLandmark | ElicitNormalizedLandmark;
 type AccumulatableBaseRecord = Record<string, unknown>;
 type AccumulatableRecord = AccumulatableBaseRecord & {
-  timeStamp: number;
+  t: number;
 };
 
 export enum ProgressKind {
@@ -30,7 +30,12 @@ export enum ProgressKind {
   ACKNOWLEDGED = 'ACKNOWLEDGED',
 }
 
-export type ProgressCallback = (kind: ProgressKind, count: number) => void;
+export type ProgressCallback = (
+  kind: ProgressKind,
+  count: number,
+  totalBytes: number,
+  totalCompressedBytes: number,
+) => void;
 
 export declare interface ElicitFaceLandmarkerResult {
   /** Detected face landmarks in normalized image coordinates. */
@@ -39,7 +44,7 @@ export declare interface ElicitFaceLandmarkerResult {
   faceBlendshapes: Classifications[];
   /** Optional facial transformation matrix. */
   facialTransformationMatrixes: Matrix[];
-  timeStamp?: number;
+  t?: number;
 }
 
 export class DatapointAccumulator {
@@ -59,7 +64,7 @@ export class DatapointAccumulator {
 
   accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
     // Push new data point with timestamp
-    this.dataPoints.push({ timeStamp: new Date().getTime(), ...dataPoint });
+    this.dataPoints.push({ t: new Date().getTime(), ...dataPoint });
 
     // Initiate the debouncing process if not already running
     if (this.debouncer == null) {
@@ -77,8 +82,8 @@ export class DatapointAccumulator {
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (candidate.timeStamp - this.lastSendTimestamp >= interval) {
-        this.lastSendTimestamp = candidate.timeStamp;
+      if (candidate.t - this.lastSendTimestamp >= interval) {
+        this.lastSendTimestamp = candidate.t;
         limitedDataPoints.push(candidate); // Add to the limited list
       } else {
         continue; // Skip old data points that don't fit within the rate limit
@@ -99,9 +104,13 @@ export class DatapointAccumulator {
 
   async sendDataPoints(dataPoints: AccumulatableRecord[]) {
     try {
-      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length);
-      await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints);
-      if (this.progressCallback) this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length);
+      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length, 0, 0);
+      const resp = (await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints)) as {
+        rawBytes: number;
+        compressedBytes: number;
+      };
+      if (this.progressCallback)
+        this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length, resp.rawBytes, resp.compressedBytes);
     } catch (err) {
       console.error(err);
     }
