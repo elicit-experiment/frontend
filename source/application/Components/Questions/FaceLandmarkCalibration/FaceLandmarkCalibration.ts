@@ -164,8 +164,6 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     this._initialCalibrationStep4Modal = new Modal(document.getElementById('initialCalibrationStep4Modal'));
     this._loadingModal = new Modal(document.getElementById('loadingModal'));
 
-    this.hideSlideShellNavigationElements();
-
     this.currentState.subscribe((newState: CALIBRATION_STATE) => {
       switch (newState) {
         case CALIBRATION_STATE.LOADING:
@@ -206,6 +204,8 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
       .Init(config)
       .then((visionImport) => {
         this.DrawingUtilsClass = visionImport.DrawingUtils;
+
+        this.hideSlideShellNavigationElements();
 
         calibrate(this.DrawingUtilsClass, this.ReceiveDatapoint.bind(this));
         this.currentState(CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1);
@@ -566,12 +566,14 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
   private hideSlideShellNavigationElements() {
     $('.panel-heading').hide();
     $('.panel-footer').hide();
+    $('.shell-footer').hide();
     $('.panel-body').css('height', 'calc(100vh - 100px)');
   }
 
   private showSlideShellNavigationElements() {
     $('.panel-heading').show();
     $('.panel-footer').show();
+    $('.shell-footer').show();
     $('.panel-body').css('height', 'auto');
   }
 }
