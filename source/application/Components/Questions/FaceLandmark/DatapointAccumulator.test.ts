@@ -24,7 +24,7 @@ describe('DatapointAccumulator', () => {
   let accumulator: DatapointAccumulator;
 
   beforeEach(() => {
-    accumulator = new DatapointAccumulator(5, null);
+    accumulator = new DatapointAccumulator(5, 5, null);
     jest.spyOn(accumulator, 'sendDataPoints').mockImplementation(async () => {
       // Mock implementation of sendDataPoints does nothing
     });
@@ -35,19 +35,22 @@ describe('DatapointAccumulator', () => {
     jest.clearAllMocks();
   });
 
-  test('should correctly debounce and rate-limit datapoints without calling setTimeout or sendDataPoints', () => {
+  test('should correctly discard rate-limited datapoints not queue others', () => {
+    const t1 = new Date().getTime() - 1000;
+    const t2 = new Date().getTime() + 10;
+
     // Prepare mock data points
     const mockDataPoint1 = {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      t: 1000,
+      t: t1,
     };
     const mockDataPoint2 = {
       faceLandmarks: [],
       faceBlendshapes: [],
       facialTransformationMatrixes: [],
-      t: 2000,
+      t: t2,
     };
 
     // Push mock data points
@@ -55,77 +58,42 @@ describe('DatapointAccumulator', () => {
     accumulator.accumulateAndDebounce(mockDataPoint2);
 
     // Check if setTimeout is set up properly
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-
-    // Fast-forward the timer to trigger the debouncerCallback
-    jest.runAllTimers();
-
-    // Check if sendDataPoints is called
-    expect(accumulator.sendDataPoints).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenCalledTimes(0);
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
-    expect(accumulator.sendDataPoints).toHaveBeenCalledWith([
-      expect.objectContaining({ t: 1000 }), // MockDataPoint1
-      expect.objectContaining({ t: 2000 }), // MockDataPoint2
+    expect(accumulator.queuedDataPoints).toEqual([
+      expect.objectContaining({ t: t2 }), // MockDataPoint2
     ]);
+    expect(accumulator.candidateDataPoints).toEqual([]);
   });
 
-  test('should reset debouncer after callback and restart if there are remaining data points', () => {
-    // Mock data points
-    const mockDataPoint = { faceLandmarks: [], faceBlendshapes: [], facialTransformationMatrixes: [], t: 1000 };
+  test('should correctly discard rate-limited datapoints not queue others - 2', () => {
+    const tBase = new Date().getTime() - 1000;
 
-    // Add a single point
-    accumulator.accumulateAndDebounce(mockDataPoint);
+    const mockDataPoints = [0, 199, 200, 201, 202, 203, 400].map((delta) => {
+      const t1 = tBase + delta;
 
-    // Check if setTimeout was called once
-    expect(setTimeout).toHaveBeenCalledTimes(1);
+      return {
+        faceLandmarks: [],
+        faceBlendshapes: [],
+        facialTransformationMatrixes: [],
+        t: t1,
+      };
+    });
 
-    // Fast-forward the timer
-    jest.runAllTimers();
+    accumulator.lastSendTimestamp = tBase - 1000;
 
-    // Ensure sendDataPoints is called
-    expect(accumulator.sendDataPoints).toHaveBeenCalledTimes(1);
+    // Push mock data points
+    mockDataPoints.forEach((mockDataPoint) => {
+      accumulator.accumulateAndDebounce(mockDataPoint);
+    });
 
-    // Debouncer should be reset after callback
-    expect(accumulator.debouncer).toBeNull();
-
-    // Add more data points to check rebouncing
-    accumulator.accumulateAndDebounce(mockDataPoint);
-
-    // Check if setTimeout starts again
-    expect(setTimeout).toHaveBeenCalledTimes(2);
-  });
-
-  test('should respect the DATAPOINTS_PER_SECOND limit for filtered data points', () => {
-    // Push data points with timestamps that violate rate limits
-    const mockDataPoint1 = {
-      faceLandmarks: [],
-      faceBlendshapes: [],
-      facialTransformationMatrixes: [],
-      t: 1000,
-    };
-    const mockDataPoint2 = {
-      faceLandmarks: [],
-      faceBlendshapes: [],
-      facialTransformationMatrixes: [],
-      t: 1005,
-    }; // Close timestamp — skipped
-    const mockDataPoint3 = {
-      faceLandmarks: [],
-      faceBlendshapes: [],
-      facialTransformationMatrixes: [],
-      t: 2000,
-    }; // Wider gap — included
-
-    accumulator.dataPoints.push(mockDataPoint1, mockDataPoint2, mockDataPoint3);
-
-    // Call debouncerCallback explicitly
-    accumulator.debouncerCallback();
-
-    // Ensure sendDataPoints only includes points respecting the interval
-    expect(accumulator.sendDataPoints).toHaveBeenCalledWith([
-      expect.objectContaining(mockDataPoint1), // Included
-      expect.objectContaining(mockDataPoint3), // Included
-    ]);
+    // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
+    expect(accumulator.queuedDataPoints).toEqual(
+      [0, 2, 6].map(
+        (index) => expect.objectContaining({ t: mockDataPoints[index].t }), // MockDataPoint2
+      ),
+    );
+    expect(accumulator.candidateDataPoints).toEqual([]);
   });
 });

@@ -19,7 +19,7 @@ class FaceLandmarkerManager extends DisposableComponent {
 
   private static _instance: FaceLandmarkerManager;
   private static SUMMARY_INTERVAL = 3000;
-  private static AUTO_SEND_INTERVAL = 1000;
+  private static AUTO_SEND_INTERVAL = 1300;
   private _summaryTimer: ReturnType<typeof setInterval> | null = null;
 
   public config: FaceLandmarkComponentConfig;
@@ -69,6 +69,7 @@ class FaceLandmarkerManager extends DisposableComponent {
 
     this.datapointAccumulator = new DatapointAccumulator(
       this.config.MaximumSendRateHz,
+      FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       (kind, count, totalBytes, totalCompressedBytes) => {
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
@@ -137,6 +138,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.SetState(FaceLandmarkerState.Running);
     this.clearSummaryTimer();
     this.stopWebcam();
+    this.datapointAccumulator.stop();
   }
 
   public queueForSend(dataPoint: FaceLandmarkerResult) {
@@ -157,7 +159,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     console.log('FaceLandmarkerManager: Start Tracking');
 
     this.clearSummaryTimer();
-    this._summaryTimer = setInterval(this.SendSummary.bind(this), FaceLandmarkerManager.AUTO_SEND_INTERVAL);
+    this._summaryTimer = setInterval(this.SendSummary.bind(this), FaceLandmarkerManager.SUMMARY_INTERVAL);
 
     this.SetState(FaceLandmarkerState.Running);
     // TODO: there is very likely a race condition here between us sending off the final

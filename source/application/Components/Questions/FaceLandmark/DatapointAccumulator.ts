@@ -48,58 +48,95 @@ export declare interface ElicitFaceLandmarkerResult {
 }
 
 export class DatapointAccumulator {
-  public dataPoints: AccumulatableRecord[] = [];
+  public candidateDataPoints: AccumulatableRecord[] = [];
+  public queuedDataPoints: AccumulatableRecord[] = [];
   public debouncer: ReturnType<typeof setTimeout> | null = null;
+  public sender: ReturnType<typeof setInterval> | null = null;
   public sessionGuid: string;
-  private lastSendTimestamp = 0;
-  private maximumSendRateHz = 5; // Configurable rate limit — can be adjusted as needed
+  public lastSendTimestamp = 0; // public for testing...
+  private maximumSampleRateHz: number; // Configurable rate limit — can be adjusted as needed
+  private minimumInterDataPointIntervalMs: number;
+  private sendRateMs: number;
   private progressCallback: ProgressCallback | null = null;
 
-  constructor(maximumSendRateHz: number, progressCallback: ProgressCallback | null) {
-    this.maximumSendRateHz = maximumSendRateHz;
+  constructor(maximumSampleRateHz: number, sendRateMs: number = 2000, progressCallback: ProgressCallback | null) {
+    this.maximumSampleRateHz = maximumSampleRateHz;
+    this.minimumInterDataPointIntervalMs = 1000.0 / maximumSampleRateHz;
+    this.sendRateMs = sendRateMs;
+    this.lastSendTimestamp = new Date().getTime() - this.minimumInterDataPointIntervalMs; // ensure we send the first one right away.
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
     this.progressCallback = progressCallback;
   }
 
+  stop() {
+    this.debouncer && clearTimeout(this.debouncer);
+    this.sender && clearInterval(this.sender);
+    this.sender = null;
+  }
+
   accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
     // Push new data point with timestamp
-    this.dataPoints.push({ t: new Date().getTime(), ...dataPoint });
+    const now = new Date().getTime();
+    this.candidateDataPoints.push({ t: now, ...dataPoint });
 
-    // Initiate the debouncing process if not already running
+    this.ensureSenderInterval();
+
     if (this.debouncer == null) {
-      this.debouncer = setTimeout(this.debouncerCallback.bind(this), 1000);
+      const timeSinceLastSend = now - this.lastSendTimestamp;
+      if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
+        // Send right away if it's been long enough since the last send.
+        this.debouncerCallback();
+      } else {
+        // Initiate the debouncing process if not already running
+        this.debouncer = setTimeout(
+          this.debouncerCallback.bind(this),
+          this.minimumInterDataPointIntervalMs - timeSinceLastSend,
+        );
+      }
     }
   }
 
   debouncerCallback() {
-    const interval = 1000 / this.maximumSendRateHz;
-
-    // Filter data points to respect the maximumSendRateHz limit
-    const limitedDataPoints: AccumulatableRecord[] = [];
-    while (this.dataPoints.length > 0) {
-      const candidate = this.dataPoints.shift(); // Always take the most recent point
+    // Filter data points to respect the maximumSampleRateHz limit
+    while (this.candidateDataPoints.length > 0) {
+      const candidate = this.candidateDataPoints.shift(); // Always take the most recent point
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (candidate.t - this.lastSendTimestamp >= interval) {
+      if (candidate.t - this.lastSendTimestamp >= this.minimumInterDataPointIntervalMs) {
         this.lastSendTimestamp = candidate.t;
-        limitedDataPoints.push(candidate); // Add to the limited list
+        this.queuedDataPoints.push(candidate); // Add to the queued list
       } else {
         continue; // Skip old data points that don't fit within the rate limit
       }
     }
 
-    // Send filtered data points
-    this.sendDataPoints(limitedDataPoints);
-
     // Reset debouncer
     this.debouncer = null;
 
     // If remaining data points exist, restart debouncer
-    if (this.dataPoints.length > 0) {
+    if (this.candidateDataPoints.length > 0) {
       this.debouncer = setTimeout(this.debouncerCallback.bind(this), 1000);
     }
+  }
+
+  ensureSenderInterval() {
+    if (this.sender == null) {
+      this.sender = setInterval(this.sendQueuedDataPoints.bind(this), this.sendRateMs);
+    }
+  }
+
+  sendQueuedDataPoints() {
+    const dataPoints = this.queuedDataPoints;
+    this.queuedDataPoints = [];
+    this.sendDataPoints(dataPoints)
+      .then(() => {
+        console.log(`Sent ${dataPoints.length} data points`);
+      })
+      .catch(() => {
+        console.error(`Failed to send ${dataPoints.length} data points`);
+      });
   }
 
   async sendDataPoints(dataPoints: AccumulatableRecord[]) {
