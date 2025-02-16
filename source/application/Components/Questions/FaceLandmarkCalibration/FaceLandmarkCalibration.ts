@@ -209,7 +209,6 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
         calibrate(this.DrawingUtilsClass, this.ReceiveDatapoint.bind(this));
         this.currentState(CALIBRATION_STATE.INITIAL_CALIBRATION_STEP1);
-        getFaceLandmarkerManager().StartTracking();
         getFaceLandmarkerManager().SetState(FaceLandmarkerState.Calibrating);
       });
 
@@ -341,7 +340,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     }
   }
 
-  protected ReceiveDatapoint(dataPoint: FaceLandmarkerResult) {
+  protected ReceiveDatapoint(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
     if (this.currentState() == CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3) {
       this.ComputeAndUpdateInitialCalibration(dataPoint);
     }
@@ -352,7 +351,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     //   this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
     // }
 
-    getFaceLandmarkerManager().queueForSend(dataPoint);
+    getFaceLandmarkerManager().queueForSend(dataPoint, timestamp);
   }
 
   // Calibration times

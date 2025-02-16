@@ -14,6 +14,7 @@ import {
   NormalizedLandmarkComponentConfig,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
+import { AccumulatableRecord } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
 
 class DatapointAccumulator {
   public dataPoints: any[] = [];
@@ -83,13 +84,19 @@ class FaceLandmark extends QuestionBase<{ CalibrationAccuracy: number }> {
         outputFaceBlendshapes: this.config.Blendshapes || true,
       };
 
-      demo(FaceLandmarker, FilesetResolver, DrawingUtils, options, (dataPoint: FaceLandmarkerResult) => {
-        // const transformedDataPoint = transformDatapoint(this.config, dataPoint);
-        // datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
+      demo(
+        FaceLandmarker,
+        FilesetResolver,
+        DrawingUtils,
+        options,
+        (dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => {
+          // const transformedDataPoint = transformDatapoint(this.config, dataPoint);
+          // datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
 
-        const compressedDataPoint = compressDatapoint(this.config, dataPoint);
-        datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
-      });
+          const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp) as AccumulatableRecord;
+          datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
+        },
+      );
     });
   }
 

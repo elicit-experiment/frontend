@@ -2,7 +2,11 @@ import DisposableComponent from 'Components/DisposableComponent';
 import ExperimentManager from 'Managers/Portal/Experiment';
 import PortalClient from 'PortalClient';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import { DatapointAccumulator, ProgressKind } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import {
+  AccumulatableRecord,
+  DatapointAccumulator,
+  ProgressKind,
+} from 'Components/Questions/FaceLandmark/DatapointAccumulator';
 import { FaceLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 
@@ -41,7 +45,8 @@ class FaceLandmarkerManager extends DisposableComponent {
   public state = FaceLandmarkerState.NotStarted;
   public webcamRunning = false;
 
-  public videoRatio: number | null = null;
+  public videoAspectRatio: number | null = null;
+  public webcamFrameRate: number | null = null;
 
   private constructor() {
     super();
@@ -132,11 +137,11 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.webcamRunning = false;
   }
 
-  public queueForSend(dataPoint: FaceLandmarkerResult) {
-    const compressedDataPoint = compressDatapoint(this.config, dataPoint);
+  public queueForSend(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
+    const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp) as AccumulatableRecord;
     if (compressedDataPoint) {
       this.currentSummaryPeriodCounts.queued++;
-      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint as Record<string, unknown>);
+      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint);
     }
   }
   private clearSummaryTimer() {
@@ -209,7 +214,8 @@ class FaceLandmarkerManager extends DisposableComponent {
           maximum_send_rate_hz: this.config.MaximumSendRateHz,
           auto_send_interval_ms: FaceLandmarkerManager.AUTO_SEND_INTERVAL,
           summary_interval_ms: FaceLandmarkerManager.SUMMARY_INTERVAL,
-          video_ratio: this.videoRatio,
+          video_aspect_ratio: this.videoAspectRatio,
+          webcam_frame_rate: this.webcamFrameRate,
         }
       : {};
     const dataPoint = {

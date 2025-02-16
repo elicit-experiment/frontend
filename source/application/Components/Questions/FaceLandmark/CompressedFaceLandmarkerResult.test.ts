@@ -23,7 +23,7 @@ describe('compressDatapoint', () => {
     });
 
     const original = createResult();
-    const compressed = compressDatapoint(config, original);
+    const compressed = compressDatapoint(config, original, performance.now());
     const uncompressed = uncompressDatapoint(compressed);
     //console.log(JSON.stringify(compressed, null, 2));
     expect(uncompressed).toEqual(original);
@@ -42,7 +42,7 @@ describe('compressDatapoint', () => {
     });
 
     const original = createResult();
-    const compressed = compressDatapoint(config, original);
+    const compressed = compressDatapoint(config, original, performance.now());
     const uncompressed = uncompressDatapoint(compressed);
     expect(compressed.m).toBeUndefined();
     delete original.facialTransformationMatrixes;
@@ -61,7 +61,7 @@ describe('compressDatapoint', () => {
     });
 
     const original = createResult();
-    const compressed = compressDatapoint(config, original);
+    const compressed = compressDatapoint(config, original, performance.now());
     const uncompressed = uncompressDatapoint(compressed);
     delete original.facialTransformationMatrixes;
     expect(

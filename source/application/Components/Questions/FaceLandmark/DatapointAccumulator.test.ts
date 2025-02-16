@@ -25,7 +25,7 @@ describe('DatapointAccumulator', () => {
 
   beforeEach(() => {
     accumulator = new DatapointAccumulator(5, 5, null);
-    jest.spyOn(accumulator, 'sendDataPoints').mockImplementation(async () => {
+    jest.spyOn(accumulator, 'sendQueuedDataPoints').mockImplementation(async () => {
       // Mock implementation of sendDataPoints does nothing
     });
   });
@@ -36,8 +36,10 @@ describe('DatapointAccumulator', () => {
   });
 
   test('should correctly discard rate-limited datapoints not queue others', () => {
-    const t1 = new Date().getTime() - 1000;
-    const t2 = new Date().getTime() + 10;
+    const t1 = new Date().getTime() - 180;
+    const t2 = t1 + 230;
+
+    accumulator.lastSendTimestamp = t1 - 10;
 
     // Prepare mock data points
     const mockDataPoint1 = {
@@ -58,7 +60,9 @@ describe('DatapointAccumulator', () => {
     accumulator.accumulateAndDebounce(mockDataPoint2);
 
     // Check if setTimeout is set up properly
-    expect(setTimeout).toHaveBeenCalledTimes(0);
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(1000);
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
     expect(accumulator.queuedDataPoints).toEqual([
@@ -86,6 +90,7 @@ describe('DatapointAccumulator', () => {
     // Push mock data points
     mockDataPoints.forEach((mockDataPoint) => {
       accumulator.accumulateAndDebounce(mockDataPoint);
+      jest.advanceTimersByTime(1000);
     });
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND

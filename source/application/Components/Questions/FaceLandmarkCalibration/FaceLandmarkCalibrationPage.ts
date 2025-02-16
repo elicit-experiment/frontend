@@ -24,7 +24,7 @@ class FaceLandmarkCalibrationPage {
   public monitorVideoEl: HTMLVideoElement;
   public enableWebcamButton: HTMLButtonElement;
 
-  public dataCallback: (FaceLandmarkerResult) => void;
+  public dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void;
 
   constructor() {
     this.calibrationVideoEl = document.getElementById('webcam') as HTMLVideoElement;
@@ -54,17 +54,25 @@ class FaceLandmarkCalibrationPage {
     navigator.mediaDevices
       .getUserMedia(CONSTRAINTS)
       .then(async (stream) => {
+        const videoTrack = stream.getVideoTracks()[0];
+        const settings = videoTrack.getSettings();
+        const frameRate = settings.frameRate;
+
         try {
           console.dir('navigator.mediaDevices.getUserMedia');
           if (this.calibrationVideoEl) {
             const ratio = await this.configureCalibrationVideoElement(stream);
-            console.log(`navigator.mediaDevices.getUserMedia: ${ratio}`);
+            getFaceLandmarkerManager().videoAspectRatio = ratio;
+            getFaceLandmarkerManager().webcamFrameRate = frameRate;
+            console.log(`navigator.mediaDevices.getUserMedia: ${ratio} ${frameRate}`);
           }
           await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
 
+          getFaceLandmarkerManager().StartTracking();
+
           // kick off the prediction loop
-          this.predictWebcam();
+          await this.predictWebcam();
         } catch (e) {
           console.log('navigator.mediaDevices.getUserMedia error: ', e.message, e.name);
         }
@@ -74,9 +82,9 @@ class FaceLandmarkCalibrationPage {
       });
   }
 
-  private configureCalibrationVideoElement(stream: MediaStream) {
+  private configureCalibrationVideoElement(stream: MediaStream): Promise<number | null> {
     this.calibrationVideoEl.srcObject = stream;
-    const setRatioFromCalibrationVideo = new Promise((resolve, reject) => {
+    return new Promise<number | null>((resolve, reject) => {
       this.calibrationVideoEl.addEventListener(
         'loadeddata',
         () => {
@@ -84,7 +92,6 @@ class FaceLandmarkCalibrationPage {
 
           if (this.calibrationVideoEl) {
             ratio = this.calibrationVideoEl.videoHeight / this.calibrationVideoEl.videoWidth;
-            getFaceLandmarkerManager().videoRatio = ratio;
             this.calibrationVideoEl.style.width = this.videoWidth + 'px';
             this.calibrationVideoEl.style.height = this.videoWidth * ratio + 'px';
             (this.calibrationVideoEl.parentNode as HTMLDivElement).style.width = this.videoWidth + 'px';
@@ -98,25 +105,24 @@ class FaceLandmarkCalibrationPage {
             }
             resolve(ratio);
           } else {
-            reject("Can't get video ratio");
+            reject(null);
           }
         },
         { once: true },
       );
     });
-    return setRatioFromCalibrationVideo;
   }
 
   private configureMonitorVideoElement(stream: MediaStream) {
     this.monitorVideoEl.srcObject = stream;
     const loadedVideoDataPromise = new Promise((resolve, reject) => {
       this.monitorVideoEl.addEventListener('loadeddata', async () => {
-        if (!getFaceLandmarkerManager().videoRatio) {
+        if (!getFaceLandmarkerManager().videoAspectRatio) {
           return reject("Can't get video ratio");
         }
 
         this.monitorVideoEl.style.width = this.videoWidth + 'px';
-        this.monitorVideoEl.style.height = this.videoWidth * getFaceLandmarkerManager().videoRatio + 'px';
+        this.monitorVideoEl.style.height = this.videoWidth * getFaceLandmarkerManager().videoAspectRatio + 'px';
 
         this.videoConfigured = true;
 
@@ -139,7 +145,7 @@ class FaceLandmarkCalibrationPage {
     return loadedVideoDataPromise;
   }
 
-  async predictWebcam() {
+  async predictWebcam(timestamp: DOMHighResTimeStamp = 0) {
     if (!this.videoConfigured) {
       throw new Error('No video configured!');
     }
@@ -153,7 +159,7 @@ class FaceLandmarkCalibrationPage {
     }
 
     if (results) {
-      this.dataCallback(results);
+      this.dataCallback(results, timestamp);
     }
 
     // Call this function again to keep predicting when the browser is ready.
@@ -162,8 +168,10 @@ class FaceLandmarkCalibrationPage {
     }
   }
 
-  public async runCalibration(DrawingUtils, dataCallback: (FaceLandmarkerResult) => void) {
-    console.log('runCalibration');
+  public async runCalibration(
+    DrawingUtils,
+    dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
+  ) {
     this.dataCallback = dataCallback;
 
     /********************************************************************
@@ -207,7 +215,10 @@ class FaceLandmarkCalibrationPage {
   }
 }
 
-export default (DrawingUtils: any, dataCallback: (FaceLandmarkerResult) => void) => {
+export default (
+  DrawingUtils: any,
+  dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
+) => {
   const faceLandmarkCalibrationPage: FaceLandmarkCalibrationPage = new FaceLandmarkCalibrationPage();
 
   faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback);

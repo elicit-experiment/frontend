@@ -16,7 +16,7 @@ export default (
   FilesetResolverClass: typeof FilesetResolver,
   DrawingUtils: any,
   options: FaceLandmarkerOptions,
-  dataCallback: (FaceLandmarkerResult) => void,
+  dataCallback: (FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
 ) => {
   const demosSection = document.getElementById('demos');
   const imageBlendShapes = document.getElementById('image-blend-shapes');
@@ -250,7 +250,7 @@ export default (
       }
 
       if (results) {
-        dataCallback(results);
+        dataCallback(results, performance.now());
       }
 
       // Call this function again to keep predicting when the browser is ready.

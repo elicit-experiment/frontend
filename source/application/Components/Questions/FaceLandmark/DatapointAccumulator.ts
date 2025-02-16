@@ -21,7 +21,7 @@ type ElicitNormalizedLandmark = {
 
 type ElicitLandmark = NormalizedLandmark | ElicitNormalizedLandmark;
 type AccumulatableBaseRecord = Record<string, unknown>;
-type AccumulatableRecord = AccumulatableBaseRecord & {
+export type AccumulatableRecord = AccumulatableBaseRecord & {
   t: number;
 };
 
@@ -75,15 +75,15 @@ export class DatapointAccumulator {
     this.sender = null;
   }
 
-  accumulateAndDebounce(dataPoint: AccumulatableBaseRecord) {
-    // Push new data point with timestamp
+  accumulateAndDebounce(dataPoint: AccumulatableRecord) {
     const now = new Date().getTime();
-    this.candidateDataPoints.push({ t: now, ...dataPoint });
+    // Push new data point with timestamp
+    this.candidateDataPoints.push(dataPoint);
 
     this.ensureSenderInterval();
 
     if (this.debouncer == null) {
-      const timeSinceLastSend = now - this.lastSendTimestamp;
+      const timeSinceLastSend = dataPoint.t - this.lastSendTimestamp;
       if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
         // Send right away if it's been long enough since the last send.
         this.debouncerCallback();
@@ -104,7 +104,8 @@ export class DatapointAccumulator {
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (candidate.t - this.lastSendTimestamp >= this.minimumInterDataPointIntervalMs) {
+      const deltaTime = candidate.t - this.lastSendTimestamp;
+      if (deltaTime >= this.minimumInterDataPointIntervalMs) {
         this.lastSendTimestamp = candidate.t;
         this.queuedDataPoints.push(candidate); // Add to the queued list
       } else {

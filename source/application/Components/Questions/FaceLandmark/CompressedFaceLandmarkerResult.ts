@@ -81,11 +81,13 @@ export declare interface CompressedFaceLandmarkerResult {
   b?: CompressedClassifications[];
   /** Optional facial transformation matrix. */
   m?: number[][]; // one matrix per face, row major form
+  t: number;
 }
 
 export function compressDatapoint(
   config: NormalizedLandmarkComponentConfig,
   dataPoint: FaceLandmarkerResult,
+  timestamp: DOMHighResTimeStamp,
 ): CompressedFaceLandmarkerResult | null {
   //const result: CompressedFaceLandmarkerResult = {};
 
@@ -133,7 +135,7 @@ export function compressDatapoint(
     );
   }
 
-  const result: CompressedFaceLandmarkerResult = {};
+  const result: CompressedFaceLandmarkerResult = { t: performance.timeOrigin + timestamp };
   if (resultLandmarks) {
     result.l = resultLandmarks;
   }
