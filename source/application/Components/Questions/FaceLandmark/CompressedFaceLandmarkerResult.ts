@@ -97,9 +97,7 @@ export function compressDatapoint(
 
   let resultMatrix: number[][] | null = null;
   if (config.FaceTransformation && dataPoint.hasOwnProperty('facialTransformationMatrixes')) {
-    resultMatrix = dataPoint.facialTransformationMatrixes.map((m) =>
-      m.data.reduce((acc, val) => acc.concat(val), Array<number>()),
-    );
+    resultMatrix = dataPoint.facialTransformationMatrixes.map((m) => m.data.flat());
   }
 
   let resultLandmarks: CompressedNormalizedLandmark[] | null = null;
@@ -108,16 +106,20 @@ export function compressDatapoint(
     return null;
   }
   if (config.Landmarks && dataPoint.hasOwnProperty('faceLandmarks')) {
-    resultLandmarks = dataPoint.faceLandmarks.map(
-      (landmarks): CompressedNormalizedLandmark => ({
+    resultLandmarks = dataPoint.faceLandmarks.map((landmarks): CompressedNormalizedLandmark => {
+      // TODO: Use indexed access and typed arrays for optimization
+      const points: number[] = [];
+      for (const val of landmarks) {
+        points.push(quantize(val.x), quantize(val.y));
+        if (!config.StripZCoordinates) {
+          points.push(quantize(val.z));
+        }
+      }
+      return {
         z: !config.StripZCoordinates,
-        p: landmarks.reduce((acc, val) => {
-          const point = [quantize(val.x), quantize(val.y)];
-          !config.StripZCoordinates && point.push(quantize(val.z));
-          return acc.concat(point);
-        }, Array<number>()),
-      }),
-    );
+        p: points,
+      };
+    });
   }
 
   let resultBlendshapes: CompressedClassifications[] | null = null;
