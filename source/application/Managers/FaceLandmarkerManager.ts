@@ -132,15 +132,6 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.webcamRunning = false;
   }
 
-  public Start() {}
-
-  public End() {
-    this.SetState(FaceLandmarkerState.Running);
-    this.clearSummaryTimer();
-    this.stopWebcam();
-    this.datapointAccumulator.stop();
-  }
-
   public queueForSend(dataPoint: FaceLandmarkerResult) {
     const compressedDataPoint = compressDatapoint(this.config, dataPoint);
     if (compressedDataPoint) {
@@ -166,12 +157,20 @@ class FaceLandmarkerManager extends DisposableComponent {
     // FaceLandmarker data and the user hitting "end experiment" which will trigger a page nav.
     // I think the best solution is to add plumming to CallQueue to check if it's empty, and
     // only un-disable the end experiment button when that's empty.
-    ExperimentManager.IsExperimentCompleted.subscribe((_completed: boolean) => {
-      this.End();
+    ExperimentManager.IsExperimentCompleted.subscribe((/*completed: boolean*/) => {
+      this.StopTracking();
     });
 
-    // Moved to Portal
-    //window.addEventListener('beforeunload', FaceLandmarkerManager.unloadListener);
+    this.SendLifecycleDataPoint(true);
+    this.SetState(FaceLandmarkerState.Running);
+  }
+
+  public StopTracking() {
+    this.SendLifecycleDataPoint(false);
+    this.SetState(FaceLandmarkerState.Ended);
+    this.clearSummaryTimer();
+    this.stopWebcam();
+    this.datapointAccumulator.stop();
   }
 
   public SendSummary() {
@@ -201,6 +200,30 @@ class FaceLandmarkerManager extends DisposableComponent {
 
     Object.keys(this.currentSummaryPeriodCounts).forEach((key) => {
       this.currentSummaryPeriodCounts[key as keyof typeof this.currentSummaryPeriodCounts] = 0;
+    });
+  }
+
+  public SendLifecycleDataPoint(start: boolean) {
+    const config = start
+      ? {
+          maximum_send_rate_hz: this.config.MaximumSendRateHz,
+          auto_send_interval_ms: FaceLandmarkerManager.AUTO_SEND_INTERVAL,
+          summary_interval_ms: FaceLandmarkerManager.SUMMARY_INTERVAL,
+          video_ratio: this.videoRatio,
+        }
+      : {};
+    const dataPoint = {
+      kind: 'face_landmark',
+      point_type: `face_landmark_lifecycle_${start ? 'start' : 'stop'}`,
+      method: '',
+      value: JSON.stringify(config),
+      datetime: new Date(),
+    };
+
+    ExperimentManager.SendSlideDataPoint('face_landmark_summary', dataPoint, (err) => {
+      if (!err) {
+        console.error('datapoint error');
+      }
     });
   }
 

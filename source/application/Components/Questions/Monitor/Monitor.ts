@@ -23,10 +23,7 @@ class Monitor extends QuestionBase<{ Context: { Type: string; Data: string }; Ti
 
     MouseTrackingManager.Instance.StartTracking();
     this.MouseMoveHandler = (event: MouseEvent) => {
-      MouseTrackingManager.Instance.ProcessPoint(
-        { x: event.x, y: event.y, timeStamp: new Date().getTime() },
-        new Date().getTime(),
-      );
+      MouseTrackingManager.Instance.ProcessPoint({ x: event.x, y: event.y, timeStamp: new Date().getTime() });
     };
     document.addEventListener('mousemove', this.MouseMoveHandler);
   }
