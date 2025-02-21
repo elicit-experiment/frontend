@@ -15,6 +15,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
   constructor(question: QuestionModel, requiresInput = true) {
     super();
+
     this.Model = question;
     this.Model.RequiresInput = requiresInput;
     this.HasAnswer = knockout.computed(
@@ -33,7 +34,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     }, 0); //Give descendant time to override HasValidAnswer
   }
 
-  private configureLayout() {
+  public configureLayout() {
     this.IsColumnLayout = this.Model.Layout?.Type === 'column';
 
     if (this.IsColumnLayout) {

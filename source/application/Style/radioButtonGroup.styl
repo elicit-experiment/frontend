@@ -1,18 +1,16 @@
 
-label.radio-button-group {
-  display: flex;
-  padding-left: 15px;
-  cursor: inherit;
-  align-items: flex-start;
-  margin: auto;
-}
-
 label.checkbox-button-group,
 label.radio-button-group {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
   position: relative;
+  padding-left: 15px;
+  cursor: inherit;
+  margin: auto;
+}
+
+label.radio-button-group {
 }
 
 label.checkbox-button-group > input[type=checkbox],
@@ -20,15 +18,16 @@ label.radio-button-group > input[type=radio] {
   margin-right: 1rem;
   margin-top: 0.4rem;
   padding: 0;
+}
+
+label.radio-button-group > input[type=radio] {
   -webkit-appearance: radio;
 }
 
-label.radio-button-group > span {
+label.radio-button-group > span,
+label.checkbox-button-group > span {
   display: inline-block;
   margin: 0;
-}
-
-label.checkbox-button-group > span {
 }
 
 .QuestionBlock > .row {

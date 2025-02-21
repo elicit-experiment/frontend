@@ -11,11 +11,18 @@
                 <div data-bind="css: `col-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), [`col-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'radio-button-group': true}">
-                    <input data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].IsAnswerable"
-                           type="radio"/>
+                <label data-bind="css: { disabled: !$parents[1].IsAnswerable(), ...$parents[1].ItemCssClass()}">
+                    <input type="radio"
+                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: $parents[1].IsAnswerable()"/>
                     <span data-bind="html: Label"></span>
                 </label>
+            <!-- /ko -->
+
+            <!-- ko if: $index() === ($parents[0].RowedItems.length - 1) -->
+            <!-- ko foreach: $parents[0].AlignmentPaddingItems -->
+            <div data-bind="css: $parents[1].ItemCssClass()">
+            </div>
+            <!-- /ko -->
             <!-- /ko -->
         </div>
 

@@ -28,12 +28,16 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
     this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
     this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
 
-    console.log(this._minNoOfSelections);
     this.CanSelectMore = knockout.computed(() => {
       //console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);
       return this.Answer().length < this._maxNoOfSelections;
     });
     this.SetItems(this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)));
+
+    // Prevent the last row from having misaligned columns.
+    this.AlignmentPaddingItems(
+      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(true)
+    );
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 
@@ -69,6 +73,11 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       );
 
       this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
+    });
+
+    this.ItemCssClass({
+      'checkbox-button-group': true,
+      ...this.ItemCssClass(),
     });
   }
 

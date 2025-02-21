@@ -46,6 +46,8 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   public CorrectnessClass: ko.Computed<string>;
   public CorrectnessLabel: ko.Computed<string>;
 
+  public IsAnswerable: ko.Computed<boolean>;
+
   protected constructor(question: QuestionModel) {
     super(question);
 
@@ -85,6 +87,13 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
         this.RevealAnswers(true);
       }
     });
+
+    this.IsAnswerable = knockout.computed(() => {
+      const canAnswer = this.CanAnswer();
+      const hasAnswer = this.HasAnswer();
+      return canAnswer && (!this.AnswerOnce || !hasAnswer);
+    });
+
   }
 
   protected SetItems(items: ItemInfo[]): void {

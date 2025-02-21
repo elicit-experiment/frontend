@@ -1,27 +1,34 @@
 ﻿<script type="text/html" id="CheckboxGroupButtons">
-    <div class="row QuestionBlock correctable-question">
-        <div class="row" data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
-            <div class="row" data-bind="foreach: $data">
+    <div class="row QuestionBlock correctable-question" data-bind="css: `${CorrectnessClass()}`">
+        <!-- ko if: ShowCorrectness -->
+        <div data-bind="css: `correctness-icon group-result ${CorrectnessClass()}`, html: CorrectnessLabel">
+        </div>
+        <!-- /ko -->
+
+        <div data-bind="foreach: RowedItems, css: `row ${CorrectnessClass()}`">
+            <!-- ko foreach: $data -->
                 <!-- ko if: ($parentContext.$index() + $index()) === -1 -->
                 <div data-bind="css: `col-${Math.floor(12/$parents[1].QuestionsPerRow())}`"
                      data-bind="visible: $parents[1].AddFillerItem, css:{HalfColumn: $parents[1].AddHalfFillerItem}"></div>
                 <!-- /ko -->
-                <label data-bind="css: {disabled: !($parents[1].CanAnswer() && IsEnabled()), [`col-${Math.floor(12/$parents[1].QuestionsPerRow())}`]: true, 'checkbox-button-group row': true}">
+                <label data-bind="css: {disabled: !$parents[1].IsAnswerable(), ...$parents[1].ItemCssClass()}">
                     <!-- ko if: $parents[1].ShowCorrectness -->
                     <div data-bind="css: `highlight-result-icon individual ${CorrectnessClass()}`">
                     </div>
                     <!-- /ko -->
                     <input type="checkbox"
-                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: ($parents[1].CanAnswer() && IsEnabled())"/>
+                           data-bind="checked: $parents[1].Answer, attr: {name: $parents[1].Id}, value: Id, enable: ($parents[1].IsAnswerable())"/>
                     <span data-bind="html: Label"></span>
                 </label>
+            <!-- /ko -->
+
+            <!-- ko if: $index() === ($parents[0].RowedItems.length - 1) -->
+            <!-- ko foreach: $parents[0].AlignmentPaddingItems -->
+            <div data-bind="css: $parents[1].ItemCssClass()">
             </div>
+            <!-- /ko -->
+            <!-- /ko -->
         </div>
-        <!-- ko if: ShowCorrectness -->
-        <div data-bind="css: `${CorrectnessClass()}`">
-            <span class="group-result correctness-icon" data-bind="html: CorrectnessLabel"> </span>
-        </div>
-        <!-- /ko -->
         <!-- ko if: ShowFeedback && FeedbackText -->
         <div data-bind="css: `row feedback ${CorrectnessClass()}`">
             <div data-bind="css: `highlight-result-icon col-2`">

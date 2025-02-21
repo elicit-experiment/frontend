@@ -13,7 +13,6 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   public CorrectnessLabel: ko.Computed<string>;
 
   public FeedbackText: ko.Observable<string> = knockout.observable<string>(null);
-  public IsAnswerable: ko.Computed<boolean>;
 
   protected readonly InstrumentTemplateName = 'RadioButtonGroupButtons';
 
@@ -23,6 +22,11 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
     this._isOptional = this.GetInstrument('IsOptional') === true;
 
     this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
+
+    // Prevent the last row from having misaligned columns.
+    this.AlignmentPaddingItems(
+      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(true)
+    );
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 
@@ -34,12 +38,6 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
       this.FeedbackText(item.Feedback);
     });
 
-    this.IsAnswerable = knockout.computed(() => {
-      const canAnswer = this.CanAnswer();
-      const hasAnswer = this.HasAnswer();
-      return canAnswer && (!this.AnswerOnce || !hasAnswer);
-    });
-
     if (this.HasAnswer()) this.Answer(this.GetAnswer().Id);
     this.Answer.subscribe((id) => {
       const item = this.Items.find((item) => item.Id === id);
@@ -47,6 +45,11 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
 
       this.AddEvent('Change', 'Mouse/Left/Down', id);
       this.SetAnswer({ Id: id, Correct: item.Correct });
+    });
+
+    this.ItemCssClass({
+      'radio-button-group': true,
+      ...this.ItemCssClass(),
     });
   }
 
