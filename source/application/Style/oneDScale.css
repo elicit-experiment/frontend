@@ -1,0 +1,136 @@
+.OneDScale .ScaleContainer {
+  display: flex;
+  flex-direction: column;
+}
+.OneDScale .SliderContainer {
+  position: relative;
+  display: flex;
+}
+.OneDScale .SliderContainer input[type="range"] {
+  position: relative;
+  left: 20%;
+  width: 60%;
+}
+.OneDScale .XLabel {
+  height: 24px;
+  text-align: center;
+}
+.OneDScale .YLabel {
+  height: 24px;
+  text-align: right;
+}
+.OneDScale .Y1Label {
+  height: 24px;
+  text-align: right;
+}
+.OneDScale .Y1Label {
+  height: 24px;
+  text-align: left;
+}
+.OneDScale .XTicks {
+  position: relative;
+  left: 20%;
+  width: 60%;
+}
+.OneDScale .XTicks .Tick {
+  position: absolute;
+}
+.OneDScale .XTicks.X2 .Tick {
+  height: 26px;
+}
+.OneDScale .XTicks .Tick:not(.MinPosition):not(.MaxPosition) {
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+.OneDScale .XTicks .Tick.MaxPosition {
+  left: auto !important;
+  right: 0;
+}
+.OneDScale .YTicks {
+  position: absolute;
+  padding: 0 10px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.OneDScale .YTicks.Y1 {
+  right: 80%;
+}
+.OneDScale .YTicks.Y2 {
+  left: 80%;
+}
+.OneDScale .YTicks .Tick {
+  display: block;
+}
+.OneDScale .YTicks.Y1 .Tick {
+  text-align: right;
+}
+.OneDScale input[type="range"] {
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: rgba(255,255,255,0);
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  border: none;
+  padding: 1px 2px;
+  border-radius: 14px;
+  background: #f0f0f0;
+  box-shadow: inset 0 1px 0 0 #0d0e0f, inset 0 -1px 0 0 #3a3d42;
+  -webkit-box-shadow: inset 0 1px 0 0 #0d0e0f, inset 0 -1px 0 0 #3a3d42;
+  outline: none /* no focus outline */;
+}
+.OneDScale input[type="range"]::-moz-range-track {
+  border: inherit;
+  background: transparent;
+}
+.OneDScale input[type="range"]::-ms-track {
+  border: inherit;
+  color: transparent /* don't draw vertical reference line */;
+  background: transparent;
+}
+.OneDScale input[type="range"]::-ms-fill-lower,
+.OneDScale input[type="range"]::-ms-fill-upper {
+  background: transparent;
+}
+.OneDScale input[type="range"]::-ms-tooltip {
+  display: none;
+}
+.OneDScale input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 18px;
+  border: none;
+  border-radius: 12px;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ccc), color-stop(100%, #aaa)) /* android <= 2.2 */;
+  background-image: -webkit-linear-gradient(top, #ccc 0, #aaa 100%) /* older mobile safari and android > 2.2 */;
+  background-image: linear-gradient(to bottom, #ccc 0, #aaa 100%) /* W3C */;
+}
+.OneDScale input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 18px;
+  border: none;
+  border-radius: 12px;
+  background-image: linear-gradient(to bottom, #ccc 0, #aaa 100%) /* W3C */;
+}
+.OneDScale input[type="range"]::-ms-thumb {
+  width: 20px;
+  height: 18px;
+  border-radius: 12px;
+  border: 0;
+  background-image: linear-gradient(to bottom, #ccc 0, #aaa 100%) /* W3C */;
+}
+.OneDScale input[type="range"].NoValue::-webkit-slider-thumb {
+  visibility: hidden;
+}
+.OneDScale input[type="range"].NoValue::-moz-range-thumb {
+  visibility: hidden;
+}
+.OneDScale input[type="range"].NoValue::-ms-thumb {
+  visibility: hidden;
+}

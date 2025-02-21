@@ -1,0 +1,7 @@
+.TextFormat {
+  vertical-align: top;
+}
+.TextFormat textarea.form-control {
+  resize: none;
+  height: 300px;
+}

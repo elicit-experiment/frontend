@@ -1,6 +1,5 @@
 @import "~bootstrap/scss/bootstrap";
 
-
 hr {
   color: var(--bs-border-color);
   opacity: 1.0;
@@ -9,3 +8,22 @@ hr {
 @import "./Style/listSelect";
 @import "./Style/media";
 @import "./Style/stimulus";
+
+@import "./Style/FaceLandmarkCalibration";
+@import "./Style/audio";
+@import "./Style/audioInformationRetrieval";
+@import "./Style/common";
+@import "./Style/flex";
+@import "./Style/freeText";
+@import "./Style/kacPS";
+@import "./Style/landmarker";
+@import "./Style/likertScale";
+@import "./Style/oneDScale";
+@import "./Style/question";
+@import "./Style/radioButtonGroup";
+@import "./Style/slide";
+@import "./Style/soloStimulus";
+@import "./Style/tagging";
+@import "./Style/textFormat";
+@import "./Style/video";
+@import "./Style/webgazer.css";

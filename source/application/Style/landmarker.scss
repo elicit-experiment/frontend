@@ -1,0 +1,124 @@
+.lm-calibration-modal h1 {
+  color: var(--header-blue);
+  font-size: 48px;
+  text-align: center;
+  font-style: unset;
+}
+.lm-calibration-step1-container {
+  background-color: #fff;
+  border: solid 6px #555;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  text-align: left;
+}
+.lm-calibration-step1-container > img {
+  height: 300px;
+  width: 100%;
+}
+.lm-calibration-step1-container > p {
+  padding: 5px;
+  margin-top: auto;
+}
+.lm-calibration-step1-container > ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  padding-top: 16px;
+  font-size: 24px;
+}
+.lm-calibration-step1-container > ul > li {
+  padding-left: 8px;
+}
+.lm-calibration-step3-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lm-calibration-step3-container > p {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+}
+.lm-calibration-step3-container > p span:nth-child(2) {
+  margin-left: 20px;
+}
+.lm-calibration-step3-container > img {
+  margin-top: 20px;
+}
+.lm-calibration-step3-container video {
+  clear: both;
+  display: block;
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+}
+.lm-calibration-step3-container > .initialCalibrationVideoFeed {
+  border: solid 6px #f00;
+  border-radius: 15px;
+  padding: 3px;
+  width: 520px;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+.lm-calibration-step3-container > .initialCalibrationVideoFeed #webcamWithOverlay {
+  display: none;
+}
+.lm-calibration-step3-container > .initialCalibrationVideoFeed #webcamButton {
+  display: block;
+}
+.lm-calibration-step3-container > .initialCalibrationVideoFeed.enabled #webcamWithOverlay {
+  display: block;
+}
+.lm-calibration-step3-container > .initialCalibrationVideoFeed.enabled #webcamButton {
+  display: none;
+}
+.lm-calibration-step3-container.lm-calibrated > .initialCalibrationVideoFeed {
+  border-color: #008000;
+}
+.circular-progress {
+  --size: 32px;
+  --half-size: calc(var(--size) / 2);
+  --stroke-width: 4px;
+  --radius: calc((var(--size) - var(--stroke-width)) / 2);
+  --circumference: calc(var(--radius) * pi() * 2);
+  --dash: calc((var(--progress) * var(--circumference)) / 100);
+}
+.circular-progress.complete .circular-progress-text {
+  fill: #008000;
+}
+.circular-progress-text {
+  font-weight: bold;
+  font-size: 18px;
+}
+.circular-progress {
+  --size: 32px;
+  --half-size: calc(var(--size) / 2);
+  --stroke-width: 4px;
+  --radius: calc((var(--size) - var(--stroke-width)) / 2);
+  --circumference: calc(var(--radius) * pi() * 2); // Note: pi() in SCSS
+  --dash: calc((var(--progress) * var(--circumference)) / 100);
+
+  &.complete {
+    .circular-progress-text {
+      fill: green;
+    }
+  }
+}
+.circular-progress circle.bg {
+  stroke: #daa;
+}
+.circular-progress circle.fg {
+  transform: rotate(-90deg);
+  transform-origin: var(--half-size) var(--half-size);
+  stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
+  transition: stroke-dasharray 0.3s linear 0s;
+  stroke: #008000;
+}
+@property --progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}

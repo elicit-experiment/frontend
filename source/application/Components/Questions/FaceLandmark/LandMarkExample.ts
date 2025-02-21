@@ -1,4 +1,3 @@
-import './LandmarkExample.css';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
 //import FaceLandmarkCalibration from 'Components/Questions/FaceLandmarkCalibration/FaceLandmarkCalibration';
 

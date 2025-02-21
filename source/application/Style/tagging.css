@@ -1,0 +1,169 @@
+.TaggingA .tagBox,
+.TaggingB .tagBox,
+.ListSelect .tagBox {
+  position: relative;
+  padding: 2px;
+  border-radius: 3px;
+  border: 1px solid #d3d3d3;
+  max-height: 300px;
+  overflow: auto;
+}
+.TaggingA .TagContainer ul,
+.TaggingB .TagContainer ul,
+.ListSelect .TagContainer ul,
+.TaggingA .TagList,
+.TaggingB .TagList,
+.ListSelect .TagList {
+  margin: 10px 0;
+  padding: 2px;
+  border-radius: 3px;
+  border: 1px solid #d3d3d3;
+  max-height: 200px;
+  overflow: auto;
+  list-style: none;
+}
+.TaggingA .TagContainer ul li,
+.TaggingB .TagContainer ul li,
+.ListSelect .TagContainer ul li,
+.TaggingA .TagList li,
+.TaggingB .TagList li,
+.ListSelect .TagList li {
+  cursor: pointer;
+}
+.TaggingA .textarea,
+.TaggingB .textarea,
+.ListSelect .textarea {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #f00;
+  padding: 8px;
+}
+.TaggingA .taggle_list,
+.TaggingB .taggle_list,
+.ListSelect .taggle_list {
+  padding: 0;
+  margin: 0;
+  line-height: 2.5;
+  width: 100%;
+}
+.TaggingA .taggle_input,
+.TaggingB .taggle_input,
+.ListSelect .taggle_input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 300;
+}
+.TaggingA .taggle_list li,
+.TaggingB .taggle_list li,
+.ListSelect .taggle_list li {
+  display: inline;
+  vertical-align: baseline;
+  white-space: nowrap;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.TaggingA .taggle_list .taggle,
+.TaggingB .taggle_list .taggle,
+.ListSelect .taggle_list .taggle {
+  margin-right: 8px;
+  background: #e2e1df;
+  padding: 5px 10px;
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.TaggingA .taggle_list .taggle_hot,
+.TaggingB .taggle_list .taggle_hot,
+.ListSelect .taggle_list .taggle_hot {
+  background: #cac8c4;
+}
+.TaggingA .taggle_list .taggle .close,
+.TaggingB .taggle_list .taggle .close,
+.ListSelect .taggle_list .taggle .close {
+  font-size: 1.1rem;
+  position: absolute;
+  top: 10px;
+  right: 3px;
+  text-decoration: none;
+  padding: 0;
+  line-height: 0.5;
+  color: #ccc;
+  color: rgba(0,0,0,0.2);
+  padding-bottom: 4px;
+  display: inline-block;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.TaggingA .taggle_list .taggle:hover,
+.TaggingB .taggle_list .taggle:hover,
+.ListSelect .taggle_list .taggle:hover {
+  padding: 5px;
+  padding-right: 15px;
+  background: #ccc;
+  transition: all 0.3s;
+}
+.TaggingA .taggle_list .taggle:hover > .close,
+.TaggingB .taggle_list .taggle:hover > .close,
+.ListSelect .taggle_list .taggle:hover > .close {
+  opacity: 1;
+  pointer-events: auto;
+}
+.TaggingA .taggle_list .taggle .close:hover,
+.TaggingB .taggle_list .taggle .close:hover,
+.ListSelect .taggle_list .taggle .close:hover {
+  color: #903;
+}
+.TaggingA .taggle_placeholder,
+.TaggingB .taggle_placeholder,
+.ListSelect .taggle_placeholder {
+  position: absolute;
+  color: #ccc;
+  top: 24px;
+  left: 16px;
+  transition: opacity, 0.25s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.TaggingA .taggle_input,
+.TaggingB .taggle_input,
+.ListSelect .taggle_input {
+  padding: 8px;
+  padding-left: 0;
+  margin-top: -5px;
+  background: none;
+  max-width: 100%;
+}
+.TaggingA .taggle_sizer,
+.TaggingB .taggle_sizer,
+.ListSelect .taggle_sizer {
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: -500px;
+  z-index: -1;
+  visibility: hidden;
+}
+.TaggingA .badge,
+.TaggingB .badge,
+.ListSelect .badge {
+  --bs-badge-color: #55f;
+  border: 1px solid var(--bs-badge-color);
+  background-color: rgba(30,30,255,0.1);
+}
+.TaggingA .badge.user,
+.TaggingB .badge.user,
+.ListSelect .badge.user {
+  --bs-badge-color: #3c3;
+  background-color: rgba(30,200,30,0.1);
+}

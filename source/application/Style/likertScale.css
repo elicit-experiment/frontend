@@ -1,0 +1,44 @@
+.LikertScale {
+  display: flex;
+}
+.LikertScale .Scale {
+  margin: 0 auto;
+  display: table;
+  min-width: 50%;
+}
+.LikertScale .Scale > label {
+  position: relative;
+  display: table-cell;
+}
+.LikertScale .Scale > label > input {
+  position: relative;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 100;
+}
+.LikertScale .Scale > label > spanlast-child {
+  width: 100%;
+  display: inline-block;
+}
+.LikertScale .Scale .Line {
+  position: absolute;
+  top: 10px;
+  height: 1px;
+  border-top: 1px solid #808080;
+  z-order: -10;
+}
+.LikertScale .Scale .Line-Right {
+  left: 50%;
+  width: 50%;
+}
+.LikertScale .Scale .Line-Left {
+  left: -50%;
+  width: 100%;
+}
+.LikertScale .Scale label:last-of-type .Line-Right {
+  display: none;
+}
+.LikertScale .Scale label:first-of-type .Line-Left {
+  display: none;
+}

@@ -53,7 +53,6 @@ module.exports = function (env) {
       ],
       entry: {
         elicit_experiment: path.resolve(__dirname, 'source/application/Main.ts'),
-        style_module: path.resolve(__dirname, `${stylRoot}/default.styl`),
         //templates: templates.map((template) => path.resolve(__dirname, template)),
       },
       output: {
@@ -91,21 +90,6 @@ module.exports = function (env) {
           {
             test: /\.(jpg|jpeg|png|ttf|otf|eot|svg|woff2?)(\?.+)?$/,
             type: 'asset/resource',
-          },
-          {
-            test: /\.(styl)$/,
-            use: [
-              MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: {
-                  sourceMap: true,
-                },
-              },
-              {
-                loader: 'stylus-loader', // compiles Styl to CSS
-              },
-            ],
           },
           // for bootstrap
           {

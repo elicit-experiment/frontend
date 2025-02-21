@@ -1,0 +1,26 @@
+.Freetext {
+  display: flex;
+  flex-direction: column;
+}
+.Freetext input[type="text"],
+.Freetext .FreetextHash input[type="text"] {
+  display: inline-block;
+  width: 300px;
+}
+.Freetext.Horizontal {
+  flex-direction: row;
+}
+.Freetext .PadLeft {
+  padding-left: 10px;
+}
+.Freetext .PadRight {
+  padding-right: 10px;
+}
+.freetext-container {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+.freetext-container label {
+  margin: auto;
+}

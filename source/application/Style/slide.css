@@ -1,0 +1,13 @@
+.SlideContainer > hr:last-of-type {
+  display: none;
+}
+.SlideContainer {
+  display: flex;
+  flex-direction: column;
+}
+.SlideContainer > .slide-push {
+  flex-grow: 1;
+}
+.SlideName {
+  text-transform: capitalize;
+}

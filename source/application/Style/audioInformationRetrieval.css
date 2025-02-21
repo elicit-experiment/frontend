@@ -1,0 +1,111 @@
+.audioInformationRetrieval {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+.audioInformationRetrieval .timeLineContainer {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -ms-justify-content: stretch;
+  -webkit-justify-content: stretch;
+  justify-content: stretch;
+  -ms-flex-align-items: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  border: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .headers {
+  -ms-flex: 0 0 auto;
+  -webkit-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -ms-justify-content: stretch;
+  -webkit-justify-content: stretch;
+  justify-content: stretch;
+  -ms-flex-align-items: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  width: 200px;
+  border-right: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .headers .header {
+  height: 100px;
+  border-bottom: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks {
+  -ms-flex: 1 1 auto;
+  -webkit-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -ms-flex-direction: column;
+  -webkit-box-orient: vertical;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -ms-justify-content: stretch;
+  -webkit-justify-content: stretch;
+  justify-content: stretch;
+  -ms-flex-align-items: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks .track {
+  position: relative;
+  height: 100px;
+  padding: 3px 0;
+  border-bottom: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks .track .segment {
+  position: absolute;
+  height: 40px;
+  overflow: hidden;
+  padding: 3px;
+  border-radius: 3px;
+  border: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks .timeTrack {
+  position: relative;
+  height: 40px;
+  border-bottom: 1px solid #000;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks .timeTrack .segment {
+  position: absolute;
+}
+.audioInformationRetrieval .timeLineContainer .timeLine .tracks .currentPosition {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background-color: #00f;
+}

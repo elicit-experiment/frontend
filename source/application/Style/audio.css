@@ -1,0 +1,12 @@
+.AudioPlayer {
+  display: inline-block;
+}
+.AudioBlock {
+  text-align: center;
+}
+.AudioBlock div {
+  display: inline-block;
+}
+.AudioControls {
+  padding-bottom: 1em;
+}

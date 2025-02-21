@@ -1,15 +1,9 @@
-const postcssCssNext = require('postcss-cssnext');
-const postcssImport = require('postcss-import');
-
-module.exports = {
+/** @type {import('postcss-load-config').Config} */
+const config = {
   plugins: [
-    postcssCssNext({
-      features: {
-        customProperties: {
-          warnings: false,
-        },
-      },
-    }),
-    postcssImport,
-  ],
-};
+    require('autoprefixer'),
+    require('postcss-nested')
+  ]
+}
+
+module.exports = config
