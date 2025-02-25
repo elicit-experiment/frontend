@@ -76,7 +76,7 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     this.UserInputBoxOutside((this.GetInstrument('UserInputBox') || 'Outside').localeCompare('Outside') === 0);
 
     const selectionTags = this.GetInstrument('Items').Item.map((tag: PredefinedTag) => ({
-      ...tag,
+      ...this.FormatPredefinedTag(tag),
       Kind: TagKind.Common,
     }));
     this.PredefinedItems.push(
@@ -123,6 +123,13 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
         }
       }
     }
+  }
+
+  private FormatPredefinedTag(tag: PredefinedTag): PredefinedTag {
+    return {
+      ...tag,
+      Label: this.GetFormatted(tag.Label),
+    };
   }
 
   protected GetTagByLabel(label: string): Tag {

@@ -14,7 +14,7 @@
 			<ul class="TagList" data-bind="class: ListCssClass()">
 				<!-- ko foreach: PredefinedItems -->
 				<li data-bind="click: Toggle, visible: !IsAdded(), class: CssClass()">
-					<span class="badge" data-bind="text: Data.Label"></span>
+					<span class="badge" data-bind="html: Data.Label"></span>
 				</li>
 				<!-- /ko -->
 				<!-- ko foreach: AddedItems -->

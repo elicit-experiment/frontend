@@ -12,6 +12,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
   public StimulusCssClass = 'col-12';
   public InstrumentCssClass = 'col-12';
   public IsColumnLayout = false;
+  public InstrumentTemplateCssClasses = 'flex flex-col';
 
   constructor(question: QuestionModel, requiresInput = true) {
     super();
@@ -36,6 +37,10 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
   public configureLayout() {
     this.IsColumnLayout = this.Model.Layout?.Type === 'column';
+
+    this.InstrumentTemplateCssClasses = `instrument-template flex flex-col ${
+      this.constructor.name.toLowerCase() + '-template'
+    }`;
 
     if (this.IsColumnLayout) {
       const stimulusCols = Math.ceil((this.Model.Layout.ColumnWidthPercent[0] * 12) / 100);
