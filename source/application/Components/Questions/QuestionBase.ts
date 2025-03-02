@@ -217,6 +217,8 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     mediaInfo.OnEvent.subscribe((newValue: { eventName: string; entityType: string }) => {
       this.AddRawEvent(newValue.eventName, mediaInfo.EventType(), 'Stimulus', id, newValue.entityType);
     });
+
+    mediaInfo.AddScreenElementLocationCallback((bbox) => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
   }
 
   protected WhenAllMediaHavePlayed(media: MediaInfo | MediaInfo[], _returnTrueOnAnswer = false): ko.Computed<boolean> {

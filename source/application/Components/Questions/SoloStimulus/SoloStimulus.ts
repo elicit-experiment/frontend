@@ -56,8 +56,6 @@ class SoloStimulus extends QuestionBase<any> {
     this.MediaInfo = MediaInfo.Create(stimulus, this.CanStartPlaying, this.MimeType(stimulus.Type));
     this.TrackMediaInfo(this.EventId, this.MediaInfo);
 
-    this.MediaInfo.AddScreenElementLocationCallback((bbox) => this.AddEvent('Layout', undefined, JSON.stringify(bbox)));
-
     this.HasMedia = true;
 
     this.CanAnswer.subscribe((v) => {
@@ -78,8 +76,7 @@ class SoloStimulus extends QuestionBase<any> {
 
       Swal.fire({
         title: 'Calibration',
-        text:
-          "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
+        text: "Please ensure that your face is visible within the rectangle within the webcam video.  When you've positioned it correctly, the rectangle will turn green and a sketch of the detected face will appear.  Then click on each of the 4 points on the screen. You must click on each point a number times till it goes yellow. Please try to hold your head steady during the process.  This will calibrate your eye movements.",
         showCancelButton: false,
       }).then(() => {
         console.log('Starting calibration.');
