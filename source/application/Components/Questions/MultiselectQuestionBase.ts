@@ -93,7 +93,6 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
       const hasAnswer = this.HasAnswer();
       return canAnswer && (!this.AnswerOnce || !hasAnswer);
     });
-
   }
 
   protected SetItems(items: ItemInfo[]): void {
@@ -108,6 +107,9 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
     this.AddHalfFillerItem = knockout.computed(() => this.Items.length === 3);
     this.AddFillerItem = knockout.computed(() => this.AddOneFillerItem() || this.AddHalfFillerItem());
 
+    if (this.Items.length < this.QuestionsPerRow()) {
+      this.QuestionsPerRow(this.Items.length);
+    }
     this.RowedItems = this.RowItems(this.Items, this.QuestionsPerRow());
   }
 
