@@ -36,7 +36,9 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
 
     // Prevent the last row from having misaligned columns.
     this.AlignmentPaddingItems(
-      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(true)
+      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(
+        true,
+      ),
     );
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
@@ -75,10 +77,12 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
     });
 
-    this.ItemCssClass({
+    const superClassItemCssClass = this.ItemCssClass;
+
+    this.ItemCssClass = knockout.computed(() => ({
       'checkbox-button-group': true,
-      ...this.ItemCssClass(),
-    });
+      ...superClassItemCssClass(),
+    }));
   }
 
   protected HasValidAnswer(answer: AnswerType): boolean {

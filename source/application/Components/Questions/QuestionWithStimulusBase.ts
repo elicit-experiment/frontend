@@ -18,13 +18,11 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
   public HasMedia = false;
   public CanAnswer: ko.Observable<boolean> | ko.Computed<boolean>;
 
-  public ItemCssClass: ko.Observable<Record<string, string | boolean | number>> = knockout.observable({});
+  public ItemCssClass: ko.Computed<Record<string, string | boolean | number>>;
 
   public AlignmentPaddingItems: ko.Observable<Array<boolean>> = knockout.observable([]);
 
-  public QuestionsPerRow() {
-    return this._questionsPerRow;
-  }
+  public QuestionsPerRow: ko.Observable<number> = knockout.observable(3);
 
   constructor(question: QuestionModel, requiresInput = true) {
     super(question, requiresInput);
@@ -38,15 +36,13 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     this.IsColumnLayout = this.Model.Layout.Type === 'column';
 
     const questionsPerRow = this.GetInstrument('QuestionsPerRow');
-    this._questionsPerRow = questionsPerRow === undefined ? 3 : questionsPerRow;
+    if (questionsPerRow) this.QuestionsPerRow(parseInt(questionsPerRow, 10));
 
     // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
 
     this.CanAnswer = this.WhenAllMediaHavePlayed(this.MediaInfo, true);
 
-    this.ItemCssClass({
-      [`col-${Math.floor(12 / this._questionsPerRow)}`]: true,
-    });
+    this.ItemCssClass = knockout.computed(() => ({ [`col-${Math.floor(12 / this.QuestionsPerRow())}`]: true }));
 
     this.configureLayout();
   }
@@ -67,7 +63,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
       console.warn('column layout but no stimulus. Resetting to row layout.');
       this.Model.Layout.Type = 'row';
       this.IsColumnLayout = false;
-    };
+    }
 
     QuestionsBase.prototype.configureLayout.call(this);
   }

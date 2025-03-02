@@ -25,7 +25,9 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
 
     // Prevent the last row from having misaligned columns.
     this.AlignmentPaddingItems(
-      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(true)
+      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(
+        true,
+      ),
     );
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
@@ -47,10 +49,12 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
       this.SetAnswer({ Id: id, Correct: item.Correct });
     });
 
-    this.ItemCssClass({
+    const superClassItemCssClass = this.ItemCssClass;
+
+    this.ItemCssClass = knockout.computed(() => ({
       'radio-button-group': true,
-      ...this.ItemCssClass(),
-    });
+      ...superClassItemCssClass(),
+    }));
   }
 
   protected HasValidAnswer(answer: AnswerType): boolean {
