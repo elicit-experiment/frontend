@@ -84,13 +84,13 @@ class MouseTrackingManager extends DisposableComponent {
     ExperimentManager.IsExperimentCompleted.subscribe((/*completed: boolean*/) => {});
 
     const config = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      window_width: window.innerWidth,
+      window_height: window.innerHeight,
     };
 
     const dataPoint: ChaosDataPoint = {
       kind: MouseTrackingManager.MOUSE_SERIES_TYPE,
-      point_type: 'mouse_tracking_start',
+      point_type: 'mouse_tracking_lifecycle_start',
       method: '',
       value: JSON.stringify(config),
       datetime: new Date(),
@@ -102,7 +102,7 @@ class MouseTrackingManager extends DisposableComponent {
   public StopTracking() {
     const dataPoint: ChaosDataPoint = {
       kind: MouseTrackingManager.MOUSE_SERIES_TYPE,
-      point_type: 'mouse_tracking_stop',
+      point_type: 'mouse_tracking_lifecycle_stop',
       method: '',
       value: '',
       datetime: new Date(),
