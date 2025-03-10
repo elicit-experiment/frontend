@@ -11,7 +11,7 @@ class FreetextHash extends FreetextBase<Answer> {
   constructor(question: QuestionModel) {
     super(question);
 
-    this._forceLowerCase = this.GetInstrument('ForceLowerCase') === 1;
+    this._forceLowerCase = this.GetBooleanInstrument('ForceLowerCase');
 
     this.Answer.subscribe((v) => {
       this.SetAnswer(this.SaveText(v));

@@ -32,7 +32,7 @@ export default class TaggingBase extends QuestionWithStimulusBase<{ Tags: TagDat
     this.SelectionTagsLabel = this.GetInstrumentFormatted('SelectionTagBoxLabel');
     this.UserTagsLabel = this.GetInstrumentFormatted('UserTagBoxLabel');
     this.InputPlaceholder = this.GetInstrument('TextField');
-    this.AnswerIsRequired = this.GetInstrument('MinNoOfScalings') !== '0';
+    this.AnswerIsRequired = this.GetNumberInstrument('MinNoOfScalings') !== 0;
 
     const selectionTags = this.GetInstrument('SelectionTags').Item.map((tag: PredefinedTag) => ({
       ...tag,

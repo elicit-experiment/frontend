@@ -30,13 +30,13 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     this.Id = this.Model.Id;
     this.HeaderLabel = this.GetInstrumentFormatted('HeaderLabel');
 
-    const alignForStimuli = this.GetInstrument('AlignForStimuli');
-    this._alignForStimuli = !(alignForStimuli === undefined || alignForStimuli === '0');
+    const alignForStimuli = this.GetBooleanInstrument('AlignForStimuli');
+    this._alignForStimuli = !(alignForStimuli === undefined || !alignForStimuli);
 
     this.IsColumnLayout = this.Model.Layout.Type === 'column';
 
-    const questionsPerRow = this.GetInstrument('QuestionsPerRow');
-    if (questionsPerRow) this.QuestionsPerRow(parseInt(questionsPerRow, 10));
+    const questionsPerRow = this.GetNumberInstrument('QuestionsPerRow');
+    this.QuestionsPerRow(questionsPerRow);
 
     // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);
 

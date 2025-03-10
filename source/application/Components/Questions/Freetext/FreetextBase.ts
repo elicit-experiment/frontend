@@ -27,7 +27,7 @@ class FreetextBase<T> extends QuestionWithStimulusBase<T> {
 
       if (validation) this._validation = new RegExp(validation);
 
-      this._resizeable = !!this.GetInstrument('Resizeable');
+      this._resizeable = this.GetBooleanInstrument('Resizeable');
       this._boxHeight = this.GetInstrumentFormatted('BoxHeight');
       this._boxWidth = this.GetInstrumentFormatted('BoxWidth');
     }

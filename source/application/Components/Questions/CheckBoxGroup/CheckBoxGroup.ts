@@ -25,8 +25,8 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
     this.FeedbackCorrect(this.GetInstrument('FeedbackCorrect'));
     this.FeedbackIncorrect(this.GetInstrument('FeedbackIncorrect'));
 
-    this._minNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'));
-    this._maxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'));
+    this._minNoOfSelections = this.GetNumberInstrument('MinNoOfSelections');
+    this._maxNoOfSelections = this.GetNumberInstrument('MaxNoOfSelections');
 
     this.CanSelectMore = knockout.computed(() => {
       //console.log(`${this.Answer().length} ${this.Answer().length < this._maxNoOfSelections}`);

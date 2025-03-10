@@ -80,6 +80,25 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     return this.GetIntrumentObject()[key];
   }
 
+  protected GetBooleanInstrument(key: string): boolean {
+    const instrument = this.GetInstrument(key);
+    if (instrument === null || instrument === undefined) return false;
+
+    if (typeof instrument === 'boolean') return instrument;
+    if (typeof instrument === 'string') return instrument.toLocaleLowerCase() === 'true';
+    if (typeof instrument === 'number') return instrument != 0;
+    throw new Error(`Instrument ${key} is not a boolean but: ${instrument}`);
+  }
+
+  protected GetNumberInstrument(key: string): number {
+    const instrument = this.GetInstrument(key);
+    if (instrument === null || instrument === undefined) return 0;
+
+    if (typeof instrument === 'number') return instrument;
+    if (typeof instrument === 'string') return parseInt(instrument, 10);
+    throw new Error(`Instrument ${key} is not a number but: ${instrument}`);
+  }
+
   protected GetInputs(): any[] {
     return this.Model === null || this.Model.Input === null ? new Array<any>() : this.Model.Input;
   }

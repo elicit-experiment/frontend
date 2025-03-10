@@ -51,11 +51,11 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   protected constructor(question: QuestionModel) {
     super(question);
 
-    this.MustAnswerCorrectly = !!this.GetInstrument('MustAnswerCorrectly');
-    this.ShowFeedback = !!this.GetInstrument('ShowFeedback');
-    this.ShowCorrectness = !!this.GetInstrument('ShowCorrectness');
-    this.AnswerOnce = !!this.GetInstrument('AnswerOnce');
-    this.IsOptional = this.GetInstrument('IsOptional') === true;
+    this.MustAnswerCorrectly = this.GetBooleanInstrument('MustAnswerCorrectly');
+    this.ShowFeedback = this.GetBooleanInstrument('ShowFeedback');
+    this.ShowCorrectness = this.GetBooleanInstrument('ShowCorrectness');
+    this.AnswerOnce = this.GetBooleanInstrument('AnswerOnce');
+    this.IsOptional = this.GetBooleanInstrument('IsOptional');
 
     this.CorrectnessClass = knockout.computed(() => {
       if (!this.RevealAnswers()) return '';
@@ -98,7 +98,7 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   protected SetItems(items: ItemInfo[]): void {
     this.Items = items;
 
-    const randomizeOrder = this.GetInstrument('RandomizeOrder');
+    const randomizeOrder = this.GetBooleanInstrument('RandomizeOrder');
     if (randomizeOrder) {
       this.Items = shuffleInPlace(this.Items);
     }

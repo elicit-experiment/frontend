@@ -17,7 +17,7 @@ class LikertScale extends QuestionWithStimulusBase<{ Id: string }> {
   constructor(question: QuestionModel) {
     super(question);
 
-    this.AnswerIsRequired = this.GetInstrument('MinNoOfScalings') !== '0';
+    this.AnswerIsRequired = this.GetNumberInstrument('MinNoOfScalings') !== 0;
 
     this.Items = this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item));
 

@@ -67,10 +67,10 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
 
     this.SelectionTagsLabel = this.GetInstrumentFormatted('SelectionTagBoxLabel');
     this.InputPlaceholder = this.GetInstrument('TextField');
-    this.UserTextInput = this.GetInstrument('UserTextInput');
-    this.IsOptional = this.GetInstrument('IsOptional') !== '0';
-    this.MaxNoOfSelections = parseInt(this.GetInstrument('MaxNoOfSelections'), 10);
-    this.MinNoOfSelections = parseInt(this.GetInstrument('MinNoOfSelections'), 10);
+    this.UserTextInput = this.GetBooleanInstrument('UserTextInput');
+    this.IsOptional = this.GetBooleanInstrument('IsOptional');
+    this.MaxNoOfSelections = this.GetNumberInstrument('MaxNoOfSelections');
+    this.MinNoOfSelections = this.GetNumberInstrument('MinNoOfSelections');
     this.AnswerIsRequired = !this.IsOptional;
     this.UserInputBoxInside((this.GetInstrument('UserInputBox') || 'Inside').localeCompare('Inside') === 0);
     this.UserInputBoxOutside((this.GetInstrument('UserInputBox') || 'Outside').localeCompare('Outside') === 0);

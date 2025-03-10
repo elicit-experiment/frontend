@@ -5,7 +5,7 @@ import QuestionModel from 'Models/Question';
 type AnswerType = { Id: string; Correct: boolean };
 
 class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
-  private _isOptional: boolean;
+  private readonly _isOptional: boolean;
 
   public Answer: ko.Observable<string> = knockout.observable<string>(null);
 
@@ -19,7 +19,7 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
   constructor(question: QuestionModel) {
     super(question);
 
-    this._isOptional = this.GetInstrument('IsOptional') === true;
+    this._isOptional = this.GetBooleanInstrument('IsOptional');
 
     this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
 
