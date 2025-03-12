@@ -23,12 +23,7 @@ class RadioButtonGroup extends MultiselectQuestionBase<AnswerType> {
 
     this.SetItems(this.GetItems<Item, ItemInfo>((item) => this.ItemInfo(item)));
 
-    // Prevent the last row from having misaligned columns.
-    this.AlignmentPaddingItems(
-      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(
-        true,
-      ),
-    );
+    this.computeAlignmentPaddingItems();
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 

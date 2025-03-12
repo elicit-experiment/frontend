@@ -36,6 +36,7 @@ abstract class QuestionsWithStimulusBase<T> extends QuestionsBase<T> {
     this.IsColumnLayout = this.Model.Layout.Type === 'column';
 
     const questionsPerRow = this.GetNumberInstrument('QuestionsPerRow');
+    console.log(`QuestionsPerRow: ${questionsPerRow}`);
     this.QuestionsPerRow(questionsPerRow);
 
     // console.log(`${this.InstrumentCssClass} and ${this.StimulusCssClass} -- ${this.HasMedia}`);

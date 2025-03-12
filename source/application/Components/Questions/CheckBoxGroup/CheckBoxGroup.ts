@@ -33,13 +33,7 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       return this.Answer().length < this._maxNoOfSelections;
     });
     this.SetItems(this.GetItems<Item, ItemInfo>((v) => this.CreateItemInfo(v)));
-
-    // Prevent the last row from having misaligned columns.
-    this.AlignmentPaddingItems(
-      Array((this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow()).fill(
-        true,
-      ),
-    );
+    this.computeAlignmentPaddingItems();
 
     this.AddEvent('Render', '', JSON.stringify(this.Items));
 

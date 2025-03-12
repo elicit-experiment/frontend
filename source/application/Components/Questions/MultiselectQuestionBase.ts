@@ -116,6 +116,17 @@ abstract class MultiselectQuestionBase<T extends CorrectableAnswer> extends Ques
   // We don't show the pre-selections when the instrument IsOptional, but if the user hasn't selected an option before they hit 'next',
   // we need to select the pre-selections and send the change event.
   protected ApplyPreselectIfNeeded() {}
+
+  protected computeAlignmentPaddingItems() {
+    if (this.QuestionsPerRow() > 1) {
+      // Prevent the last row from having misaligned columns.
+      const lastRowEmptyColumnCount =
+        (this.QuestionsPerRow() - (this.Items.length % this.QuestionsPerRow())) % this.QuestionsPerRow();
+      this.AlignmentPaddingItems(Array(lastRowEmptyColumnCount).fill(true));
+    } else {
+      this.AlignmentPaddingItems([]);
+    }
+  }
 }
 
 export default MultiselectQuestionBase;

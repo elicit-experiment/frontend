@@ -92,6 +92,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
 
   protected GetNumberInstrument(key: string): number {
     const instrument = this.GetInstrument(key);
+    console.log(`GetNumberInstrument ${key} = ${instrument}`);
     if (instrument === null || instrument === undefined) return 0;
 
     if (typeof instrument === 'number') return instrument;
@@ -168,7 +169,7 @@ abstract class QuestionsBase<T> extends DisposableComponent implements IQuestion
     let row: TItem[];
 
     items.forEach((item, index) => {
-      if (index % columnCount === 0) {
+      if (columnCount > 1 ? index % columnCount === 0 : index === 0) {
         row = new Array<TItem>();
         result.push(row);
       }
