@@ -72,8 +72,14 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     this.MaxNoOfSelections = this.GetNumberInstrument('MaxNoOfSelections');
     this.MinNoOfSelections = this.GetNumberInstrument('MinNoOfSelections');
     this.AnswerIsRequired = !this.IsOptional;
-    this.UserInputBoxInside((this.GetInstrument('UserInputBox') || 'Inside').localeCompare('Inside') === 0);
-    this.UserInputBoxOutside((this.GetInstrument('UserInputBox') || 'Outside').localeCompare('Outside') === 0);
+    if (this.UserTextInput) {
+      const userTextInputBox = this.GetInstrument('UserInputBox') || 'Inside';
+      this.UserInputBoxInside(userTextInputBox.toLocaleLowerCase().localeCompare('inside') === 0);
+      this.UserInputBoxOutside(userTextInputBox.toLocaleLowerCase().localeCompare('outside') === 0);
+    } else {
+      this.UserInputBoxInside(false);
+      this.UserInputBoxOutside(false);
+    }
 
     const selectionTags = this.GetInstrument('Items').Item.map((tag: PredefinedTag) => ({
       ...this.FormatPredefinedTag(tag),
