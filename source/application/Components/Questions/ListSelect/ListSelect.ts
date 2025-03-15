@@ -191,7 +191,7 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     tag.IsAdded(true);
     this.AddedItems.push(tag);
 
-    this.AddRawEvent('Change', this.constructor.name, 'Instrument', 'Add', tag.Data.Label);
+    this.AddRawEvent('Change', this.InstrumentTemplateName, 'Instrument', 'Add', tag.Data.Label);
     this.UpdateAnswer();
 
     return true;
@@ -203,7 +203,7 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
     tag.IsAdded(false);
     this.AddedItems.remove(tag);
 
-    this.AddRawEvent('Change', this.constructor.name, 'Instrument', 'Remove', tag.Data.Label);
+    this.AddRawEvent('Change', this.InstrumentTemplateName, 'Instrument', 'Remove', tag.Data.Label);
     this.UpdateAnswer();
   }
 
