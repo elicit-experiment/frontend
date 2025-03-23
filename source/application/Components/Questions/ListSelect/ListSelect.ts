@@ -234,7 +234,7 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
 
     tag.Data.Selected = !tag.Data.Selected;
     tag.IsSelected(tag.Data.Selected);
-    this.AddRawEvent('Change', this.constructor.name, 'Instrument', 'Select', tag.Data.Label);
+    this.AddRawEvent('Change', this.InstrumentTemplateName, 'Instrument', 'Select', tag.Data.Label);
     this.UpdateAnswer();
     return;
   }
