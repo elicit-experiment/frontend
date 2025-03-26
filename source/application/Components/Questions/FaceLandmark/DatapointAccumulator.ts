@@ -53,7 +53,7 @@ export class DatapointAccumulator {
   public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sender: ReturnType<typeof setInterval> | null = null;
   public sessionGuid: string;
-  public lastSendTimestamp = 0; // public for testing...
+  public lastSendTimestamp: number | null = null; // public for testing...
   private maximumSampleRateHz: number; // Configurable rate limit — can be adjusted as needed
   private minimumInterDataPointIntervalMs: number;
   private sendRateMs: number;
@@ -63,7 +63,7 @@ export class DatapointAccumulator {
     this.maximumSampleRateHz = maximumSampleRateHz;
     this.minimumInterDataPointIntervalMs = 1000.0 / maximumSampleRateHz;
     this.sendRateMs = sendRateMs;
-    this.lastSendTimestamp = new Date().getTime() - this.minimumInterDataPointIntervalMs; // ensure we send the first one right away.
+    this.lastSendTimestamp = null; // Initialize as null to indicate no datapoints have been sent yet
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
     this.progressCallback = progressCallback;
@@ -82,16 +82,21 @@ export class DatapointAccumulator {
     this.ensureSenderInterval();
 
     if (this.debouncer == null) {
-      const timeSinceLastSend = dataPoint.t - this.lastSendTimestamp;
-      if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
-        // Send right away if it's been long enough since the last send.
+      if (this.lastSendTimestamp === null) {
+        // First datapoint, send immediately
         this.debouncerCallback();
       } else {
-        // Initiate the debouncing process if not already running
-        this.debouncer = setTimeout(
-          this.debouncerCallback.bind(this),
-          this.minimumInterDataPointIntervalMs - timeSinceLastSend,
-        );
+        const timeSinceLastSend = dataPoint.t - this.lastSendTimestamp;
+        if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
+          // Send right away if it's been long enough since the last send.
+          this.debouncerCallback();
+        } else {
+          // Initiate the debouncing process if not already running
+          this.debouncer = setTimeout(
+            this.debouncerCallback.bind(this),
+            this.minimumInterDataPointIntervalMs - timeSinceLastSend,
+          );
+        }
       }
     }
   }
@@ -103,8 +108,8 @@ export class DatapointAccumulator {
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      const deltaTime = candidate.t - this.lastSendTimestamp;
-      if (deltaTime >= this.minimumInterDataPointIntervalMs) {
+      if (this.lastSendTimestamp === null || 
+          (candidate.t - this.lastSendTimestamp) >= this.minimumInterDataPointIntervalMs) {
         this.lastSendTimestamp = candidate.t;
         this.queuedDataPoints.push(candidate); // Add to the queued list
       } else {
