@@ -209,6 +209,10 @@ class FaceLandmarkerManager extends DisposableComponent {
   }
 
   public SendLifecycleDataPoint(start: boolean) {
+    const highResTimeMs = performance.timeOrigin + performance.now();
+    const systemTimeMs = Date.now();
+    const differenceMs = systemTimeMs - highResTimeMs;
+
     const config = start
       ? {
           maximum_send_rate_hz: this.config.MaximumSendRateHz,
@@ -216,6 +220,7 @@ class FaceLandmarkerManager extends DisposableComponent {
           summary_interval_ms: FaceLandmarkerManager.SUMMARY_INTERVAL,
           video_aspect_ratio: this.videoAspectRatio,
           webcam_frame_rate: this.webcamFrameRate,
+          clock_skew_ms: differenceMs,
         }
       : {};
     const dataPoint = {
