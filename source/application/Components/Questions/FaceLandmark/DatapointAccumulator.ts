@@ -76,7 +76,6 @@ export class DatapointAccumulator {
   }
 
   accumulateAndDebounce(dataPoint: AccumulatableRecord) {
-    const now = new Date().getTime();
     // Push new data point with timestamp
     this.candidateDataPoints.push(dataPoint);
 
@@ -141,6 +140,10 @@ export class DatapointAccumulator {
   }
 
   async sendDataPoints(dataPoints: AccumulatableRecord[]) {
+    if (dataPoints.length < 1) {
+      return;
+    }
+
     try {
       if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length, 0, 0);
       const resp = (await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints)) as {
