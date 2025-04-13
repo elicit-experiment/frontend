@@ -82,6 +82,7 @@ export class DatapointAccumulator {
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
     this.progressCallback = progressCallback;
+    this.config = config;
   }
 
   stop() {

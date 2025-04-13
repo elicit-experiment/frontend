@@ -130,6 +130,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.datapointAccumulator = new DatapointAccumulator(
       this.config,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
+      this.config,
       (kind, count, totalBytes, totalCompressedBytes) => {
         this.landmarkerMonitorViewModel?.incrStat(kind.toLocaleLowerCase(), count);
         if (kind === ProgressKind.QUEUED) {
