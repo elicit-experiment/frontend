@@ -1,22 +1,12 @@
-<div id="landmarker-page">
-    <h1>Face landmark detection using the MediaPipe FaceLandmarker task</h1>
-
-    <section id="demos" class="invisible">
-        <h2>Demo: Webcam continuous face landmarks detection</h2>
-        <p>Hold your face in front of your webcam to get real-time face landmarker detection.</br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
-
-        <div id="liveView" class="videoView">
-            <button id="webcamButton" class="mdc-button mdc-button--raised">
-                <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">ENABLE WEBCAM</span>
-            </button>
-            <div style="position: relative;">
-                <video id="webcam" style="position: absolute" autoplay playsinline></video>
-                <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0; top: 0;"></canvas>
+<div id="landmarker-stats-monitor">
+    <span data-bind="text: Object.keys(stats).join(',')"></span>
+    <div class="stats-grid">
+        <!-- ko foreach: Object.keys(stats) -->
+            <div class="stats-indicator">
+                <span class="stats-name" data-bind="text: $data[0]"></span>
+                <span class="stats-value" data-bind="text: $parent.stats[$data]"></span>
+                <span class="stats-bar" css="{width: $parent.stats[$data]}"></span>
             </div>
-        </div>
-        <div class="blend-shapes">
-            <ul class="blend-shapes-list" id="video-blend-shapes"></ul>
-        </div>
-    </section>
+        <!-- /ko -->
+    </div>
 </div>

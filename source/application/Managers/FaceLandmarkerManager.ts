@@ -9,6 +9,10 @@ import {
 } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
 import { FaceLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
+import FaceLandmarkStatsMonitor, {
+  template as FaceLandmarkStatsMonitorTemplate,
+} from 'Components/Questions/FaceLandmark/FaceLandmarkStatsMonitor';
+import * as knockout from 'knockout';
 
 export enum FaceLandmarkerState {
   NotStarted,
@@ -37,6 +41,8 @@ class FaceLandmarkerManager extends DisposableComponent {
     posted: 0,
     posted_bytes: 0,
     posted_compressed_bytes: 0,
+    skipped: 0,
+    skipped_bytes: 0,
     acknowledged: 0,
     acknowledged_bytes: 0,
     acknowledged_compressed_bytes: 0,
@@ -47,6 +53,7 @@ class FaceLandmarkerManager extends DisposableComponent {
 
   public videoAspectRatio: number | null = null;
   public webcamFrameRate: number | null = null;
+  private landmarkerMonitorViewModel: FaceLandmarkStatsMonitor;
 
   private constructor() {
     super();
@@ -76,9 +83,14 @@ class FaceLandmarkerManager extends DisposableComponent {
       this.config.MaximumSendRateHz,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       (kind, count, totalBytes, totalCompressedBytes) => {
+        this.landmarkerMonitorViewModel?.incrStat(kind, 1);
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
           this.currentSummaryPeriodCounts.posted_bytes += totalBytes;
+        }
+        if (kind === ProgressKind.SKIPPED) {
+          this.currentSummaryPeriodCounts.skipped += count;
+          this.currentSummaryPeriodCounts.skipped_bytes += totalBytes;
         }
         if (kind === ProgressKind.ACKNOWLEDGED) {
           this.currentSummaryPeriodCounts.acknowledged += count;
@@ -96,6 +108,8 @@ class FaceLandmarkerManager extends DisposableComponent {
             outputFacialTransformationMatrixes: this.config.FaceTransformation || false,
             outputFaceBlendshapes: this.config.Blendshapes || true,
           });
+
+          this.maybeRenderMonitorComponent();
 
           resolve(visionImport);
         })
@@ -141,6 +155,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp) as AccumulatableRecord;
     if (compressedDataPoint) {
       this.currentSummaryPeriodCounts.queued++;
+      this.landmarkerMonitorViewModel?.incrStat('queued', 1);
       this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint);
     }
   }
@@ -240,6 +255,20 @@ class FaceLandmarkerManager extends DisposableComponent {
 
   public SetState(newState: FaceLandmarkerState) {
     this.state = newState;
+  }
+
+  public maybeRenderMonitorComponent() {
+    const monitorDiv = document.createElement('div');
+    const componentDiv = document.createElement('face-landmark-stats-monitor');
+    monitorDiv.id = 'landmarker-monitor';
+    document.body.appendChild(monitorDiv);
+    monitorDiv.appendChild(componentDiv);
+
+    componentDiv.innerHTML = FaceLandmarkStatsMonitorTemplate;
+
+    this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor(['queued', 'skipped', 'posted', 'acknowledged']);
+
+    knockout.applyBindings(this.landmarkerMonitorViewModel, monitorDiv);
   }
 }
 

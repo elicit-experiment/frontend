@@ -27,6 +27,7 @@ export type AccumulatableRecord = AccumulatableBaseRecord & {
 
 export enum ProgressKind {
   POSTED = 'POSTED',
+  SKIPPED = 'SKIPPED',
   ACKNOWLEDGED = 'ACKNOWLEDGED',
 }
 
@@ -108,11 +109,16 @@ export class DatapointAccumulator {
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (this.lastSendTimestamp === null || 
-          (candidate.t - this.lastSendTimestamp) >= this.minimumInterDataPointIntervalMs) {
+      if (
+        this.lastSendTimestamp === null ||
+        candidate.t - this.lastSendTimestamp >= this.minimumInterDataPointIntervalMs
+      ) {
         this.lastSendTimestamp = candidate.t;
         this.queuedDataPoints.push(candidate); // Add to the queued list
       } else {
+        if (this.progressCallback) {
+          this.progressCallback(ProgressKind.SKIPPED, 1, 0, 0);
+        }
         continue; // Skip old data points that don't fit within the rate limit
       }
     }
