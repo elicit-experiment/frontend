@@ -2,7 +2,8 @@ import DisposableComponent from 'Components/DisposableComponent';
 import ExperimentManager from 'Managers/Portal/Experiment';
 import PortalClient from 'PortalClient';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import { DatapointAccumulator, ProgressKind } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { DatapointAccumulator } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { ProgressKind } from 'Components/Questions/FaceLandmark/FaceLandmarkTypes';
 import { FaceLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
 import FaceLandmarkStatsMonitor, {
   template as FaceLandmarkStatsMonitorTemplate,
@@ -128,7 +129,6 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.state = FaceLandmarkerState.NotStarted;
 
     this.datapointAccumulator = new DatapointAccumulator(
-      this.config,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       this.config,
       (kind, count, totalBytes, totalCompressedBytes) => {
