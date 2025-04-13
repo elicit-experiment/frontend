@@ -1,11 +1,12 @@
 <div id="landmarker-stats-monitor">
-    <span data-bind="text: Object.keys(stats).join(',')"></span>
     <div class="stats-grid">
         <!-- ko foreach: Object.keys(stats) -->
             <div class="stats-indicator">
-                <span class="stats-name" data-bind="text: $data[0]"></span>
-                <span class="stats-value" data-bind="text: $parent.stats[$data]"></span>
-                <span class="stats-bar" css="{width: $parent.stats[$data]}"></span>
+                <div class="stats-name" data-bind="text: $parent.getLabel($data)"></div>
+                <div class="state-rate" data-bind="text: $parent.getFormattedRate($data)"></div>
+                <div class="stats-value" data-bind="text: $parent.getFormattedValue($data)"></div>
+                <div class="stats-bar" data-bind="class: $data, style: { width: $parent.barWidth($data) }"></div>
+                <div></div>
             </div>
         <!-- /ko -->
     </div>

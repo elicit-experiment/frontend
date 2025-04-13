@@ -14,11 +14,17 @@
     -moz-transform: rotateY(180deg);
 }
 
+body:not(.debug-mode) {
+    #landmarker-stats-monitor {
+        display:none;
+    }
+}
+
 #landmarker-stats-monitor {
     position: absolute;
     right: 0;
     top: 0;
-    width: 99px;
+    width: 140px;
     z-index: 10001;
     background-color: rgba(0,0,0,0.1);
     border-bottom-left-radius: 16px;
@@ -30,7 +36,34 @@
     .stats-grid {
         display: flex;
         flex-direction: column;
+        padding: 4px;
 
-        padding: 4px
+        .stats-indicator {
+            display: grid;
+            grid-template-columns: 12px 24px 24px 48px 1fr;
+            justify-content: space-between;
+
+            .stats-bar {
+                height: 8px;
+                display: inline-block;
+            }
+
+            .stats-bar.queued {
+                background-color: var(--bs-primary-border-subtle);
+            }
+
+            .stats-bar.posted {
+                background-color: var(--bs-warning-border-subtle);
+            }
+
+            .stats-bar.skipped {
+                background-color: var(--bs-danger-border-subtle);
+            }
+
+            .stats-bar.acknowledged {
+                background-color: var(--bs-success-border-subtle);
+            }
+        }
+
     }
 }

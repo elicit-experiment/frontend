@@ -22,6 +22,54 @@ export enum FaceLandmarkerState {
   Ended,
 }
 
+// Debug Keyword State Machine
+// This creates a state machine that triggers an event when "debug" is typed
+
+function debugListener() {
+  // The sequence we're looking for
+  const targetSequence = 'debug';
+
+  // Current state of our state machine (how many correct characters in sequence so far)
+  let currentState = 0;
+
+  // Create and configure a custom event
+  const debugTriggeredEvent = new CustomEvent('debugTriggered', {
+    bubbles: true,
+    detail: { message: 'Debug sequence detected!' },
+  });
+
+  // Add the keyboard event listener to the document
+  document.addEventListener('keydown', function (event) {
+    // Get the pressed key
+    const keyPressed = event.key.toLowerCase();
+
+    // Check if the pressed key matches the next expected character in our sequence
+    if (keyPressed === targetSequence[currentState]) {
+      // Move to the next state
+      currentState++;
+
+      // Check if we've completed the sequence
+      if (currentState === targetSequence.length) {
+        // Fire the custom event
+        document.dispatchEvent(debugTriggeredEvent);
+        console.log('Debug sequence detected!');
+
+        // Reset the state machine
+        currentState = 0;
+      }
+    } else {
+      // If we're already tracking a potential sequence and the user presses 'd'
+      // we should start a new potential sequence rather than reset completely
+      if (keyPressed === targetSequence[0]) {
+        currentState = 1;
+      } else {
+        // Reset the state if the wrong key is pressed
+        currentState = 0;
+      }
+    }
+  });
+}
+
 class FaceLandmarkerManager extends DisposableComponent {
   public sessionGuid: string;
 
@@ -54,6 +102,7 @@ class FaceLandmarkerManager extends DisposableComponent {
   public videoAspectRatio: number | null = null;
   public webcamFrameRate: number | null = null;
   private landmarkerMonitorViewModel: FaceLandmarkStatsMonitor;
+  private debugMode = false;
 
   private constructor() {
     super();
@@ -61,6 +110,10 @@ class FaceLandmarkerManager extends DisposableComponent {
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+
+    // Example event listener for the debug triggered event
+    debugListener();
+    document.addEventListener('debugTriggered', this.toggleDebugMode.bind(this));
   }
 
   static get Instance(): FaceLandmarkerManager {
@@ -83,7 +136,7 @@ class FaceLandmarkerManager extends DisposableComponent {
       this.config.MaximumSendRateHz,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       (kind, count, totalBytes, totalCompressedBytes) => {
-        this.landmarkerMonitorViewModel?.incrStat(kind, 1);
+        this.landmarkerMonitorViewModel?.incrStat(kind.toLocaleLowerCase(), count);
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
           this.currentSummaryPeriodCounts.posted_bytes += totalBytes;
@@ -269,6 +322,11 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor(['queued', 'skipped', 'posted', 'acknowledged']);
 
     knockout.applyBindings(this.landmarkerMonitorViewModel, monitorDiv);
+  }
+
+  public toggleDebugMode() {
+    this.debugMode = !this.debugMode;
+    document.querySelector('body').classList.toggle('debug-mode');
   }
 }
 

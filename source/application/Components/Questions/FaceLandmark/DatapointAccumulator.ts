@@ -109,10 +109,11 @@ export class DatapointAccumulator {
       if (!candidate) break;
 
       // Check if candidate respects the send interval
-      if (
-        this.lastSendTimestamp === null ||
-        candidate.t - this.lastSendTimestamp >= this.minimumInterDataPointIntervalMs
-      ) {
+      const timeStampDelta = candidate.t - this.lastSendTimestamp;
+
+      //console.log(`Time delta: ${timeStampDelta}ms`);
+
+      if (this.lastSendTimestamp === null || timeStampDelta >= this.minimumInterDataPointIntervalMs) {
         this.lastSendTimestamp = candidate.t;
         this.queuedDataPoints.push(candidate); // Add to the queued list
       } else {
@@ -157,10 +158,12 @@ export class DatapointAccumulator {
 
     try {
       if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length, 0, 0);
+
       const resp = (await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints)) as {
         rawBytes: number;
         compressedBytes: number;
       };
+
       if (this.progressCallback)
         this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length, resp.rawBytes, resp.compressedBytes);
     } catch (err) {
