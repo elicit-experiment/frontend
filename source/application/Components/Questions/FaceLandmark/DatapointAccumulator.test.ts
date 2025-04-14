@@ -32,7 +32,7 @@ xdescribe('DatapointAccumulator', () => {
   let accumulator: DatapointAccumulator;
 
   beforeEach(() => {
-    accumulator = new DatapointAccumulator({ MaximumSendRateHz: 5 }, { MaximumSendRateHz: 5 }, null);
+    accumulator = new DatapointAccumulator({ MaximumSendRateHz: 5 }, 5, null);
     jest.spyOn(accumulator, 'sendQueuedDataPoints').mockImplementation(async () => {
       // Mock implementation of sendDataPoints does nothing
     });
