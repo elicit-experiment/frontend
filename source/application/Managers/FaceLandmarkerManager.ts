@@ -2,13 +2,8 @@ import DisposableComponent from 'Components/DisposableComponent';
 import ExperimentManager from 'Managers/Portal/Experiment';
 import PortalClient from 'PortalClient';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import {
-  AccumulatableRecord,
-  DatapointAccumulator,
-  ProgressKind,
-} from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { DatapointAccumulator, ProgressKind } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
 import { FaceLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
-import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 import FaceLandmarkStatsMonitor, {
   template as FaceLandmarkStatsMonitorTemplate,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkStatsMonitor';
@@ -133,10 +128,13 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.state = FaceLandmarkerState.NotStarted;
 
     this.datapointAccumulator = new DatapointAccumulator(
-      this.config.MaximumSendRateHz,
+      this.config,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       (kind, count, totalBytes, totalCompressedBytes) => {
         this.landmarkerMonitorViewModel?.incrStat(kind.toLocaleLowerCase(), count);
+        if (kind === ProgressKind.QUEUED) {
+          this.currentSummaryPeriodCounts.posted += count;
+        }
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
           this.currentSummaryPeriodCounts.posted_bytes += totalBytes;
@@ -205,12 +203,7 @@ class FaceLandmarkerManager extends DisposableComponent {
   }
 
   public queueForSend(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
-    const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp) as AccumulatableRecord;
-    if (compressedDataPoint) {
-      this.currentSummaryPeriodCounts.queued++;
-      this.landmarkerMonitorViewModel?.incrStat('queued', 1);
-      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint);
-    }
+    this.datapointAccumulator.accumulateAndDebounce(dataPoint, timestamp);
   }
   private clearSummaryTimer() {
     if (this._summaryTimer) {

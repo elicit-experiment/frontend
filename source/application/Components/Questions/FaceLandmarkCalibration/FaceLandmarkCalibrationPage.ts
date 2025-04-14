@@ -145,7 +145,7 @@ class FaceLandmarkCalibrationPage {
     return loadedVideoDataPromise;
   }
 
-  async predictWebcam(timestamp: DOMHighResTimeStamp = 0) {
+  async predictWebcam(timestamp: DOMHighResTimeStamp = 0, metadata?: { mediaTime: number }) {
     if (!this.videoConfigured) {
       throw new Error('No video configured!');
     }
@@ -153,8 +153,10 @@ class FaceLandmarkCalibrationPage {
     let results = undefined;
 
     const startTimeMs = performance.now();
-    if (this.monitoringVideoTime !== this.monitorVideoEl.currentTime) {
-      this.monitoringVideoTime = this.monitorVideoEl.currentTime;
+    const currentVideoTime = metadata?.mediaTime || this.monitorVideoEl.currentTime;
+
+    if (this.monitoringVideoTime !== currentVideoTime) {
+      this.monitoringVideoTime = currentVideoTime;
       results = getFaceLandmarkerManager().faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
     }
 
@@ -164,7 +166,11 @@ class FaceLandmarkCalibrationPage {
 
     // Call this function again to keep predicting when the browser is ready.
     if (getFaceLandmarkerManager().webcamIsRunning()) {
-      window.requestAnimationFrame(this.predictWebcam.bind(this));
+      if ('requestVideoFrameCallback' in this.monitorVideoEl) {
+        this.monitorVideoEl.requestVideoFrameCallback(this.predictWebcam.bind(this));
+      } else {
+        window.requestAnimationFrame(this.predictWebcam.bind(this));
+      }
     }
   }
 

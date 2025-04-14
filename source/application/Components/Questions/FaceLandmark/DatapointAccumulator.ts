@@ -1,6 +1,9 @@
 import { postTimeSeriesRawAsJson } from 'Utility/TimeSeries';
 import PortalClient from 'PortalClient';
 import { Classifications, NormalizedLandmark } from '@mediapipe/tasks-vision';
+import { NormalizedLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
+import { FaceLandmarkerResult } from '@mediapipe/tasks-vision';
+import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 
 // Copied from vision.d.ts since it's not exported.
 declare interface Matrix {
@@ -26,6 +29,7 @@ export type AccumulatableRecord = AccumulatableBaseRecord & {
 };
 
 export enum ProgressKind {
+  QUEUED = 'QUEUED',
   POSTED = 'POSTED',
   SKIPPED = 'SKIPPED',
   ACKNOWLEDGED = 'ACKNOWLEDGED',
@@ -49,22 +53,32 @@ export declare interface ElicitFaceLandmarkerResult {
 }
 
 export class DatapointAccumulator {
-  public candidateDataPoints: AccumulatableRecord[] = [];
+  public candidateDataPoints: [FaceLandmarkerResult, DOMHighResTimeStamp][] = [];
   public queuedDataPoints: AccumulatableRecord[] = [];
   public debouncer: ReturnType<typeof setTimeout> | null = null;
   public sender: ReturnType<typeof setInterval> | null = null;
   public sessionGuid: string;
-  public lastSendTimestamp: number | null = null; // public for testing...
+  public lastQueuedTimestamp: number | null = null; // public for testing...
+  public config: NormalizedLandmarkComponentConfig;
   private maximumSampleRateHz: number; // Configurable rate limit — can be adjusted as needed
   private minimumInterDataPointIntervalMs: number;
   private sendRateMs: number;
   private progressCallback: ProgressCallback | null = null;
 
-  constructor(maximumSampleRateHz: number, sendRateMs: number = 2000, progressCallback: ProgressCallback | null) {
-    this.maximumSampleRateHz = maximumSampleRateHz;
-    this.minimumInterDataPointIntervalMs = 1000.0 / maximumSampleRateHz;
+  // Permit 1ms of jitter around the debounce to account for processing and other delays.
+  // Note that the frame rate of the webcam effectively rate limits the datapoints upstream of the accumulator
+  // so we should never see two samples within < 1/frame rate, which is always much larger than this value.
+  public static RATE_LIMIT_JITTER = 1;
+
+  constructor(
+    config: NormalizedLandmarkComponentConfig,
+    sendRateMs: number = 2000,
+    progressCallback: ProgressCallback | null,
+  ) {
+    this.config = config;
+    this.minimumInterDataPointIntervalMs = 1000.0 / config.MaximumSendRateHz - DatapointAccumulator.RATE_LIMIT_JITTER;
     this.sendRateMs = sendRateMs;
-    this.lastSendTimestamp = null; // Initialize as null to indicate no datapoints have been sent yet
+    this.lastQueuedTimestamp = null; // Initialize as null to indicate no datapoints have been sent yet
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
     this.progressCallback = progressCallback;
@@ -72,32 +86,26 @@ export class DatapointAccumulator {
 
   stop() {
     this.debouncer && clearTimeout(this.debouncer);
-    this.sender && clearInterval(this.sender);
+    this.sender && clearTimeout(this.sender);
     this.sender = null;
   }
 
-  accumulateAndDebounce(dataPoint: AccumulatableRecord) {
+  accumulateAndDebounce(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
+    if (this.progressCallback) {
+      this.progressCallback(ProgressKind.QUEUED, 1, 0, 0);
+    }
+
     // Push new data point with timestamp
-    this.candidateDataPoints.push(dataPoint);
+    const timeSinceLastSend = timestamp - this.lastQueuedTimestamp;
+    if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
+      this.candidateDataPoints.push([dataPoint, timestamp]);
+      this.lastQueuedTimestamp = timestamp;
 
-    this.ensureSenderInterval();
-
-    if (this.debouncer == null) {
-      if (this.lastSendTimestamp === null) {
-        // First datapoint, send immediately
-        this.debouncerCallback();
-      } else {
-        const timeSinceLastSend = dataPoint.t - this.lastSendTimestamp;
-        if (timeSinceLastSend >= this.minimumInterDataPointIntervalMs) {
-          // Send right away if it's been long enough since the last send.
-          this.debouncerCallback();
-        } else {
-          // Initiate the debouncing process if not already running
-          this.debouncer = setTimeout(
-            this.debouncerCallback.bind(this),
-            this.minimumInterDataPointIntervalMs - timeSinceLastSend,
-          );
-        }
+      this.ensureDebouncerInterval();
+      this.ensureSenderInterval();
+    } else {
+      if (this.progressCallback) {
+        this.progressCallback(ProgressKind.SKIPPED, 1, 0, 0);
       }
     }
   }
@@ -105,31 +113,18 @@ export class DatapointAccumulator {
   debouncerCallback() {
     // Filter data points to respect the maximumSampleRateHz limit
     while (this.candidateDataPoints.length > 0) {
-      const candidate = this.candidateDataPoints.shift(); // Always take the most recent point
+      const [candidate, t] = this.candidateDataPoints.shift(); // Always take the most recent point
       if (!candidate) break;
 
-      // Check if candidate respects the send interval
-      const timeStampDelta = candidate.t - this.lastSendTimestamp;
+      const compressedDataPoint = compressDatapoint(this.config, candidate, t) as AccumulatableRecord;
 
-      //console.log(`Time delta: ${timeStampDelta}ms`);
-
-      if (this.lastSendTimestamp === null || timeStampDelta >= this.minimumInterDataPointIntervalMs) {
-        this.lastSendTimestamp = candidate.t;
-        this.queuedDataPoints.push(candidate); // Add to the queued list
-      } else {
-        if (this.progressCallback) {
-          this.progressCallback(ProgressKind.SKIPPED, 1, 0, 0);
-        }
-        continue; // Skip old data points that don't fit within the rate limit
-      }
+      this.queuedDataPoints.push(compressedDataPoint); // Add to the queued list
     }
+  }
 
-    // Reset debouncer
-    this.debouncer = null;
-
-    // If remaining data points exist, restart debouncer
-    if (this.candidateDataPoints.length > 0) {
-      this.debouncer = setTimeout(this.debouncerCallback.bind(this), 1000);
+  ensureDebouncerInterval() {
+    if (this.debouncer == null) {
+      this.debouncer = setInterval(this.debouncerCallback.bind(this), this.minimumInterDataPointIntervalMs);
     }
   }
 
