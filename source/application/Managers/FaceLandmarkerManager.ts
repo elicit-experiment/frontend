@@ -134,7 +134,7 @@ class FaceLandmarkerManager extends DisposableComponent {
       (kind, count, totalBytes, totalCompressedBytes) => {
         this.landmarkerMonitorViewModel?.incrStat(kind.toLocaleLowerCase(), count);
         if (kind === ProgressKind.QUEUED) {
-          this.currentSummaryPeriodCounts.posted += count;
+          this.currentSummaryPeriodCounts.queued += count;
         }
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
