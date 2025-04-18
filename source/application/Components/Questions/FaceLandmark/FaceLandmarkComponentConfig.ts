@@ -26,7 +26,7 @@ export function NormalizeConfig(config: FaceLandmarkComponentConfig): Normalized
   const blendshapes = config.IncludeBlendshapes || config.IncludeBlandshapes;
   const Blendshapes = config.Blendshapes || blendshapes != null;
   const Landmarks = config.Landmarks || config.IncludeLandmarks != null;
-  const MaximumSendRateHz = config.MaximumSendRateHz || 5;
+  const MaximumSendRateHz = config.MaximumSendRateHz || 15;
   return {
     ...config,
     Blendshapes,
