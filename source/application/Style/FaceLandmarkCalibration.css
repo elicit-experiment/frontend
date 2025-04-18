@@ -48,6 +48,31 @@ body:not(.debug-mode) {
                 display: inline-block;
             }
 
+            .stats-rate {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin-right: 3px;
+
+                :nth-child(1) {
+                    flex-grow: 1;
+                }
+
+                :nth-child(2) {
+                    line-height: 6px;
+                    font-size: 6px
+                }
+            }
+
+            .stats-bar.analyzed {
+                background-color: var(--bs-info-border-subtle);
+            }
+
+            .stats-bar.compressed {
+                background-color: var(--bs-secondary-border-subtle);
+            }
+
             .stats-bar.queued {
                 background-color: var(--bs-primary-border-subtle);
             }

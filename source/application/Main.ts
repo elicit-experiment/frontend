@@ -48,7 +48,6 @@ import TextBlock from 'Components/Questions/TextBlock/TextBlock';
 import TwoDScaleK from 'Components/Questions/TwoDScaleK/TwoDScaleK';
 import Unsupported from 'Components/Questions/Unsupported/Unsupported';
 import WebGazerCalibrate from 'Components/Questions/WebGazerCalibrate/WebGazerCalibrate';
-import FaceLandmark from './Components/Questions/FaceLandmark/FaceLandmark';
 import FaceLandmarkCalibration from './Components/Questions/FaceLandmarkCalibration/FaceLandmarkCalibration';
 
 import KnockoutBindings from './KnockoutBindings/KnockoutBindings';
@@ -98,7 +97,6 @@ knockout.applyBindings({
     TwoDScaleK,
     Unsupported,
     WebGazerCalibrate,
-    FaceLandmark,
     FaceLandmarkCalibration,
   ],
 });

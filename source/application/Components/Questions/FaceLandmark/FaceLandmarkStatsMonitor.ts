@@ -9,9 +9,11 @@ interface TimePoint {
 class SlidingWindowRate {
   private timeWindow: number;
   private dataPoints: TimePoint[] = [];
+  private statType: 'rate' | 'average_value';
 
-  constructor(windowSizeMs: number = 5000) {
+  constructor(windowSizeMs: number = 5000, statType: 'rate' | 'average_value' = 'rate') {
     this.timeWindow = windowSizeMs;
+    this.statType = statType;
   }
 
   public addIncrement(increment: number): void {
@@ -33,18 +35,29 @@ class SlidingWindowRate {
   }
 
   public getRate(): [number, number] {
-    if (this.dataPoints.length === 0) return [0, 0];
+    const numDatapoints = this.dataPoints.length;
+    if (numDatapoints === 0) return [0, 0];
 
     const now = performance.now();
     this.pruneOldPoints(now);
 
-    if (this.dataPoints.length === 0) return [0, 0];
+    if (numDatapoints === 0) return [0, 0];
 
     const totalIncrements = this.dataPoints.reduce((sum, point) => sum + point.increment, 0);
 
-    return [(totalIncrements * 1000.0) / this.timeWindow, totalIncrements];
+    if (this.statType === 'rate') {
+      return [(totalIncrements * 1000.0) / this.timeWindow, totalIncrements];
+    } else {
+      return [totalIncrements / numDatapoints, totalIncrements];
+    }
   }
 }
+
+type StatDefinition = {
+  name: string;
+  targetRate: number;
+  type: 'rate' | 'average_value';
+};
 
 class FaceLandmarkStatsMonitor {
   public stats: { [statName: string]: knockout.Observable<number> };
@@ -52,11 +65,18 @@ class FaceLandmarkStatsMonitor {
   public slidingValues: { [statName: string]: knockout.Observable<number> };
   private rateTrackers: { [statName: string]: SlidingWindowRate };
   private targetRate = 30;
+  private definitions: Map<string, StatDefinition>;
 
-  constructor(statNames: string[]) {
+  constructor(statDefinitions: StatDefinition[]) {
+    this.definitions = new Map(statDefinitions.map((statDef) => [statDef.name, statDef]));
+
+    const statNames = statDefinitions.map((statDef) => statDef.name);
+
     this.stats = Object.fromEntries(statNames.map((statName) => [statName, knockout.observable(0)]));
     this.rates = Object.fromEntries(statNames.map((statName) => [statName, knockout.observable(0)]));
-    this.rateTrackers = Object.fromEntries(statNames.map((statName) => [statName, new SlidingWindowRate(5000)]));
+    this.rateTrackers = Object.fromEntries(
+      statNames.map((statName) => [statName, new SlidingWindowRate(5000, this.definitions.get(statName).type)]),
+    );
     this.slidingValues = Object.fromEntries(statNames.map((statName) => [statName, knockout.observable(0)]));
 
     // Update rates every second
@@ -73,10 +93,19 @@ class FaceLandmarkStatsMonitor {
   }
 
   public getLabel(statName: string): string {
-    return { queued: '😐', skipped: '🚫', posted: '⬆️', acknowledged: '✅' }[statName];
+    return { analyzed: '📍', compressed: '🗜', queued: '😐', skipped: '🚫', posted: '⬆️', acknowledged: '✅' }[statName];
   }
 
   public getFormattedRate(statName: string): string {
+    return this.rates[statName]().toFixed(1).toString();
+  }
+
+  public getFormattedRateUnit(statName: string): string {
+    if (this.definitions.get(statName).type === 'rate') {
+      return 'hz';
+    } else {
+      return 'ms';
+    }
     return this.rates[statName]().toFixed(1).toString();
   }
 
@@ -85,7 +114,7 @@ class FaceLandmarkStatsMonitor {
   }
 
   public barWidth(statName: string): string {
-    return `${((100.0 * this.rates[statName]()) / this.targetRate).toFixed(1)}%`;
+    return `${((100.0 * this.rates[statName]()) / this.definitions.get(statName).targetRate).toFixed(1)}%`;
   }
 
   private updateRates(): void {

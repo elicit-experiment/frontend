@@ -203,9 +203,15 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.webcamRunning = false;
   }
 
-  public queueForSend(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
-    this.datapointAccumulator.accumulateAndDebounce(dataPoint, timestamp);
+  public queueForSend(
+    dataPoint: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    frameJitter: DOMHighResTimeStamp,
+  ) {
+    this.datapointAccumulator.accumulateAndDebounce(dataPoint, timestamp, analyzeDuration, frameJitter);
   }
+
   private clearSummaryTimer() {
     if (this._summaryTimer) {
       clearInterval(this._summaryTimer);
@@ -313,7 +319,14 @@ class FaceLandmarkerManager extends DisposableComponent {
 
     componentDiv.innerHTML = FaceLandmarkStatsMonitorTemplate;
 
-    this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor(['queued', 'skipped', 'posted', 'acknowledged']);
+    this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor([
+      { name: 'analyzed', targetRate: 1000.0 / this.config.MaximumSendRateHz, type: 'average_value' },
+      { name: 'compressed', targetRate: 1000.0 / this.config.MaximumSendRateHz, type: 'average_value' },
+      { name: 'queued', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'skipped', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'posted', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'acknowledged', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+    ]);
 
     knockout.applyBindings(this.landmarkerMonitorViewModel, monitorDiv);
   }

@@ -24,7 +24,12 @@ class FaceLandmarkCalibrationPage {
   public monitorVideoEl: HTMLVideoElement;
   public enableWebcamButton: HTMLButtonElement;
 
-  public dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void;
+  public dataCallback: (
+    result: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    frameSkew: DOMHighResTimeStamp,
+  ) => void;
 
   constructor() {
     this.calibrationVideoEl = document.getElementById('webcam') as HTMLVideoElement;
@@ -161,7 +166,9 @@ class FaceLandmarkCalibrationPage {
     }
 
     if (results) {
-      this.dataCallback(results, timestamp);
+      const landmarkerAnalyzeDuration = performance.now() - startTimeMs;
+      // console.log('landmarkerAnalyzeDuration %o %o', timestamp, landmarkerAnalyzeDuration);
+      this.dataCallback(results, timestamp, landmarkerAnalyzeDuration, startTimeMs - timestamp);
     }
 
     // Call this function again to keep predicting when the browser is ready.

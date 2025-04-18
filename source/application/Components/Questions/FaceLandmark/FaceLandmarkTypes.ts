@@ -24,6 +24,8 @@ export type AccumulatableRecord = AccumulatableBaseRecord & {
 };
 
 export enum ProgressKind {
+  ANALYZED = 'ANALYZED',
+  COMPRESSED = 'COMPRESSED',
   QUEUED = 'QUEUED',
   POSTED = 'POSTED',
   SKIPPED = 'SKIPPED',

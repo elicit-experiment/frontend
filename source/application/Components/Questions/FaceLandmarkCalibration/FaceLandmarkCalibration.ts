@@ -340,7 +340,12 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     }
   }
 
-  protected ReceiveDatapoint(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
+  protected ReceiveDatapoint(
+    dataPoint: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    frameJitter: DOMHighResTimeStamp,
+  ) {
     if (this.currentState() == CALIBRATION_STATE.INITIAL_CALIBRATION_STEP3) {
       this.ComputeAndUpdateInitialCalibration(dataPoint);
     }
@@ -351,7 +356,7 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
     //   this.datapointAccumulator.accumulateAndDebounce(transformedDataPoint);
     // }
 
-    getFaceLandmarkerManager().queueForSend(dataPoint, timestamp);
+    getFaceLandmarkerManager().queueForSend(dataPoint, timestamp, analyzeDuration, frameJitter);
   }
 
   // Calibration times

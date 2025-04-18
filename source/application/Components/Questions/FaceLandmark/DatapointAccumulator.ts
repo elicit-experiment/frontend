@@ -7,7 +7,7 @@ import { CompressedFaceLandmarkerResult } from './CompressedFaceLandmarkerResult
 import { ProgressCallback, ProgressKind } from './FaceLandmarkTypes';
 
 export class DatapointAccumulator {
-  public pendingTimestamps: Set<number> = new Set();
+  public pendingTimestamps: Map<number, DOMHighResTimeStamp> = new Map();
   public compressedDataPoints: Map<number, CompressedFaceLandmarkerResult> = new Map();
   public queuedDataPoints: CompressedFaceLandmarkerResult[] = [];
   public sender: ReturnType<typeof setInterval> | null = null;
@@ -56,6 +56,11 @@ export class DatapointAccumulator {
 
         // Process datapoints in timestamp order
         this.processCompressedDataPoints();
+
+        const compressTime = performance.now() - this.pendingTimestamps.get(timestamp);
+        if (this.progressCallback) {
+          this.progressCallback(ProgressKind.COMPRESSED, compressTime, 0, 0);
+        }
       }
 
       // Remove from pending set
@@ -93,8 +98,15 @@ export class DatapointAccumulator {
     }
   }
 
-  accumulateAndDebounce(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
+  accumulateAndDebounce(
+    dataPoint: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    frameJitter: DOMHighResTimeStamp,
+  ) {
     if (this.progressCallback) {
+      this.progressCallback(ProgressKind.ANALYZED, analyzeDuration, 0, 0);
       this.progressCallback(ProgressKind.QUEUED, 1, 0, 0);
     }
 
@@ -105,7 +117,7 @@ export class DatapointAccumulator {
       this.lastQueuedTimestamp = timestamp;
 
       // Add to pending set
-      this.pendingTimestamps.add(timestamp);
+      this.pendingTimestamps.set(timestamp, performance.now());
 
       // Send to worker for compression
       if (this.worker) {

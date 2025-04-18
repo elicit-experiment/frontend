@@ -3,7 +3,10 @@
         <!-- ko foreach: Object.keys(stats) -->
             <div class="stats-indicator">
                 <div class="stats-name" data-bind="text: $parent.getLabel($data)"></div>
-                <div class="state-rate" data-bind="text: $parent.getFormattedRate($data)"></div>
+                <div class="stats-rate" >
+                    <span data-bind="text: $parent.getFormattedRate($data)"></span>
+                    <span data-bind="text: $parent.getFormattedRateUnit($data)"></span>
+                </div>
                 <div class="stats-value" data-bind="text: $parent.getFormattedValue($data)"></div>
                 <div class="stats-bar" data-bind="class: $data, style: { width: $parent.barWidth($data) }"></div>
                 <div></div>

@@ -64,8 +64,8 @@ xdescribe('DatapointAccumulator', () => {
     };
 
     // Push mock data points
-    accumulator.accumulateAndDebounce(mockDataPoint1, t1);
-    accumulator.accumulateAndDebounce(mockDataPoint2, t2);
+    accumulator.accumulateAndDebounce(mockDataPoint1, t1, 0, 0);
+    accumulator.accumulateAndDebounce(mockDataPoint2, t2, 0, 0);
 
     // Check if setTimeout is set up properly
     // expect(setInterval).toHaveBeenCalledTimes(1);
@@ -97,7 +97,7 @@ xdescribe('DatapointAccumulator', () => {
 
     // Push mock data points
     mockDataPoints.forEach((mockDataPoint) => {
-      accumulator.accumulateAndDebounce(mockDataPoint, mockDataPoint.t);
+      accumulator.accumulateAndDebounce(mockDataPoint, mockDataPoint.t, 0, 0);
       jest.advanceTimersByTime(1000);
     });
 
