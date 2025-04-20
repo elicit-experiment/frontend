@@ -100,12 +100,16 @@ class FaceLandmarkerManager extends DisposableComponent {
   private landmarkerMonitorViewModel: FaceLandmarkStatsMonitor;
   private debugMode = false;
 
+  private sendSummaryBoundMethod: () => void;
+
   private constructor() {
     super();
 
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+
+    this.sendSummaryBoundMethod = this.SendSummary.bind(this);
 
     // Example event listener for the debug triggered event
     debugListener();
@@ -223,7 +227,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     console.log('FaceLandmarkerManager: Start Tracking');
 
     this.clearSummaryTimer();
-    this._summaryTimer = setInterval(this.SendSummary.bind(this), FaceLandmarkerManager.SUMMARY_INTERVAL);
+    this._summaryTimer = setInterval(this.sendSummaryBoundMethod, FaceLandmarkerManager.SUMMARY_INTERVAL);
 
     this.SetState(FaceLandmarkerState.Running);
     // TODO: there is very likely a race condition here between us sending off the final
