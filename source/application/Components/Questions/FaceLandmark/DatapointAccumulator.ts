@@ -116,15 +116,16 @@ export class DatapointAccumulator {
       // Rate limiting passed, update timestamp
       this.lastQueuedTimestamp = timestamp;
 
-      // Add to pending set
-      this.pendingTimestamps.set(timestamp, performance.now());
-
       // Send to worker for compression
       if (this.worker) {
+        // Add to pending set
+        this.pendingTimestamps.set(timestamp, performance.now());
+
         this.worker.postMessage({
           timestamp,
           config: this.config,
           dataPoint,
+          toJson: true,
         });
       }
     } else {
@@ -148,24 +149,29 @@ export class DatapointAccumulator {
     const dataPoints = this.queuedDataPoints;
     this.queuedDataPoints = [];
 
-    if (dataPoints.length > 0) {
-      this.sendDataPoints(dataPoints)
+    const dataPointCount = dataPoints.length;
+    if (dataPointCount > 0) {
+      const toSend =
+        Array.isArray(dataPoints) && typeof dataPoints[0] === 'string'
+          ? dataPoints.join()
+          : (dataPoints as CompressedFaceLandmarkerResult[]);
+      this.sendDataPoints(toSend, dataPointCount)
         .then(() => {
-          console.log(`Sent ${dataPoints.length} data points`);
+          console.log(`Sent ${dataPointCount} data points`);
         })
         .catch(() => {
-          console.error(`Failed to send ${dataPoints.length} data points`);
+          console.error(`Failed to send ${dataPointCount} data points`);
         });
     }
   }
 
-  async sendDataPoints(dataPoints: CompressedFaceLandmarkerResult[]) {
-    if (dataPoints.length < 1) {
+  async sendDataPoints(dataPoints: CompressedFaceLandmarkerResult[] | string, dataPointCount: number) {
+    if (dataPointCount < 1) {
       return;
     }
 
     try {
-      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPoints.length, 0, 0);
+      if (this.progressCallback) this.progressCallback(ProgressKind.POSTED, dataPointCount, 0, 0);
 
       const resp = (await postTimeSeriesRawAsJson('face_landmark', this.sessionGuid, dataPoints)) as {
         rawBytes: number;
@@ -173,7 +179,7 @@ export class DatapointAccumulator {
       };
 
       if (this.progressCallback)
-        this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPoints.length, resp.rawBytes, resp.compressedBytes);
+        this.progressCallback(ProgressKind.ACKNOWLEDGED, dataPointCount, resp.rawBytes, resp.compressedBytes);
     } catch (err) {
       console.error(err);
     }

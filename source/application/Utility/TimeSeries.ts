@@ -71,8 +71,8 @@ function postTimeSeriesAsJson(body: any, seriesType: string) {
   });
 }
 
-function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: Array<object>) {
-  const jsonString = body.map((row) => JSON.stringify(row)).join('\n') + '\n'; // NDJSON
+function postTimeSeriesRawAsJson(seriesType: string, sessionGuid: string, body: Array<object> | string) {
+  const jsonString = typeof body === 'string' ? body : body.map((row) => JSON.stringify(row)).join('\n') + '\n'; // NDJSON
   const rawBytes = jsonString.length;
 
   const blob = new Blob([jsonString], { type: 'application/json' });
