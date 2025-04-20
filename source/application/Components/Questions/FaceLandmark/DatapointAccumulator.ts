@@ -8,8 +8,8 @@ import { ProgressCallback, ProgressKind } from './FaceLandmarkTypes';
 
 export class DatapointAccumulator {
   public pendingTimestamps: Map<number, DOMHighResTimeStamp> = new Map();
-  public compressedDataPoints: Map<number, CompressedFaceLandmarkerResult> = new Map();
-  public queuedDataPoints: CompressedFaceLandmarkerResult[] = [];
+  public compressedDataPoints: Map<number, CompressedFaceLandmarkerResult | string> = new Map();
+  public queuedDataPoints: (CompressedFaceLandmarkerResult | string)[] = [];
   public sender: ReturnType<typeof setInterval> | null = null;
   public sessionGuid: string;
   public lastQueuedTimestamp: number | null = null;
@@ -50,6 +50,7 @@ export class DatapointAccumulator {
     this.worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const { timestamp, compressedDataPoint } = event.data;
 
+      console.log(typeof compressedDataPoint);
       if (compressedDataPoint) {
         // Store the compressed datapoint, keyed by timestamp
         this.compressedDataPoints.set(timestamp, compressedDataPoint);
