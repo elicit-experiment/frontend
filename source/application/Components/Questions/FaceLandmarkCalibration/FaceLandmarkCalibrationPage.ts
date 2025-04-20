@@ -24,6 +24,8 @@ class FaceLandmarkCalibrationPage {
   public monitorVideoEl: HTMLVideoElement;
   public enableWebcamButton: HTMLButtonElement;
 
+  private predictWebcamBoundFunction: (timestamp: DOMHighResTimeStamp) => void;
+
   public dataCallback: (
     result: FaceLandmarkerResult,
     timestamp: DOMHighResTimeStamp,
@@ -35,6 +37,8 @@ class FaceLandmarkCalibrationPage {
     this.calibrationVideoEl = document.getElementById('webcam') as HTMLVideoElement;
     this.canvasElement = document.getElementById('output_canvas') as HTMLCanvasElement;
     this.monitorVideoEl = document.createElement('video');
+
+    this.predictWebcamBoundFunction = this.predictWebcam.bind(this);
   }
 
   // Enable the live webcam view and start detection.
@@ -174,9 +178,9 @@ class FaceLandmarkCalibrationPage {
     // Call this function again to keep predicting when the browser is ready.
     if (getFaceLandmarkerManager().webcamIsRunning()) {
       if ('requestVideoFrameCallback' in this.monitorVideoEl) {
-        this.monitorVideoEl.requestVideoFrameCallback(this.predictWebcam.bind(this));
+        this.monitorVideoEl.requestVideoFrameCallback(this.predictWebcamBoundFunction);
       } else {
-        window.requestAnimationFrame(this.predictWebcam.bind(this));
+        window.requestAnimationFrame(this.predictWebcamBoundFunction);
       }
     }
   }
