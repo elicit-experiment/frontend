@@ -177,7 +177,8 @@ pub fn compress_datapoint(
     if toJson {
         // Serialize result to JSON string
         let json_str = serde_json::to_string(&result)
-            .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))?;
+            .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))?
+            + "\n";
         Ok(JsValue::from_str(&json_str))
     } else {
         // Convert result to JS object

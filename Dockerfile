@@ -5,6 +5,7 @@ ARG ELICIT_LANDING_URL
 ARG API_SCHEME
 
 RUN apk add git
+RUN apk add --no-cache rust cargo
 
 RUN mkdir /experiment-frontend
 
@@ -27,6 +28,7 @@ RUN ls -als
 RUN npm install
 
 COPY . /experiment-frontend
+RUN cd wasm/face-landmark && cargo build
 RUN mv ./source/configuration-production.json ./source/configuration.json
 RUN cat ./source/configuration.json
 

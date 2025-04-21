@@ -56,13 +56,13 @@ module.exports = function (env) {
           crateDirectory: path.resolve(__dirname, 'wasm/face-landmark'),
           outDir: path.resolve(__dirname, 'wasm/face-landmark/pkg'),
           outName: 'face_landmark',
-          forceMode: 'production'
+          forceMode: 'production',
         }),
         new CopyPlugin({
           patterns: [
-            { 
-              from: 'wasm/face-landmark/src/wasm_stub.js', 
-              to: 'wasm/face-landmark/pkg/wasm_stub.js' 
+            {
+              from: 'wasm/face-landmark/src/wasm_stub.js',
+              to: 'wasm/face-landmark/pkg/wasm_stub.js',
             },
           ],
         }),
@@ -192,6 +192,11 @@ module.exports = function (env) {
         },
         compress: process.env.NODE_ENV === 'production',
         port: 5504,
+        // Set cross-origin isolation headers for SharedArrayBuffer support
+        headers: {
+          'Cross-Origin-Opener-Policy': 'same-origin',
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
         // historyApiFallback: {
         //   index: 'default.html',
         // },

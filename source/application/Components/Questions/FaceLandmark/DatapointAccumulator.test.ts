@@ -1,5 +1,4 @@
-import { jest, xdescribe, test, expect } from '@jest/globals';
-import { beforeEach, afterEach } from '@jest/globals';
+import { jest, xdescribe, test, expect, beforeEach, afterEach } from '@jest/globals';
 
 // Mocking 'PortalClient' with a default export
 jest.mock('PortalClient', () => ({
@@ -73,7 +72,7 @@ xdescribe('DatapointAccumulator', () => {
     jest.advanceTimersByTime(1000);
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
-    expect(accumulator.queuedDataPoints).toEqual([
+    expect(accumulator.compressedDataPoints[t2]).toEqual([
       expect.objectContaining({ t: t2 }), // MockDataPoint2
     ]);
     expect(accumulator.pendingTimestamps).toEqual([]);
@@ -102,7 +101,7 @@ xdescribe('DatapointAccumulator', () => {
     });
 
     // Validate that the correct filtered data points are sent based on DATAPOINTS_PER_SECOND
-    expect(accumulator.queuedDataPoints).toEqual(
+    expect(accumulator.compressedDataPoints.values()).toEqual(
       [0, 2, 6].map(
         (index) => expect.objectContaining({ t: mockDataPoints[index].t }), // MockDataPoint2
       ),

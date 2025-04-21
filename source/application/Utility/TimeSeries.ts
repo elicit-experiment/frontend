@@ -204,7 +204,7 @@ async function calculateStreamSize(stream: ReadableStream<Uint8Array>): Promise<
 function postTimeSeriesRawAsJsonStream(
   seriesType: string,
   sessionGuid: string,
-  body: Array<object | string>,
+  body: Array<object | string> | ReadableStream<Uint8Array>,
   compress = true,
 ): Promise<object> {
   if (!sessionGuid) {
@@ -212,8 +212,18 @@ function postTimeSeriesRawAsJsonStream(
     return Promise.reject('Session GUID is required.');
   }
 
-  // Create the NDJSON stream that emits each object individually
-  let dataStream = createNDJSONStream(body);
+  // Handle different input types
+  let dataStream: ReadableStream<Uint8Array>;
+  if (body instanceof ReadableStream) {
+    dataStream = body;
+  } else if (Array.isArray(body)) {
+    if (body.length === 0) {
+      return Promise.reject('Empty array provided');
+    }
+    dataStream = createNDJSONStream(body);
+  } else {
+    return Promise.reject('Invalid input type');
+  }
 
   // Apply compression if requested
   if (compress) {
