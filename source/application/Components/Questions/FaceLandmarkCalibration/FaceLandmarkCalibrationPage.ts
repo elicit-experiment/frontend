@@ -68,12 +68,11 @@ class FaceLandmarkCalibrationPage {
         const frameRate = settings.frameRate;
 
         try {
-          console.dir('navigator.mediaDevices.getUserMedia');
           if (this.calibrationVideoEl) {
             const ratio = await this.configureCalibrationVideoElement(stream);
             getFaceLandmarkerManager().videoAspectRatio = ratio;
             getFaceLandmarkerManager().webcamFrameRate = frameRate;
-            console.log(`navigator.mediaDevices.getUserMedia: ${ratio} ${frameRate}`);
+            console.log(`navigator.mediaDevices.getUserMedia: ratio:${ratio} framerate:${frameRate}`);
           }
           await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
