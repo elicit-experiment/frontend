@@ -1,6 +1,7 @@
 ﻿import * as knockout from 'knockout';
 import QuestionWithStimulusBase from 'Components/Questions/QuestionWithStimulusBase';
 import QuestionModel from 'Models/Question';
+import { shuffleInPlace } from 'Utility/ShuffleInPlace';
 
 enum TagKind {
   User = 'user',
@@ -81,13 +82,25 @@ class ListSelect extends QuestionWithStimulusBase<ListSelectAnswer> {
       this.UserInputBoxOutside(false);
     }
 
-    const selectionTags = this.GetInstrument('Items').Item.map((tag: PredefinedTag) => ({
+    const randomizeOrder = this.GetBooleanInstrument('RandomizeOrder');
+
+    let selectionTags = this.GetInstrument('Items').Item.map((tag: PredefinedTag) => ({
       ...this.FormatPredefinedTag(tag),
       Kind: TagKind.Common,
     }));
+    if (randomizeOrder) {
+      selectionTags = shuffleInPlace(selectionTags);
+    }
+    selectionTags.forEach((tag, index) => {
+      tag.Position = index;
+    });
+    console.dir(selectionTags);
+    console.log(randomizeOrder);
     this.PredefinedItems.push(
       ...this.CreateTags(selectionTags.sort((a: PredefinedTag, b: PredefinedTag) => a.Position - b.Position)),
     );
+
+    this.AddEvent('Render', '', JSON.stringify(this.PredefinedItems));
 
     this.HasPredefinedItems = this.PureComputed(() => this.PredefinedItems().some((t) => !t.IsAdded()));
     this.HasAddedItems = this.PureComputed(() => this.AddedItems().length != 0);
