@@ -5,7 +5,7 @@ ARG ELICIT_LANDING_URL
 ARG API_SCHEME
 
 RUN apk add git
-RUN apk add --no-cache rust cargo
+RUN apk add --no-cache rust-wasm cargo
 
 RUN mkdir /experiment-frontend
 
