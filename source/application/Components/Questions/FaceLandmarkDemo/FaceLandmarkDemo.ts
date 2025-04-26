@@ -43,6 +43,20 @@ export interface MonitorInstrument {
 
 interface Demo {}
 
+const LANDMARK_CONFIG = new Map([
+  ['FACE_LANDMARKS_TESSELATION', { color: '#C0C0C070', lineWidth: 1 }],
+  ['FACE_LANDMARKS_RIGHT_EYE', { color: '#FF3030' }],
+  ['FACE_LANDMARKS_RIGHT_EYEBROW', { color: '#FF3030' }],
+  ['FACE_LANDMARKS_LEFT_EYE', { color: '#30FF30' }],
+  ['FACE_LANDMARKS_LEFT_EYEBROW', { color: '#30FF30' }],
+  ['FACE_LANDMARKS_FACE_OVAL', { color: '#E0E0E0' }],
+  ['FACE_LANDMARKS_LIPS', { color: '#E0E0E0' }],
+  ['FACE_LANDMARKS_RIGHT_IRIS', { color: '#FF3030' }],
+  ['FACE_LANDMARKS_LEFT_IRIS', { color: '#30FF30' }],
+]);
+
+console.dir(FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE);
+
 class FaceLandmarkDemo extends QuestionBase<Demo> {
   public CanAnswer: ko.Observable<boolean> = knockout.observable<boolean>(false);
   public Answer: ko.Observable<Demo> = knockout.observable<Demo>(null);
@@ -113,6 +127,7 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
   protected EnableDisableClick(event) {
     if (!this.page?.videoConfigured) {
       this.page.enableCam(event);
+      this.EnableDisableLabel('Stop Prediction');
     } else {
       if (getFaceLandmarkerManager().webcamIsRunning()) {
         this.EnableDisableLabel('Start Prediction');
@@ -135,20 +150,9 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const drawingUtils = new this.DrawingUtilsClass(ctx);
     for (const landmarks of faceLandmarkerResult.faceLandmarks) {
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_TESSELATION, {
-        color: '#C0C0C070',
-        lineWidth: 1,
+      LANDMARK_CONFIG.forEach((config, landmarkType) => {
+        drawingUtils.drawConnectors(landmarks, FaceLandmarker[landmarkType], config);
       });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE, { color: '#FF3030' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW, { color: '#FF3030' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE, { color: '#30FF30' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW, { color: '#30FF30' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL, { color: '#E0E0E0' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, {
-        color: '#E0E0E0',
-      });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS, { color: '#FF3030' });
-      drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS, { color: '#30FF30' });
     }
   }
 
