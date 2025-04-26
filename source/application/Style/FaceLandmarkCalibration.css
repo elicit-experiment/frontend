@@ -92,3 +92,71 @@ body:not(.debug-mode) {
 
     }
 }
+
+#face-landmarker-demo-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+
+    .header {
+        padding-bottom: 20px;
+    }
+
+    .footer {
+
+    }
+
+    .main-content {
+        display: flex;
+        flex: 1;
+        margin: 0 20px;
+
+        .left-column {
+            text-align: center;
+            flex: 1;
+
+            #webcam-with-overlay {
+                margin-top: 20px;
+                width: 100%;
+                object-fit: cover;
+                border: 1px solid #aaa;
+            }
+
+            #webcam {
+                left: 0;
+            }
+        }
+
+        .right-column {
+            text-align: center;
+            flex: 1;
+
+            .blend-shape-list {
+                list-style: none;
+                text-align: left;
+            }
+
+            .blend-shapes-item {
+                display: flex;
+                align-items: center;
+                height: 20px;
+            }
+
+            .blend-shapes-label {
+                display: flex;
+                width: 120px;
+                justify-content: flex-end;
+                align-items: center;
+                margin-right: 4px;
+            }
+
+            .blend-shapes-value {
+                display: flex;
+                height: 16px;
+                align-items: center;
+                background-color: #007f8b;
+                font-family: "Courier New", Courier, monospace;
+            }
+        }
+    }
+}

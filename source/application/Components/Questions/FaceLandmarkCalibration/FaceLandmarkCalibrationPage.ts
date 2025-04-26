@@ -11,7 +11,7 @@ const CONSTRAINTS: MediaStreamConstraints = {
 };
 
 // TODO: more of this should be moved to FaceLandmarkManager
-class FaceLandmarkCalibrationPage {
+export class FaceLandmarkCalibrationPage {
   public videoWidth = 480;
 
   // let calibrationVideoTime = -1;
@@ -26,6 +26,8 @@ class FaceLandmarkCalibrationPage {
 
   private predictWebcamBoundFunction: (timestamp: DOMHighResTimeStamp) => void;
 
+  private predictionLoopCallbackId: number | null = null;
+
   public dataCallback: (
     result: FaceLandmarkerResult,
     timestamp: DOMHighResTimeStamp,
@@ -33,17 +35,16 @@ class FaceLandmarkCalibrationPage {
     frameSkew: DOMHighResTimeStamp,
   ) => void;
 
-  constructor() {
-    this.calibrationVideoEl = document.getElementById('webcam') as HTMLVideoElement;
-    this.canvasElement = document.getElementById('output_canvas') as HTMLCanvasElement;
-    this.monitorVideoEl = document.createElement('video');
+  constructor(webcamId: string = 'webcam', outputCanvasId: string = 'output_canvas', monitorVideoId: string = 'video') {
+    this.calibrationVideoEl = document.getElementById(webcamId) as HTMLVideoElement;
+    this.canvasElement = document.getElementById(outputCanvasId) as HTMLCanvasElement;
+    this.monitorVideoEl = document.createElement(monitorVideoId) as HTMLVideoElement;
 
     this.predictWebcamBoundFunction = this.predictWebcam.bind(this);
   }
 
   // Enable the live webcam view and start detection.
   enableCam(_event) {
-    console.log('enableCam');
     if (!getFaceLandmarkerManager().faceLandmarker) {
       console.log('Wait! faceLandmarker not loaded yet.');
       return;
@@ -174,12 +175,26 @@ class FaceLandmarkCalibrationPage {
       this.dataCallback(results, timestamp, landmarkerAnalyzeDuration, startTimeMs - timestamp);
     }
 
+    this.ensurePredictionLoop();
+  }
+
+  public ensurePredictionLoop() {
+    if (this.predictionLoopCallbackId) return;
+
     // Call this function again to keep predicting when the browser is ready.
     if (getFaceLandmarkerManager().webcamIsRunning()) {
       if ('requestVideoFrameCallback' in this.monitorVideoEl) {
-        this.monitorVideoEl.requestVideoFrameCallback(this.predictWebcamBoundFunction);
+        this.predictionLoopCallbackId = this.monitorVideoEl.requestVideoFrameCallback(
+          (timestamp: DOMHighResTimeStamp) => {
+            this.predictionLoopCallbackId = null;
+            this.predictWebcamBoundFunction(timestamp);
+          },
+        );
       } else {
-        window.requestAnimationFrame(this.predictWebcamBoundFunction);
+        this.predictionLoopCallbackId = window.requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
+          this.predictionLoopCallbackId = null;
+          this.predictWebcamBoundFunction(timestamp);
+        });
       }
     }
   }
@@ -225,6 +240,34 @@ class FaceLandmarkCalibrationPage {
     }
   }
 
+  public async startPrediction(
+    DrawingUtils,
+    dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
+  ) {
+    this.dataCallback = dataCallback;
+
+    this.monitorVideoEl.setAttribute(
+      'width',
+      String(((CONSTRAINTS.video as MediaTrackConstraints).width as ConstrainULongRange).ideal),
+    );
+    this.monitorVideoEl.setAttribute(
+      'height',
+      String(((CONSTRAINTS.video as MediaTrackConstraints).height as ConstrainULongRange).ideal),
+    );
+    this.monitorVideoEl.style.visibility = 'hidden';
+    this.monitorVideoEl.style.position = 'absolute';
+    this.monitorVideoEl.style.zIndex = '-1';
+    this.monitorVideoEl.style.top = '0';
+    this.monitorVideoEl.style.left = '0';
+
+    document.body.appendChild(this.monitorVideoEl);
+  }
+
+  // Check if webcam access is supported.
+  public hasGetUserMedia() {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  }
+
   private ShowCalibrationPoint() {
     $('.Calibration').show();
     $('#Pt5').hide(); // initially hides the middle button
@@ -235,6 +278,7 @@ export default (
   DrawingUtils: any,
   dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
 ) => {
+  console.log('FaceLandmarkCalibrationPage init');
   const faceLandmarkCalibrationPage: FaceLandmarkCalibrationPage = new FaceLandmarkCalibrationPage();
 
   faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback);

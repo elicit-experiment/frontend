@@ -52,6 +52,9 @@ class Question {
       } else if (question.Type == 'NewComponent::FaceLandmarkCalibration') {
         questionMap = QuestionMapGet('FaceLandmarkCalibration');
         input = component;
+      } else if (question.Type == 'NewComponent::FaceLandmarkDemo') {
+        questionMap = QuestionMapGet('FaceLandmarkDemo');
+        input = component;
       } else if (question.Type == 'NewComponent') {
         const numStimuli = 'Stimuli' in component ? component.Stimuli.length : 0;
         const numInstruments = 'Instruments' in component ? component.Instruments.length : 0;

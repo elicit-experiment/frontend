@@ -1,0 +1,46 @@
+<div id="face-landmarker-demo-page">
+    <div id="loadingModal" class="modal hide fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="d-flex flex-column justify-content-center align-items-center justify-items-center">
+                        <p><h1>Loading Face-Tracker</h1></p>
+                        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="header"></div>
+
+    <div class="main-content">
+        <div class="demo-video-feed left-column" data-bind="css: { height: VideoHeight }">
+            <h2>Video</h2>
+            <button id="webcamButton" class="btn btn-primary">
+                <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__label" data-bind="click: EnableDisableClick, text: EnableDisableLabel "></span>
+            </button>
+            <div id="webcam-with-overlay" style="position: relative; width: 500px; height: 290px">
+                <video id="webcam" style="position: absolute" autoplay playsinline></video>
+                <canvas id="demo-overlay-canvas" style="position: absolute; left: 0; top: 0;"></canvas>
+            </div>
+        </div>
+
+        <div class="right-column">
+            <h2>Blendshapes</h2>
+
+            <div class="blend-shape-list">
+                <ul data-bind="html: BlendshapesHtml()"></ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer"></div>
+</div>
