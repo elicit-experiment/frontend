@@ -71,6 +71,10 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
 
   public BlendShapes: ko.Observable<Classifications[]> = knockout.observable<Classifications[]>([]);
 
+  public overlayCanvas: HTMLCanvasElement;
+  public overlayCanvasContext: CanvasRenderingContext2D;
+  public drawingUtils: any;
+
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'FaceLandmarkDemo', 'FaceLandmarkDemo', method, data);
   }
@@ -101,6 +105,10 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
         this.DrawingUtilsClass = visionImport.DrawingUtils;
 
         this.hideSlideShellNavigationElements();
+
+        this.overlayCanvas = document.getElementById('demo-overlay-canvas') as HTMLCanvasElement;
+        this.overlayCanvasContext = this.overlayCanvas.getContext('2d');
+        this.drawingUtils = new this.DrawingUtilsClass(this.overlayCanvasContext);
 
         this.page = new FaceLandmarkCalibrationPage('webcam', 'demo-overlay-canvas', 'video');
 
@@ -140,20 +148,70 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
     }
   }
 
+  private prevBoundingBox: { minX: number; minY: number; maxX: number; maxY: number } | null = null;
+
   protected RenderFaceMeshOverlay(faceLandmarkerResult: FaceLandmarkerResult) {
     if (faceLandmarkerResult.faceLandmarks?.length == 0) {
+      if (this.prevBoundingBox) {
+        // Clear the previous bounding box area if we had one
+        this.overlayCanvasContext.clearRect(
+          this.prevBoundingBox.minX - 5,
+          this.prevBoundingBox.minY - 5,
+          this.prevBoundingBox.maxX - this.prevBoundingBox.minX + 10,
+          this.prevBoundingBox.maxY - this.prevBoundingBox.minY + 10,
+        );
+        this.prevBoundingBox = null;
+      }
       return;
     }
 
-    const canvas = document.getElementById('demo-overlay-canvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const drawingUtils = new this.DrawingUtilsClass(ctx);
+    // Calculate current bounding box
+    let minX = this.overlayCanvas.width;
+    let minY = this.overlayCanvas.height;
+    let maxX = 0;
+    let maxY = 0;
+
+    // Pre-scan to find bounding box
+    for (const landmarks of faceLandmarkerResult.faceLandmarks) {
+      for (const landmark of landmarks) {
+        const x = landmark.x * this.overlayCanvas.width;
+        const y = landmark.y * this.overlayCanvas.height;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+
+    // Add padding to the bounding box
+    const padding = 20; // Pixels of padding around landmarks
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(this.overlayCanvas.width, maxX + padding);
+    maxY = Math.min(this.overlayCanvas.height, maxY + padding);
+
+    // Clear previous bounding box if it exists
+    if (this.prevBoundingBox) {
+      this.overlayCanvasContext.clearRect(
+        this.prevBoundingBox.minX,
+        this.prevBoundingBox.minY,
+        this.prevBoundingBox.maxX - this.prevBoundingBox.minX,
+        this.prevBoundingBox.maxY - this.prevBoundingBox.minY,
+      );
+    } else {
+      // No previous bounding box, clear the entire canvas once
+      this.overlayCanvasContext.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+    }
+
+    // Draw all landmarks
     for (const landmarks of faceLandmarkerResult.faceLandmarks) {
       LANDMARK_CONFIG.forEach((config, landmarkType) => {
-        drawingUtils.drawConnectors(landmarks, FaceLandmarker[landmarkType], config);
+        this.drawingUtils.drawConnectors(landmarks, FaceLandmarker[landmarkType], config);
       });
     }
+
+    // Store current bounding box for next frame
+    this.prevBoundingBox = { minX, minY, maxX, maxY };
   }
 
   protected ReceiveDatapoint(
@@ -162,23 +220,16 @@ class FaceLandmarkDemo extends QuestionBase<Demo> {
     analyzeDuration: DOMHighResTimeStamp,
     frameJitter: DOMHighResTimeStamp,
   ) {
-    this.RenderFaceMeshOverlay(dataPoint);
-    this.BlendShapes(dataPoint.faceBlendshapes);
+    requestAnimationFrame(() => {
+      this.RenderFaceMeshOverlay(dataPoint);
+      this.BlendShapes(dataPoint.faceBlendshapes);
+    });
     getFaceLandmarkerManager().queueForSend(dataPoint, timestamp, analyzeDuration, frameJitter);
   }
 
   // sleep function because java doesn't have one, sourced from http://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
   private sleep(time: number) {
     return new Promise<never>((resolve) => setTimeout(resolve, time));
-  }
-
-  private ClearCanvas() {
-    $('.Calibration').hide();
-
-    const canvas = <HTMLCanvasElement>document.getElementById('plotting-canvas');
-    if (canvas) {
-      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    }
   }
 
   //
