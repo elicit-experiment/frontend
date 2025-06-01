@@ -192,11 +192,12 @@ module.exports = function (env) {
         },
         compress: process.env.NODE_ENV === 'production',
         port: 5504,
+        // NOTE: this breaks YouTube videos; maybe one day Google will fix this.
         // Set cross-origin isolation headers for SharedArrayBuffer support
-        headers: {
-          'Cross-Origin-Opener-Policy': 'same-origin',
-          'Cross-Origin-Embedder-Policy': 'require-corp',
-        },
+        // headers: {
+        //   'Cross-Origin-Opener-Policy': 'same-origin',
+        //   'Cross-Origin-Embedder-Policy': 'require-corp',
+        // },
         // historyApiFallback: {
         //   index: 'default.html',
         // },

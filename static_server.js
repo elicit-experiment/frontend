@@ -6,12 +6,13 @@ const options = {
   index: 'index.html',
 };
 
+// NOTE: this breaks YouTube videos; maybe one day Google will fix this.
 // Set cross-origin isolation headers for SharedArrayBuffer support
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+//   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+//   next();
+// });
 
 app.use(express.static('dist', options));
 
