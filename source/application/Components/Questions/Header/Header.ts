@@ -11,7 +11,9 @@ class Header extends QuestionBase<any> {
 
     this.HeaderLabel = this.GetInstrumentFormatted('HeaderLabel');
 
-    if (!this.HeaderLabel) throw new Error('HeaderLabel not found for Header');
+    if (this.HeaderLabel == null) {
+      throw new Error('HeaderLabel not found for Header');
+    }
 
     ExperimentManager.SlideTitle(this.HeaderLabel);
   }
