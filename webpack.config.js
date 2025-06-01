@@ -22,6 +22,10 @@ module.exports = function (env) {
     {
       stats: { errorDetails: true },
       plugins: [
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+          __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
+        }),
         new webpack.ProvidePlugin({
           $: 'jquery',
           jQuery: 'jquery',
