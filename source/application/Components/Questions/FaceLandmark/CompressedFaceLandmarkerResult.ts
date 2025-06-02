@@ -136,7 +136,7 @@ export function compressDatapoint(
     );
   }
 
-  const t = performance.timeOrigin + timestamp;
+  const t = timestamp;
   const dt = Date.now() - t;
 
   const result: CompressedFaceLandmarkerResult = { t, dt };

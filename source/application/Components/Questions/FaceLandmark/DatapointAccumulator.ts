@@ -214,7 +214,7 @@ export class DatapointAccumulator {
     timestamp: DOMHighResTimeStamp,
     analyzeDuration: DOMHighResTimeStamp,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    frameJitter: DOMHighResTimeStamp,
+    _frameJitter: DOMHighResTimeStamp,
   ) {
     if (this.progressCallback) {
       this.progressCallback(ProgressKind.ANALYZED, analyzeDuration, 0, 0);
@@ -241,8 +241,18 @@ export class DatapointAccumulator {
         });
       } else {
         // if the worker isn't running, just compress the data point and send it directly in the main thread
-        const compressedDataPoint = `${JSON.stringify(compressDatapoint(this.config, dataPoint, timestamp))}\n`;
-        this.handleFallbackResponse(timestamp, compressedDataPoint);
+        const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp);
+        if (__DEV__) {
+          if (
+            compressedDataPoint.t < performance.timeOrigin ||
+            compressedDataPoint.t > performance.timeOrigin + 1000 * 1000000.0
+          ) {
+            console.error('Invalid timestamp:', compressedDataPoint.t);
+            debugger;
+          }
+        }
+        const compressedDataPointString = `${JSON.stringify(compressedDataPoint)}\n`;
+        this.handleFallbackResponse(timestamp, compressedDataPointString);
       }
     } else {
       // Skip this datapoint due to rate limiting

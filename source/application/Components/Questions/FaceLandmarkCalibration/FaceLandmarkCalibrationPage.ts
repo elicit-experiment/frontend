@@ -24,7 +24,7 @@ export class FaceLandmarkCalibrationPage {
   public monitorVideoEl: HTMLVideoElement;
   public enableWebcamButton: HTMLButtonElement;
 
-  private predictWebcamBoundFunction: (timestamp: DOMHighResTimeStamp) => void;
+  private predictWebcamBoundFunction: (_timestamp: DOMHighResTimeStamp) => void;
 
   private predictionLoopCallbackId: number | null = null;
 
@@ -35,12 +35,15 @@ export class FaceLandmarkCalibrationPage {
     frameSkew: DOMHighResTimeStamp,
   ) => void;
 
+  private hasRequestVideoFrameCallback: boolean = false;
+
   constructor(webcamId: string = 'webcam', outputCanvasId: string = 'output_canvas', monitorVideoId: string = 'video') {
     this.calibrationVideoEl = document.getElementById(webcamId) as HTMLVideoElement;
     this.canvasElement = document.getElementById(outputCanvasId) as HTMLCanvasElement;
     this.monitorVideoEl = document.createElement(monitorVideoId) as HTMLVideoElement;
 
     this.predictWebcamBoundFunction = this.predictWebcam.bind(this);
+    this.hasRequestVideoFrameCallback = 'requestVideoFrameCallback' in this.monitorVideoEl;
   }
 
   // Enable the live webcam view and start detection.
@@ -154,7 +157,9 @@ export class FaceLandmarkCalibrationPage {
     return loadedVideoDataPromise;
   }
 
-  async predictWebcam(timestamp: DOMHighResTimeStamp = 0, metadata?: { mediaTime: number }) {
+  async predictWebcam(timeStamp: DOMHighResTimeStamp | null = null, metadata?: { mediaTime: number }) {
+    const epochTimeStamp = timeStamp || performance.timeOrigin + performance.now();
+
     if (!this.videoConfigured) {
       throw new Error('No video configured!');
     }
@@ -171,8 +176,8 @@ export class FaceLandmarkCalibrationPage {
 
     if (results) {
       const landmarkerAnalyzeDuration = performance.now() - startTimeMs;
-      // console.log('landmarkerAnalyzeDuration %o %o', timestamp, landmarkerAnalyzeDuration);
-      this.dataCallback(results, timestamp, landmarkerAnalyzeDuration, startTimeMs - timestamp);
+      console.log('landmarkerAnalyzeDuration %o %o', epochTimeStamp, landmarkerAnalyzeDuration);
+      this.dataCallback(results, epochTimeStamp, landmarkerAnalyzeDuration, startTimeMs - epochTimeStamp);
     }
 
     this.ensurePredictionLoop();
@@ -183,22 +188,25 @@ export class FaceLandmarkCalibrationPage {
 
     // Call this function again to keep predicting when the browser is ready.
     if (getFaceLandmarkerManager().webcamIsRunning()) {
-      if ('requestVideoFrameCallback' in this.monitorVideoEl) {
+      if (this.hasRequestVideoFrameCallback) {
         this.predictionLoopCallbackId = this.monitorVideoEl.requestVideoFrameCallback(
           (timestamp: DOMHighResTimeStamp) => {
             this.predictionLoopCallbackId = null;
-            this.predictWebcamBoundFunction(timestamp);
+            // Convert performance-relative timestamp to Unix epoch
+            const unixTimestamp = performance.timeOrigin + timestamp;
+            this.predictWebcamBoundFunction(unixTimestamp);
           },
         );
       } else {
         this.predictionLoopCallbackId = window.requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
           this.predictionLoopCallbackId = null;
-          this.predictWebcamBoundFunction(timestamp);
+          // Convert performance-relative timestamp to Unix epoch
+          const unixTimestamp = performance.timeOrigin + timestamp;
+          this.predictWebcamBoundFunction(unixTimestamp);
         });
       }
     }
   }
-
   public async runCalibration(
     DrawingUtils,
     dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,

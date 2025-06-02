@@ -213,6 +213,12 @@ class FaceLandmarkerManager extends DisposableComponent {
     analyzeDuration: DOMHighResTimeStamp,
     frameJitter: DOMHighResTimeStamp,
   ) {
+    if (__DEV__ && timestamp > performance.timeOrigin + 3600 * 1000000.0) {
+      // We shouldn't have any data points that are more than 1 hour old.
+      console.log(timestamp);
+      console.log(new Date(timestamp));
+      debugger;
+    }
     this.datapointAccumulator.accumulateAndDebounce(dataPoint, timestamp, analyzeDuration, frameJitter);
   }
 
