@@ -3,6 +3,7 @@ let _map: { [key: string]: QuestionMap };
 
 export function Get(key: string) {
   const map = _map[key];
+  console.dir(`${key} -> ${map}`);
 
   return map != null ? map : _map[_unsupported];
 }
@@ -37,6 +38,7 @@ function Initialize() {
     WebGazerCalibrate: new QuestionMap('Questions/WebGazerCalibrate'),
     FaceLandmark: new QuestionMap('Questions/FaceLandmark'),
     FaceLandmarkCalibration: new QuestionMap('Questions/FaceLandmarkCalibration'),
+    FaceLandmarkDemo: new QuestionMap('Questions/FaceLandmarkDemo'),
   };
 
   _map[_unsupported] = new QuestionMap('Questions/Unsupported', false);

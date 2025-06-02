@@ -348,7 +348,7 @@ class WebGazerManager extends DisposableComponent {
 
     const postWebgazerJSON = () =>
       new Promise((resolve, reject) => {
-        postTimeSeriesAsJson(JSON.stringify({ sessionGUID: this.sessionGuid, points: pointsToSend }), 'webgazer')
+        postTimeSeriesAsJson({ sessionGUID: this.sessionGuid, points: pointsToSend }, 'webgazer')
           .then((json) => resolve(json))
           .catch((err) => reject(err));
       });

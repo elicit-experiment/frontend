@@ -2,13 +2,9 @@ import DisposableComponent from 'Components/DisposableComponent';
 import ExperimentManager from 'Managers/Portal/Experiment';
 import PortalClient from 'PortalClient';
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import {
-  AccumulatableRecord,
-  DatapointAccumulator,
-  ProgressKind,
-} from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { DatapointAccumulator } from 'Components/Questions/FaceLandmark/DatapointAccumulator';
+import { ProgressKind } from 'Components/Questions/FaceLandmark/FaceLandmarkTypes';
 import { FaceLandmarkComponentConfig } from 'Components/Questions/FaceLandmark/FaceLandmarkComponentConfig';
-import { compressDatapoint } from 'Components/Questions/FaceLandmark/CompressedFaceLandmarkerResult';
 import FaceLandmarkStatsMonitor, {
   template as FaceLandmarkStatsMonitorTemplate,
 } from 'Components/Questions/FaceLandmark/FaceLandmarkStatsMonitor';
@@ -104,12 +100,16 @@ class FaceLandmarkerManager extends DisposableComponent {
   private landmarkerMonitorViewModel: FaceLandmarkStatsMonitor;
   private debugMode = false;
 
+  private sendSummaryBoundMethod: () => void;
+
   private constructor() {
     super();
 
     const serviceCaller = PortalClient.ServiceCallerService.GetDefaultCaller();
 
     this.sessionGuid = serviceCaller.GetCurrentSession().Guid;
+
+    this.sendSummaryBoundMethod = this.SendSummary.bind(this);
 
     // Example event listener for the debug triggered event
     debugListener();
@@ -133,10 +133,13 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.state = FaceLandmarkerState.NotStarted;
 
     this.datapointAccumulator = new DatapointAccumulator(
-      this.config.MaximumSendRateHz,
+      this.config,
       FaceLandmarkerManager.AUTO_SEND_INTERVAL,
       (kind, count, totalBytes, totalCompressedBytes) => {
         this.landmarkerMonitorViewModel?.incrStat(kind.toLocaleLowerCase(), count);
+        if (kind === ProgressKind.QUEUED) {
+          this.currentSummaryPeriodCounts.queued += count;
+        }
         if (kind === ProgressKind.POSTED) {
           this.currentSummaryPeriodCounts.posted += count;
           this.currentSummaryPeriodCounts.posted_bytes += totalBytes;
@@ -204,14 +207,21 @@ class FaceLandmarkerManager extends DisposableComponent {
     this.webcamRunning = false;
   }
 
-  public queueForSend(dataPoint: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) {
-    const compressedDataPoint = compressDatapoint(this.config, dataPoint, timestamp) as AccumulatableRecord;
-    if (compressedDataPoint) {
-      this.currentSummaryPeriodCounts.queued++;
-      this.landmarkerMonitorViewModel?.incrStat('queued', 1);
-      this.datapointAccumulator.accumulateAndDebounce(compressedDataPoint);
+  public queueForSend(
+    dataPoint: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    frameJitter: DOMHighResTimeStamp,
+  ) {
+    if (__DEV__ && timestamp > performance.timeOrigin + 3600 * 1000000.0) {
+      // We shouldn't have any data points that are more than 1 hour old.
+      console.log(timestamp);
+      console.log(new Date(timestamp));
+      debugger;
     }
+    this.datapointAccumulator.accumulateAndDebounce(dataPoint, timestamp, analyzeDuration, frameJitter);
   }
+
   private clearSummaryTimer() {
     if (this._summaryTimer) {
       clearInterval(this._summaryTimer);
@@ -223,7 +233,7 @@ class FaceLandmarkerManager extends DisposableComponent {
     console.log('FaceLandmarkerManager: Start Tracking');
 
     this.clearSummaryTimer();
-    this._summaryTimer = setInterval(this.SendSummary.bind(this), FaceLandmarkerManager.SUMMARY_INTERVAL);
+    this._summaryTimer = setInterval(this.sendSummaryBoundMethod, FaceLandmarkerManager.SUMMARY_INTERVAL);
 
     this.SetState(FaceLandmarkerState.Running);
     // TODO: there is very likely a race condition here between us sending off the final
@@ -319,7 +329,14 @@ class FaceLandmarkerManager extends DisposableComponent {
 
     componentDiv.innerHTML = FaceLandmarkStatsMonitorTemplate;
 
-    this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor(['queued', 'skipped', 'posted', 'acknowledged']);
+    this.landmarkerMonitorViewModel = new FaceLandmarkStatsMonitor([
+      { name: 'analyzed', targetRate: 1000.0 / this.config.MaximumSendRateHz, type: 'average_value' },
+      { name: 'compressed', targetRate: 1000.0 / this.config.MaximumSendRateHz, type: 'average_value' },
+      { name: 'queued', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'skipped', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'posted', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+      { name: 'acknowledged', targetRate: this.config.MaximumSendRateHz, type: 'rate' },
+    ]);
 
     knockout.applyBindings(this.landmarkerMonitorViewModel, monitorDiv);
   }

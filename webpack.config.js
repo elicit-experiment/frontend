@@ -7,6 +7,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const glob = require('glob');
 const CompressionPlugin = require('compression-webpack-plugin');
+const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const stylRoot = 'source/application/Style';
 templates = glob.sync('source/application/Components/**/*.html');
@@ -20,6 +22,10 @@ module.exports = function (env) {
     {
       stats: { errorDetails: true },
       plugins: [
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+          __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
+        }),
         new webpack.ProvidePlugin({
           $: 'jquery',
           jQuery: 'jquery',
@@ -50,6 +56,20 @@ module.exports = function (env) {
         new CompressionPlugin({
           algorithm: 'gzip',
         }),
+        new WasmPackPlugin({
+          crateDirectory: path.resolve(__dirname, 'wasm/face-landmark'),
+          outDir: path.resolve(__dirname, 'wasm/face-landmark/pkg'),
+          outName: 'face_landmark',
+          forceMode: 'production',
+        }),
+        new CopyPlugin({
+          patterns: [
+            {
+              from: 'wasm/face-landmark/src/wasm_stub.js',
+              to: 'wasm/face-landmark/pkg/wasm_stub.js',
+            },
+          ],
+        }),
       ],
       entry: {
         elicit_experiment: path.resolve(__dirname, 'source/application/Main.ts'),
@@ -63,11 +83,19 @@ module.exports = function (env) {
         devtoolModuleFilenameTemplate: process.env.NODE_ENV === 'production' ? '[resource-path]' : void 0,
       },
       target: 'web',
+      experiments: {
+        asyncWebAssembly: true,
+        syncWebAssembly: true,
+      },
       module: {
         rules: [
           {
             test: /\.ts?(\?.+)?$/,
             use: ['ts-loader'],
+          },
+          {
+            test: /\.wasm$/,
+            type: 'webassembly/async',
           },
           {
             test: /\.html?(\?.+)?$/,
@@ -136,7 +164,7 @@ module.exports = function (env) {
       resolve: {
         fallback: { path: require.resolve('path-browserify') },
         plugins: [new TsconfigPathsPlugin()],
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.js', '.wasm'],
         alias: {
           Source: path.resolve(__dirname, 'source/'),
           Components: path.resolve(__dirname, 'source/application/Components/'),
@@ -147,6 +175,7 @@ module.exports = function (env) {
           KnockoutBindings: path.resolve(__dirname, 'source/application/KnockoutBindings'),
           PortalClient: path.resolve(path.join(__dirname, 'dependencies/PortalClient/PortalClient.min.js')),
           WebGazer: path.resolve(path.join(__dirname, 'dependencies/webgazer/webgazer.commonjs2.js')),
+          FaceLandmarkWasm: path.resolve(__dirname, 'wasm/face-landmark/pkg'),
         },
       },
       optimization: {
@@ -167,6 +196,12 @@ module.exports = function (env) {
         },
         compress: process.env.NODE_ENV === 'production',
         port: 5504,
+        // NOTE: this breaks YouTube videos; maybe one day Google will fix this.
+        // Set cross-origin isolation headers for SharedArrayBuffer support
+        // headers: {
+        //   'Cross-Origin-Opener-Policy': 'same-origin',
+        //   'Cross-Origin-Embedder-Policy': 'require-corp',
+        // },
         // historyApiFallback: {
         //   index: 'default.html',
         // },

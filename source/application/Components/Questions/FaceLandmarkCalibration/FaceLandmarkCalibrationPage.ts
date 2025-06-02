@@ -11,7 +11,7 @@ const CONSTRAINTS: MediaStreamConstraints = {
 };
 
 // TODO: more of this should be moved to FaceLandmarkManager
-class FaceLandmarkCalibrationPage {
+export class FaceLandmarkCalibrationPage {
   public videoWidth = 480;
 
   // let calibrationVideoTime = -1;
@@ -24,17 +24,30 @@ class FaceLandmarkCalibrationPage {
   public monitorVideoEl: HTMLVideoElement;
   public enableWebcamButton: HTMLButtonElement;
 
-  public dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void;
+  private predictWebcamBoundFunction: (_timestamp: DOMHighResTimeStamp) => void;
 
-  constructor() {
-    this.calibrationVideoEl = document.getElementById('webcam') as HTMLVideoElement;
-    this.canvasElement = document.getElementById('output_canvas') as HTMLCanvasElement;
-    this.monitorVideoEl = document.createElement('video');
+  private predictionLoopCallbackId: number | null = null;
+
+  public dataCallback: (
+    result: FaceLandmarkerResult,
+    timestamp: DOMHighResTimeStamp,
+    analyzeDuration: DOMHighResTimeStamp,
+    frameSkew: DOMHighResTimeStamp,
+  ) => void;
+
+  private hasRequestVideoFrameCallback: boolean = false;
+
+  constructor(webcamId: string = 'webcam', outputCanvasId: string = 'output_canvas', monitorVideoId: string = 'video') {
+    this.calibrationVideoEl = document.getElementById(webcamId) as HTMLVideoElement;
+    this.canvasElement = document.getElementById(outputCanvasId) as HTMLCanvasElement;
+    this.monitorVideoEl = document.createElement(monitorVideoId) as HTMLVideoElement;
+
+    this.predictWebcamBoundFunction = this.predictWebcam.bind(this);
+    this.hasRequestVideoFrameCallback = 'requestVideoFrameCallback' in this.monitorVideoEl;
   }
 
   // Enable the live webcam view and start detection.
   enableCam(_event) {
-    console.log('enableCam');
     if (!getFaceLandmarkerManager().faceLandmarker) {
       console.log('Wait! faceLandmarker not loaded yet.');
       return;
@@ -59,12 +72,11 @@ class FaceLandmarkCalibrationPage {
         const frameRate = settings.frameRate;
 
         try {
-          console.dir('navigator.mediaDevices.getUserMedia');
           if (this.calibrationVideoEl) {
             const ratio = await this.configureCalibrationVideoElement(stream);
             getFaceLandmarkerManager().videoAspectRatio = ratio;
             getFaceLandmarkerManager().webcamFrameRate = frameRate;
-            console.log(`navigator.mediaDevices.getUserMedia: ${ratio} ${frameRate}`);
+            console.log(`navigator.mediaDevices.getUserMedia: ratio:${ratio} framerate:${frameRate}`);
           }
           await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
@@ -145,7 +157,9 @@ class FaceLandmarkCalibrationPage {
     return loadedVideoDataPromise;
   }
 
-  async predictWebcam(timestamp: DOMHighResTimeStamp = 0) {
+  async predictWebcam(timeStamp: DOMHighResTimeStamp | null = null, metadata?: { mediaTime: number }) {
+    const epochTimeStamp = timeStamp || performance.timeOrigin + performance.now();
+
     if (!this.videoConfigured) {
       throw new Error('No video configured!');
     }
@@ -153,21 +167,46 @@ class FaceLandmarkCalibrationPage {
     let results = undefined;
 
     const startTimeMs = performance.now();
-    if (this.monitoringVideoTime !== this.monitorVideoEl.currentTime) {
-      this.monitoringVideoTime = this.monitorVideoEl.currentTime;
+    const currentVideoTime = metadata?.mediaTime || this.monitorVideoEl.currentTime;
+
+    if (this.monitoringVideoTime !== currentVideoTime) {
+      this.monitoringVideoTime = currentVideoTime;
       results = getFaceLandmarkerManager().faceLandmarker.detectForVideo(this.monitorVideoEl, startTimeMs);
     }
 
     if (results) {
-      this.dataCallback(results, timestamp);
+      const landmarkerAnalyzeDuration = performance.now() - startTimeMs;
+      console.log('landmarkerAnalyzeDuration %o %o', epochTimeStamp, landmarkerAnalyzeDuration);
+      this.dataCallback(results, epochTimeStamp, landmarkerAnalyzeDuration, startTimeMs - epochTimeStamp);
     }
+
+    this.ensurePredictionLoop();
+  }
+
+  public ensurePredictionLoop() {
+    if (this.predictionLoopCallbackId) return;
 
     // Call this function again to keep predicting when the browser is ready.
     if (getFaceLandmarkerManager().webcamIsRunning()) {
-      window.requestAnimationFrame(this.predictWebcam.bind(this));
+      if (this.hasRequestVideoFrameCallback) {
+        this.predictionLoopCallbackId = this.monitorVideoEl.requestVideoFrameCallback(
+          (timestamp: DOMHighResTimeStamp) => {
+            this.predictionLoopCallbackId = null;
+            // Convert performance-relative timestamp to Unix epoch
+            const unixTimestamp = performance.timeOrigin + timestamp;
+            this.predictWebcamBoundFunction(unixTimestamp);
+          },
+        );
+      } else {
+        this.predictionLoopCallbackId = window.requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
+          this.predictionLoopCallbackId = null;
+          // Convert performance-relative timestamp to Unix epoch
+          const unixTimestamp = performance.timeOrigin + timestamp;
+          this.predictWebcamBoundFunction(unixTimestamp);
+        });
+      }
     }
   }
-
   public async runCalibration(
     DrawingUtils,
     dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
@@ -209,6 +248,34 @@ class FaceLandmarkCalibrationPage {
     }
   }
 
+  public async startPrediction(
+    DrawingUtils,
+    dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
+  ) {
+    this.dataCallback = dataCallback;
+
+    this.monitorVideoEl.setAttribute(
+      'width',
+      String(((CONSTRAINTS.video as MediaTrackConstraints).width as ConstrainULongRange).ideal),
+    );
+    this.monitorVideoEl.setAttribute(
+      'height',
+      String(((CONSTRAINTS.video as MediaTrackConstraints).height as ConstrainULongRange).ideal),
+    );
+    this.monitorVideoEl.style.visibility = 'hidden';
+    this.monitorVideoEl.style.position = 'absolute';
+    this.monitorVideoEl.style.zIndex = '-1';
+    this.monitorVideoEl.style.top = '0';
+    this.monitorVideoEl.style.left = '0';
+
+    document.body.appendChild(this.monitorVideoEl);
+  }
+
+  // Check if webcam access is supported.
+  public hasGetUserMedia() {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  }
+
   private ShowCalibrationPoint() {
     $('.Calibration').show();
     $('#Pt5').hide(); // initially hides the middle button
@@ -219,6 +286,7 @@ export default (
   DrawingUtils: any,
   dataCallback: (result: FaceLandmarkerResult, timestamp: DOMHighResTimeStamp) => void,
 ) => {
+  console.log('FaceLandmarkCalibrationPage init');
   const faceLandmarkCalibrationPage: FaceLandmarkCalibrationPage = new FaceLandmarkCalibrationPage();
 
   faceLandmarkCalibrationPage.runCalibration(DrawingUtils, dataCallback);

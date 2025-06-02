@@ -43,7 +43,6 @@ class Slide {
   }
 
   public SetIsWorking(observeable: ko.Computed<boolean>): void {
-    console.log('ISWorking', observeable());
     this._isWorking(observeable);
   }
 }
