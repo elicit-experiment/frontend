@@ -70,13 +70,17 @@ export class FaceLandmarkCalibrationPage {
         const videoTrack = stream.getVideoTracks()[0];
         const settings = videoTrack.getSettings();
         const frameRate = settings.frameRate;
+        const actualWidth = settings.width;
+        const actualHeight = settings.height;
 
         try {
           if (this.calibrationVideoEl) {
             const ratio = await this.configureCalibrationVideoElement(stream);
             getFaceLandmarkerManager().videoAspectRatio = ratio;
             getFaceLandmarkerManager().webcamFrameRate = frameRate;
-            console.log(`navigator.mediaDevices.getUserMedia: ratio:${ratio} framerate:${frameRate}`);
+            getFaceLandmarkerManager().videoWidth = actualWidth;
+            getFaceLandmarkerManager().videoHeight = actualHeight;
+            console.log(`navigator.mediaDevices.getUserMedia: ratio:${ratio} framerate:${frameRate} resolution:${actualWidth}x${actualHeight}`);
           }
           await this.configureMonitorVideoElement(stream);
           this.ShowCalibrationPoint();
