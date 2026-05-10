@@ -1,7 +1,6 @@
-use wasm_bindgen::prelude::*;
-use serde::{Serialize, Deserialize};
-use js_sys::{Array, Object};
+use serde::{Deserialize, Serialize};
 use serde_json;
+use wasm_bindgen::prelude::*;
 
 mod wasm_utils;
 pub use wasm_utils::*;
@@ -26,18 +25,20 @@ pub struct NormalizedLandmark {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NormalizedLandmarkComponentConfig {
-    FaceTransformation: bool,
-    Landmarks: bool,
-    Blendshapes: bool,
-    StripZCoordinates: bool,
+    face_transformation: bool,
+    landmarks: bool,
+    blendshapes: bool,
+    strip_z_coordinates: bool,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FaceLandmarkerResult {
-    faceLandmarks: Option<Vec<Vec<NormalizedLandmark>>>,
-    facialTransformationMatrixes: Option<Vec<TransformationMatrix>>,
-    faceBlendshapes: Option<Vec<Classifications>>,
+    face_landmarks: Option<Vec<Vec<NormalizedLandmark>>>,
+    facial_transformation_matrixes: Option<Vec<TransformationMatrix>>,
+    face_blendshapes: Option<Vec<Classifications>>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -46,10 +47,11 @@ pub struct Classifications {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Category {
     score: f64,
     index: i32,
-    categoryName: String,
+    category_name: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -84,87 +86,105 @@ pub struct CompressedFaceLandmarkerResult {
 
 #[wasm_bindgen(js_name = "compress_datapoint")]
 pub fn compress_datapoint(
-    config_js: JsValue, 
-    datapoint_js: JsValue, 
+    config_js: JsValue,
+    datapoint_js: JsValue,
     timestamp: f64,
-    toJson: bool
+    to_json: bool,
 ) -> Result<JsValue, JsValue> {
     // Convert JS objects to Rust structs
     let config: NormalizedLandmarkComponentConfig = serde_wasm_bindgen::from_value(config_js)?;
     let datapoint: FaceLandmarkerResult = serde_wasm_bindgen::from_value(datapoint_js)?;
-    
+
     // Check if data is valid
-    if config.FaceTransformation && datapoint.facialTransformationMatrixes.is_none() {
+    if config.face_transformation && datapoint.facial_transformation_matrixes.is_none() {
         return Ok(JsValue::NULL);
     }
-    
+
     // Process transformation matrices
     let mut result_matrix = None;
-    if config.FaceTransformation && datapoint.facialTransformationMatrixes.is_some() {
-        let matrices = datapoint.facialTransformationMatrixes.unwrap();
+    if config.face_transformation && datapoint.facial_transformation_matrixes.is_some() {
+        let matrices = datapoint.facial_transformation_matrixes.unwrap();
         result_matrix = Some(matrices.into_iter().map(|m| m.data).collect());
     }
-    
+
     // Process landmarks
     let mut result_landmarks = None;
-    if datapoint.faceLandmarks.is_none() {
+    if datapoint.face_landmarks.is_none() {
         return Ok(JsValue::NULL);
     }
-    
-    if config.Landmarks && datapoint.faceLandmarks.is_some() {
-        let landmarks = datapoint.faceLandmarks.unwrap();
-        result_landmarks = Some(landmarks.into_iter().map(|landmarks_set| {
-            let mut points = Vec::new();
-            for val in landmarks_set {
-                points.push(quantize(val.x));
-                points.push(quantize(val.y));
-                if !config.StripZCoordinates {
-                    if let Some(z) = val.z {
-                        points.push(quantize(z));
+
+    if config.landmarks && datapoint.face_landmarks.is_some() {
+        let landmarks = datapoint.face_landmarks.unwrap();
+        result_landmarks = Some(
+            landmarks
+                .into_iter()
+                .map(|landmarks_set| {
+                    let mut points = Vec::new();
+                    for val in landmarks_set {
+                        points.push(quantize(val.x));
+                        points.push(quantize(val.y));
+                        if !config.strip_z_coordinates {
+                            if let Some(z) = val.z {
+                                points.push(quantize(z));
+                            }
+                        }
                     }
-                }
-            }
-            
-            CompressedNormalizedLandmark {
-                z: !config.StripZCoordinates,
-                p: points,
-            }
-        }).collect());
+
+                    CompressedNormalizedLandmark {
+                        z: !config.strip_z_coordinates,
+                        p: points,
+                    }
+                })
+                .collect(),
+        );
     }
-    
+
     // Process blendshapes
     let mut result_blendshapes = None;
-    if datapoint.faceBlendshapes.is_none() {
+    if datapoint.face_blendshapes.is_none() {
         return Ok(JsValue::NULL);
     }
-    
-    if config.Blendshapes && datapoint.faceBlendshapes.is_some() {
-        let blendshapes = datapoint.faceBlendshapes.unwrap();
-        result_blendshapes = Some(blendshapes.into_iter().map(|classifications| {
-            let scores = classifications.categories.iter().map(|c| quantize(c.score)).collect();
-            let indices = classifications.categories.iter().map(|c| c.index).collect();
-            
-            // Get category indices from names
-            // In a real implementation, you would need the BLENDSHAPE_CATEGORY_INDICES mapping
-            // Here we're returning the index directly for simplicity
-            let categories = classifications.categories.iter().map(|c| {
-                // In JavaScript, we'd look up the index from the name
-                // Here we're just using the index directly
-                c.index
-            }).collect();
-            
-            CompressedClassifications {
-                s: scores,
-                i: indices,
-                c: categories,
-            }
-        }).collect());
+
+    if config.blendshapes && datapoint.face_blendshapes.is_some() {
+        let blendshapes = datapoint.face_blendshapes.unwrap();
+        result_blendshapes = Some(
+            blendshapes
+                .into_iter()
+                .map(|classifications| {
+                    let scores = classifications
+                        .categories
+                        .iter()
+                        .map(|c| quantize(c.score))
+                        .collect();
+                    let indices = classifications.categories.iter().map(|c| c.index).collect();
+
+                    // Get category indices from names
+                    // In a real implementation, you would need the BLENDSHAPE_CATEGORY_INDICES mapping
+                    // Here we're returning the index directly for simplicity
+                    let categories = classifications
+                        .categories
+                        .iter()
+                        .map(|c| {
+                            // In JavaScript, we'd look up the index from the name
+                            // Here we're just using the index directly
+                            c.index
+                        })
+                        .collect();
+
+                    CompressedClassifications {
+                        s: scores,
+                        i: indices,
+                        c: categories,
+                    }
+                })
+                .collect(),
+        );
     }
-    
+
     // Calculate timestamps
     let t = timestamp;
     let dt = js_sys::Date::now() - t;
-    
+
     // Create result
     let result = CompressedFaceLandmarkerResult {
         landmarks: result_landmarks,
@@ -173,8 +193,8 @@ pub fn compress_datapoint(
         t,
         dt,
     };
-    
-    if toJson {
+
+    if to_json {
         // Serialize result to JSON string
         let json_str = serde_json::to_string(&result)
             .map_err(|e| JsValue::from_str(&format!("Serialization error: {}", e)))?
