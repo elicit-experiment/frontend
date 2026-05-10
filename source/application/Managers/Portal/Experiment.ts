@@ -78,13 +78,12 @@ class Experiment extends DisposableComponent {
   }
 
   public ExperimentCompleted(): void {
-    Portal.AllowPageLoads();
-
     Slide.Completed(this._id, this.NumberOfSlides() - 1).WithCallback((response) => {
       if (response.Error != null) Notification.Error(`Failed to complete experiment: ${response.Error.Message}`);
-    });
 
-    this.IsExperimentCompleted(true);
+      Portal.AllowPageLoads();
+      this.IsExperimentCompleted(true);
+    });
   }
 
   public Load(id: string): void {
