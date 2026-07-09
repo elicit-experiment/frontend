@@ -94,6 +94,8 @@ interface CalibrationPoint {
 
 type Calibration = {
   calibrationPoints: CalibrationPoint;
+  videoWidth?: number;
+  videoHeight?: number;
 };
 
 enum CALIBRATION_STATE {
@@ -467,7 +469,11 @@ class FaceLandmarkCalibration extends QuestionBase<Calibration> {
 
     this.CanAnswer(true);
 
-    this.Answer({ calibrationPoints: this.CalibrationPoints });
+    this.Answer({
+      calibrationPoints: this.CalibrationPoints,
+      videoWidth: getFaceLandmarkerManager().videoWidth,
+      videoHeight: getFaceLandmarkerManager().videoHeight,
+    });
 
     this.showSlideShellNavigationElements();
 

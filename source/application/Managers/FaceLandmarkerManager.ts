@@ -97,6 +97,8 @@ class FaceLandmarkerManager extends DisposableComponent {
 
   public videoAspectRatio: number | null = null;
   public webcamFrameRate: number | null = null;
+  public videoWidth: number | null = null;
+  public videoHeight: number | null = null;
   private landmarkerMonitorViewModel: FaceLandmarkStatsMonitor;
   private debugMode = false;
 
@@ -299,6 +301,8 @@ class FaceLandmarkerManager extends DisposableComponent {
           video_aspect_ratio: this.videoAspectRatio,
           webcam_frame_rate: this.webcamFrameRate,
           clock_skew_ms: differenceMs,
+          video_width: this.videoWidth,
+          video_height: this.videoHeight,
         }
       : {};
     const dataPoint = {
