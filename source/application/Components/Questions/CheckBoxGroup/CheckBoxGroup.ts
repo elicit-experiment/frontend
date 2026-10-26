@@ -22,6 +22,8 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
   constructor(question: QuestionModel) {
     super(question);
 
+    const restoredSelections = this.HasAnswer() ? this.GetAnswer().Selections : undefined;
+
     this.FeedbackCorrect(this.GetInstrument('FeedbackCorrect'));
     this.FeedbackIncorrect(this.GetInstrument('FeedbackIncorrect'));
 
@@ -58,17 +60,14 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
       );
     });
 
-    if (this.HasAnswer()) {
-      if (this.GetAnswer()['Selections']) this.Answer.push.apply(this.Answer, this.GetAnswer().Selections);
-    } else this.SetAnswer({ Selections: [], Correct: false });
+    // Persist untouched defaults without recording a synthetic mouse interaction.
+    // A restored empty selection is intentional and replaces every default.
+    this.Answer(restoredSelections === undefined ? this.Answer().slice() : restoredSelections.slice());
+    this.UpdateSelection(this.Answer().slice());
 
     this.Answer.subscribe((selectedIds) => {
       this.AddEvent('Change', 'Mouse/Left/Down', selectedIds.join(','));
-      this.ItemCorrectness = this.Items.map((item) =>
-        selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
-      );
-
-      this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
+      this.UpdateSelection(selectedIds);
     });
 
     const superClassItemCssClass = this.ItemCssClass;
@@ -88,6 +87,13 @@ class CheckBoxGroup extends MultiselectQuestionBase<AnswerType> {
 
   public AddEvent(eventType: string, method = 'None', data = 'None'): void {
     super.AddRawEvent(eventType, 'CheckBoxGroup', 'Instrument', method, data);
+  }
+
+  private UpdateSelection(selectedIds: string[]): void {
+    this.ItemCorrectness = this.Items.map((item) =>
+      selectedIds.indexOf(item.Id) !== -1 ? item.Correct : !item.Correct,
+    );
+    this.SetAnswer({ Selections: selectedIds, Correct: this.ItemCorrectness.reduce((a, b) => a && b, true) });
   }
 
   private CreateItemInfo(item: Item): ItemInfo {

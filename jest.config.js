@@ -2,9 +2,9 @@
 const path = require('path');
 module.exports = {
   testEnvironment: 'node',
-  module: 'es2020',
   preset: 'ts-jest',
   transform: {
+    '^.+\\.html$': '<rootDir>/test/html-transformer.js',
     '^.+.tsx?$': [
       'ts-jest',
       {
@@ -27,6 +27,8 @@ module.exports = {
     '^Managers(.*)': '<rootDir>/source/application/Managers/$1',
     '^Source(.*)': '<rootDir>/source/$1',
     '^Components(.*)': '<rootDir>/source/application/Components$1',
+    '^Models/(.*)$': '<rootDir>/source/application/Models/$1',
+    '^KnockoutBindings/(.*)$': '<rootDir>/source/application/KnockoutBindings/$1',
     PortalClient: '<rootDir>/dependencies/PortalClient/PortalClient.min.js',
   },
 };
