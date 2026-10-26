@@ -102,6 +102,12 @@ npm run serve_static
 - Use `beforeEach()`/`afterEach()` for setup/teardown
 - Mock timers with `jest.useFakeTimers()` when testing time-dependent code
 - Tests are excluded from TypeScript compilation (`**/*.spec.ts`)
+- Import Jest APIs from `@jest/globals` in new TypeScript tests (the application
+  tsconfig does not include global Jest types). Use `.spec.ts` for new tests until
+  M1 aligns application/test TypeScript configuration for both filename patterns.
+- HTML imports in Jest preserve template source through `test/html-transformer.js`.
+- Project browser smoke orchestration lives in the API repository at `test/e2e/`;
+  run `bin/test-e2e smoke` from the API root after installing its prerequisites.
 
 ### File Organization
 
